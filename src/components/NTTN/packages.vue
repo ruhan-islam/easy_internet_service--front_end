@@ -199,7 +199,7 @@
         </div>
       </v-row>
 
-      <v-row justify="center">
+      <v-row v-if="currPkgIdx != -1" justify="center">
         <v-dialog v-model="dialog2" persistent max-width="80%">
           <v-card>
             <v-card-title class="text-h5">
@@ -207,8 +207,9 @@
             </v-card-title>
 
             <v-card-text>
-              name: {{ this.allPkgs[currPkgIdx].name }} <br />
-              bandwidth: {{ this.allPkgs[currPkgIdx].bandwidth }} GBPS <br />
+              object: {{ allPkgs[currPkgIdx] }} <br />
+              name: {{ allPkgs[currPkgIdx].name }} <br />
+              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} GBPS <br />
             </v-card-text>
 
             <v-card-actions>
@@ -235,10 +236,10 @@ export default {
 
   data() {
     return {
+      valid: false,
       dialog: false,
       dialog2: false,
-      valid: false,
-      messages: 0,
+      currPkgIdx: -1,
 
       areas: [],
       areaList: [
@@ -303,7 +304,6 @@ export default {
       dummyPkg: "",
 
       nameList: [],
-      currPkgIdx: -1,
     };
   },
 
@@ -346,7 +346,6 @@ export default {
         for (let i in this.pkgs) {
           this.nameList.push(this.allPkgs[i].name);
         }
-        // console.log(this.nameList);
       })
       .catch((err) => {
         console.log(err);
@@ -361,7 +360,7 @@ export default {
     },
     reset() {
       this.$refs.form.reset();
-      console.log(this.nameList);
+      // console.log(this.nameList);
     },
     submit() {
       // console.log("submit pressed");
@@ -381,7 +380,6 @@ export default {
           areas: this.areas,
         })
         .then((res) => {
-          // console.log(res);
           if (res.status === 201) {
             this.dialog = false;
             axios
@@ -389,7 +387,6 @@ export default {
                 packageCreator: "Nttn",
               })
               .then((ress) => {
-                // console.log(ress.data.data);
                 this.allPkgs = ress.data.data;
                 this.pkgs = this.allPkgs;
                 this.nameList = [];
@@ -408,12 +405,6 @@ export default {
           console.log(err);
         });
     },
-    // validate() {
-    //   this.$refs.form.validate();
-    // },
-    // resetValidation() {
-    //   this.$refs.form.resetValidation();
-    // },
   },
 };
 </script>
