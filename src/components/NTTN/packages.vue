@@ -9,14 +9,7 @@
       <v-row justify="center">
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              mb-5
-              @click="page = 1"
-              color="primary"
-              dark
-              v-bind="attrs"
-              v-on="on"
-            >
+            <v-btn mb-5 color="primary" dark v-bind="attrs" v-on="on">
               Create new package
             </v-btn>
           </template>
@@ -174,36 +167,57 @@
         <div class="col-lg-4" v-for="(pkg, i) in pkgs" :key="i">
           <v-badge :content="0" :value="0" color="red" overlap icon="mdi-home">
             <v-card>
-              <v-img
-                @click="clickOnImg(i)"
-                height="250"
-                src="./../../assets/images.jpg"
-              ></v-img>
+              <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
-              <v-card-title> {{ packageName }} </v-card-title>
+              <v-card-title> {{ pkg.name }} </v-card-title>
 
               <v-card-text>
-                <div class="my-4 text-subtitle-1">Taka {{ price }}</div>
+                <div class="my-4 text-subtitle-1">Taka {{ pkg.price }}</div>
                 <div>
-                  {{ bandwidth }} GBPS speed relentless speed of unlimited
+                  {{ pkg.bandwidth }} GBPS speed relentless speed of unlimited
                   traffic with 24/7 service.
                 </div>
               </v-card-text>
 
               <v-card-actions>
-                <v-btn color="deep-purple lighten-2" text>
+                <v-btn
+                  color="deep-purple lighten-2"
+                  @click="detailsPressed(i)"
+                  text
+                >
                   Details
                 </v-btn>
                 <v-btn color="deep-purple lighten-2" text>
                   Mark
                 </v-btn>
                 <v-btn color="deep-purple lighten-2" text>
-                  Delete
+                  Disable
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-badge>
         </div>
+      </v-row>
+
+      <v-row justify="center">
+        <v-dialog v-model="dialog2" persistent max-width="80%">
+          <v-card>
+            <v-card-title class="text-h5">
+              {{ nameList[currPkgIdx] }}
+            </v-card-title>
+
+            <v-card-text>
+              name: {{ this.allPkgs[currPkgIdx].name }} <br />
+              bandwidth: {{ this.allPkgs[currPkgIdx].bandwidth }} GBPS <br />
+            </v-card-text>
+
+            <v-card-actions>
+              <v-btn color="green darken-1" text @click="dialog2 = false">
+                Cancel
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-row>
     </div>
 
@@ -222,6 +236,7 @@ export default {
   data() {
     return {
       dialog: false,
+      dialog2: false,
       valid: false,
       messages: 0,
 
@@ -237,12 +252,18 @@ export default {
         "Sylhet",
         "Rangpur",
       ],
-      areaRules: [(v) => !!v.length || "This field is required"],
+      areaRules: [
+        (v) => !!v.length || "This field is required",
+        (v) =>
+          !(v.length > 1 && this.areas.includes(this.areaList[0])) ||
+          "Invalid combination",
+      ],
 
       packageName: "",
       nameLen: 20,
       nameRules: [
         (v) => !!v || "Name is required",
+        (v) => !this.nameList.includes(v.trim()) || "Name already in use",
         (v) =>
           (v && v.length <= this.nameLen) ||
           `Name must be less than ${this.nameLen} characters`,
@@ -281,7 +302,8 @@ export default {
       pkgs: [],
       dummyPkg: "",
 
-      markPkg: [],
+      nameList: [],
+      currPkgIdx: -1,
     };
   },
 
@@ -314,14 +336,17 @@ export default {
 
   created() {
     axios
-      .get("/api/package/fetch")
+      .post("/api/package/fetchByQuery", {
+        packageCreator: "Nttn",
+      })
       .then((res) => {
         this.allPkgs = res.data.data;
         this.pkgs = this.allPkgs;
-        for (let pkg of this.pkgs) {
-          this.markPkg.push(1);
-          this.dummyPkg = pkg;
+        this.nameList = [];
+        for (let i in this.pkgs) {
+          this.nameList.push(this.allPkgs[i].name);
         }
+        // console.log(this.nameList);
       })
       .catch((err) => {
         console.log(err);
@@ -329,13 +354,14 @@ export default {
   },
 
   methods: {
-    clickOnImg(i) {
-      this.markPkg[i] = 1 - this.markPkg[i];
-      this.currI = i;
-      console.log(this.markPkg[i]);
+    detailsPressed(i) {
+      this.currPkgIdx = i;
+      this.dialog2 = true;
+      console.log(this.currPkgIdx);
     },
     reset() {
       this.$refs.form.reset();
+      console.log(this.nameList);
     },
     submit() {
       // console.log("submit pressed");
@@ -358,6 +384,22 @@ export default {
           // console.log(res);
           if (res.status === 201) {
             this.dialog = false;
+            axios
+              .post("/api/package/fetchByQuery", {
+                packageCreator: "Nttn",
+              })
+              .then((ress) => {
+                // console.log(ress.data.data);
+                this.allPkgs = ress.data.data;
+                this.pkgs = this.allPkgs;
+                this.nameList = [];
+                for (let pkg in this.pkgs) {
+                  this.nameList.push(pkg.name);
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           } else {
             this.error = true;
           }

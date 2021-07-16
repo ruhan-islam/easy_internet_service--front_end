@@ -6,13 +6,13 @@ import VueRouter from "vue-router";
 // import bkashProceed3 from "../components/bkashProceed4.vue";
 // import comparedPkgs from "../components/comparedPkgs";
 // import home from "../components/home";
-import login from "../components/login";
 // import notifications from "../components/notifications";
+import login from "../components/login";
+import NTTN_dashboard from "../components/NTTN/dashboard";
 import NTTN_home from "../components/NTTN/home";
 import NTTN_notifications from "../components/NTTN/notifications";
 import NTTN_packages from "../components/NTTN/packages";
 import NTTN_payments from "../components/NTTN/payments";
-import NTTN_profile from "../components/NTTN/profile";
 // import payDone from "../components/payDone";
 // import payment from "../components/payment";
 // import payMethods from "../components/payMethods";
@@ -59,9 +59,9 @@ const routes = [
     component: NTTN_notifications,
   },
   {
-    name: "NTTN_profile",
-    path: "/NTTN/profile",
-    component: NTTN_profile,
+    name: "NTTN_dashboard",
+    path: "/NTTN/dashboard",
+    component: NTTN_dashboard,
   },
   // {
   //   name: "profile",

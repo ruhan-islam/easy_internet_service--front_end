@@ -69,7 +69,13 @@
       </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/NTTN/profile" exact>
+          <v-btn
+            v-bind="attrs"
+            v-on="on"
+            router-link
+            to="/NTTN/dashboard"
+            exact
+          >
             <span> Dashboard </span>
             <v-icon> mdi-widgets </v-icon>
           </v-btn>
