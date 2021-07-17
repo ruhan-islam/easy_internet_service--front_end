@@ -914,6 +914,10 @@ export default {
         // this.bwMax = maxBW;
         // this.dMin = minDuration;
         // this.dMax = maxDuration;
+        // this.pkgs.sort(this.compareByPrice);
+        // this.pkgs.sort(this.compareByBandwidth);
+        // this.pkgs.sort(this.compareByDuration);
+        this.pkgs.sort(this.compareByName);
       })
       .catch((err) => {
         console.log(err);
@@ -921,6 +925,46 @@ export default {
   },
 
   methods: {
+    compareByName(a, b) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+        return -1;
+      }
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+        return 1;
+      }
+      return 0;
+    },
+
+    compareByPrice(a, b) {
+      if (a.price < b.price) {
+        return -1;
+      }
+      if (a.price > b.price) {
+        return 1;
+      }
+      return 0;
+    },
+
+    compareByBandwidth(a, b) {
+      if (a.bandwidth < b.bandwidth) {
+        return -1;
+      }
+      if (a.bandwidth > b.bandwidth) {
+        return 1;
+      }
+      return 0;
+    },
+
+    compareByDuration(a, b) {
+      if (a.duration < b.duration) {
+        return -1;
+      }
+      if (a.duration > b.duration) {
+        return 1;
+      }
+      return 0;
+    },
+
     getToday() {
       let today = new Date();
       today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
