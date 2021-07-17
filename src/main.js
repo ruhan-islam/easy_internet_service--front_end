@@ -9,7 +9,7 @@ import store from './store';
 //export const eventBus = new Vue(); 
 Vue.config.productionTip = false
 
-axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.baseURL = 'https://amader-internet.herokuapp.com/';
 
 new Vue({
   vuetify,

@@ -33,23 +33,27 @@
               <v-divider></v-divider>
 
               <v-list nav dense>
-                <v-list-item link @click="pageInfo = 'offers'">
+                <v-list-item link @click="showOffers">
                   <v-list-item-icon>
-                    <v-icon>mdi-folder</v-icon>
+                    <v-icon color="isInOffer ? 'green' : 'red'">
+                      mdi-folder
+                    </v-icon>
                   </v-list-item-icon>
                   <v-list-item-title>
                     Offers
                   </v-list-item-title>
                 </v-list-item>
+
                 <v-list-item link @click="pageInfo = 'tickets'">
                   <v-list-item-icon>
-                    <v-icon>mdi-account-multiple</v-icon>
+                    <v-icon color="getColor"> mdi-account-multiple </v-icon>
                   </v-list-item-icon>
                   <v-list-item-title> Tickets </v-list-item-title>
                 </v-list-item>
+
                 <v-list-item link @click="pageInfo = 'stats'">
                   <v-list-item-icon>
-                    <v-icon>mdi-star</v-icon>
+                    <v-icon color="getColor"> mdi-star </v-icon>
                   </v-list-item-icon>
                   <v-list-item-title> Statistics </v-list-item-title>
                 </v-list-item>
@@ -58,12 +62,12 @@
           </v-card>
         </v-col>
 
-        <v-col class="mt-5" cols="10" v-show="pageInfo === 'offers'">
+        <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'offers'">
           <v-row justify="center">
             <v-dialog v-model="dialog" persistent max-width="80%">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
-                  max-width="90%"
+                  max-width="95%"
                   color="primary"
                   dark
                   v-bind="attrs"
@@ -186,8 +190,11 @@
                   <v-card-title> {{ offer.name }} </v-card-title>
 
                   <v-card-text>
-                    <div class="my-4 text-subtitle-1">
-                      {{ offer.reducePrice }}
+                    <div class="text-subtitle-1">
+                      Reduction: {{ offer.reduction }}% <br />
+                      {{ offer.startTime.slice(0, 10) }} to
+                      {{ offer.expirationTime.slice(0, 10) }} <br />
+                      status: {{ offer.status ? "Active" : "Disabled" }}
                     </div>
                   </v-card-text>
 
@@ -212,8 +219,10 @@
           </v-row>
         </v-col>
 
-        <v-col class="mt-5" cols="10" v-show="pageInfo === 'tickets'"> </v-col>
-        <v-col class="mt-5" cols="10" v-show="pageInfo === 'stats'"> </v-col>
+        <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'tickets'">
+        </v-col>
+        <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'stats'">
+        </v-col>
       </v-row>
     </div>
 
@@ -277,6 +286,21 @@ export default {
   },
 
   computed: {
+    isInOffer() {
+      return this.pageInfo === "offers";
+    },
+    // getColor() {
+    //   switch (this.pageInfo) {
+    //     case "offers":
+    //       return "primary";
+    //     case "tickets":
+    //       return "primary";
+    //     case "stats":
+    //       return "primary";
+    //     default:
+    //       return "";
+    //   }
+    // },
     dateRangeText() {
       return this.dates.join(" ~ ");
     },
@@ -290,33 +314,42 @@ export default {
   },
 
   methods: {
+    showOffers() {
+      this.pageInfo = "offers";
+    },
+
     resetPressed() {
       this.$refs.form.reset();
       this.dates = [];
     },
+
     submitPressed() {
       console.log("submit pressed");
 
-      // let newOffer = {
-      //   name:this.offerName,
-      //   reduction: this.reduction,
-      //   startDate: this.dates[0],
-      //   endDate: this.dates[1],
-      //   // minPrice: this.minPrice,
-      // };
-      // axios
-      // .get("/api/offer/fetch")
-      // .then((res) => {
-      //   this.allOffers = res.data.Data.data;
-      //   // console.log(this.allOffers);
-      //   this.nameList = [];
-      //   for (let i in this.allOffers) {
-      //     this.nameList.push(this.allOffers[i].name);
-      //   }
-      // })
-      // .catch((err) => {
-      //   console.log(err);
-      // });
+      let newOffer = {
+        name: this.offerName,
+        status: true,
+        reduction: this.reduction,
+        startTime: this.dates[0],
+        expirationTime: this.dates[1],
+        // minPrice: this.minPrice,
+      };
+
+      axios
+        .post("/api/offer/insert", newOffer)
+        .then((res) => {
+          if (res.status === 201) {
+            this.allOffers.push(newOffer);
+            // console.log(this.allOffers);
+            this.nameList = [];
+            this.nameList.push(newOffer.name);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
       this.dialog = false;
     },
