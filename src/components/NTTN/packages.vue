@@ -528,7 +528,14 @@
               </v-card-title>
 
               <v-card-text>
-                <div class="my-4 text-subtitle-1">Taka {{ pkg.price }}</div>
+                <div class="my-4 text-subtitle-1">
+                  Taka
+                  <span v-if="pkg.offerId === '-1'"> {{ pkg.price }} </span>
+                  <strike v-if="pkg.offerId !== '-1'"> {{ pkg.price }} </strike>
+                  <span v-if="pkg.offerId !== '-1'">
+                    &nbsp; {{ calculateReducedPrice(pkg.price, pkg.offerId) }}
+                  </span>
+                </div>
                 <v-chip-group
                   active-class="deep-purple accent-4 white--text"
                   column
@@ -550,14 +557,16 @@
                 >
                   Details
                 </v-btn>
+
                 <v-btn
                   @click="toggleOfferPressed(i)"
                   color="deep-purple lighten-2"
                   text
                 >
                   <span v-if="pkg.offerId === '-1'"> Add Offer </span>
-                  <span v-else> Remove Offer </span>
+                  <span v-if="pkg.offerId !== '-1'"> Remove Offer </span>
                 </v-btn>
+
                 <v-btn
                   @click="toggleStatusPressed(i)"
                   color="deep-purple lighten-2"
@@ -667,7 +676,7 @@
               <!-- :label="`Radio ${n}`" -->
               <v-radio-group mandatory v-model="selectedOffer">
                 <v-radio
-                  v-for="(offer, i) in allOffers"
+                  v-for="(offer, i) in validOffers"
                   :key="i"
                   :label="
                     `${offer.name} - ${
@@ -804,6 +813,7 @@ export default {
       pkgNameList: [],
 
       allOffers: [],
+      validOffers: [],
 
       filterPrice: [0, 1000000],
       filterBW: [0, 200],
@@ -850,7 +860,15 @@ export default {
       .get("/api/offer/fetch")
       .then((res) => {
         this.allOffers = res.data.Data.data;
-        console.log(this.allOffers);
+        // console.log(this.allOffers);
+        this.validOffers = [];
+        for (let i in this.allOffers) {
+          if (
+            this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
+          ) {
+            this.validOffers.push(this.allOffers[i]);
+          }
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -903,6 +921,26 @@ export default {
   },
 
   methods: {
+    getToday() {
+      let today = new Date();
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      return today.toISOString().slice(0, 10);
+    },
+
+    calculateReducedPrice(price, offerId) {
+      let percentage = 0;
+      if (offerId === "-1") {
+        return;
+      }
+      for (let i in this.allOffers) {
+        if (this.allOffers[i]._id === offerId) {
+          percentage = this.allOffers[i].reduction;
+          break;
+        }
+      }
+      return price - (price * percentage) / 100.0;
+    },
+
     offerConfirmPressed() {
       console.log(this.selectedOffer);
       this.dialog3 = false;
@@ -929,8 +967,31 @@ export default {
 
     toggleOfferPressed(i) {
       this.currPkgIdx = i;
-      this.dialog3 = true;
-      console.log(this.currPkgIdx);
+      // console.log(this.currPkgIdx);
+      if (this.allPkgs[i].offerId === "-1") {
+        this.dialog3 = true;
+      } else {
+        this.selectedOffer = "-1";
+        axios
+          .post("/api/package/addOffer", {
+            name: this.pkgs[this.currPkgIdx].name,
+            packageCreator: "Nttn",
+            offerId: this.selectedOffer,
+          })
+          .then((res) => {
+            console.log(res);
+            if (res.status === 200) {
+              this.pkgs[this.currPkgIdx].offerId = this.selectedOffer;
+              this.currPkgIdx = -1;
+              this.selectedOffer = "";
+            } else {
+              this.error = true;
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     },
 
     toggleStatusPressed(i) {

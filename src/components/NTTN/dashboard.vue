@@ -187,7 +187,7 @@
                             </template>
                             <v-date-picker
                               v-model="dates"
-                              :min="today"
+                              :min="getToday"
                               @input="menu = dates.length === 2 ? false : true"
                               year-icon="mdi-calendar-blank"
                               prev-icon="mdi-skip-previous"
@@ -335,7 +335,6 @@ export default {
       allOffers: [],
 
       menu: "",
-      today: new Date().toISOString().slice(0, 10),
       dates: [],
       dateRules: [
         (v) => !!v || "Date is required",
@@ -361,6 +360,12 @@ export default {
   },
 
   computed: {
+    getToday() {
+      let today = new Date();
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      return today.toISOString().slice(0, 10);
+    },
+
     isInOffer() {
       return this.pageInfo === "offers";
     },
