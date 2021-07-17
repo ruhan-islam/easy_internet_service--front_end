@@ -6,6 +6,7 @@
       <!-- contents here  -->
 
       <!-- adding new package  -->
+
       <v-row justify="center">
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
@@ -142,7 +143,7 @@
                 :disabled="isResetDisabled"
                 color="error"
                 class="mr-4"
-                @click="reset"
+                @click="resetPressed"
               >
                 Reset
               </v-btn>
@@ -151,7 +152,7 @@
                 :disabled="isSubmitDisabled"
                 color="success"
                 class="mr-4"
-                @click="submit"
+                @click="submitPressed"
               >
                 Confirm
               </v-btn>
@@ -161,6 +162,49 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+      </v-row>
+
+      <v-row class="ma-10" justify="center">
+        <div class="row filterDiv">
+          <div class="col-lg-3">
+            <v-range-slider
+              v-model="filterPrice"
+              label="Price (Taka)"
+              min="0"
+              max="1000000"
+              step="1000"
+            >
+            </v-range-slider>
+            <label>{{ filterPrice }}</label>
+          </div>
+
+          <div class="col-lg-3">
+            <v-range-slider
+              v-model="filterBW"
+              label="Bandwidth (GBPS)"
+              min="0"
+              max="100"
+            >
+            </v-range-slider>
+            <label>{{ filterBW }}</label>
+          </div>
+
+          <div class="col-lg-3">
+            <v-range-slider
+              v-model="filterDuration"
+              label="Duration (Months)"
+              min="0"
+              max="24"
+            >
+            </v-range-slider>
+            <label>{{ filterDuration }}</label>
+          </div>
+          <div class="col-lg-3">
+            <v-btn depressed color="primary" @click="doFilter">
+              Filter
+            </v-btn>
+          </div>
+        </div>
       </v-row>
 
       <v-row>
@@ -304,6 +348,17 @@ export default {
       dummyPkg: "",
 
       nameList: [],
+
+      filterPrice: [0, 1000000],
+      filterBW: [0, 200],
+      filterDuration: [0, 24],
+
+      pMin: "",
+      pMax: "",
+      bwMin: "",
+      bwMax: "",
+      dMin: "",
+      dMax: "",
     };
   },
 
@@ -343,9 +398,39 @@ export default {
         this.allPkgs = res.data.data;
         this.pkgs = this.allPkgs;
         this.nameList = [];
+
+        // let minPrice = Infinity;
+        // let maxPrice = -1;
+        // let minBW = Infinity;
+        // let maxBW = -1;
+        // let minDuration = Infinity;
+        // let maxDuration = -1;
+
         for (let i in this.pkgs) {
           this.nameList.push(this.allPkgs[i].name);
+
+          // if (this.allPkgs[i].price < minPrice)
+          //   minPrice = this.allPkgs[i].price;
+          // if (this.allPkgs[i].price > maxPrice)
+          //   maxPrice = this.allPkgs[i].price;
+          // if (this.allPkgs[i].bandwidth < minBW)
+          //   minBW = this.allPkgs[i].bandwidth;
+          // if (this.allPkgs[i].bandwidth > maxBW)
+          //   maxBW = this.allPkgs[i].bandwidth;
+          // if (this.allPkgs[i].duration < minDuration)
+          //   minDuration = this.allPkgs[i].duration;
+          // if (this.allPkgs[i].duration > maxDuration)
+          //   maxDuration = this.allPkgs[i].duration;
         }
+
+        // this.pMin = minPrice;
+        // this.pMax = maxPrice;
+        // this.filterPrice.push(minPrice);
+        // this.filterPrice.push(maxPrice);
+        // this.bwMin = minBW;
+        // this.bwMax = maxBW;
+        // this.dMin = minDuration;
+        // this.dMax = maxDuration;
       })
       .catch((err) => {
         console.log(err);
@@ -358,45 +443,37 @@ export default {
       this.dialog2 = true;
       console.log(this.currPkgIdx);
     },
-    reset() {
+
+    resetPressed() {
       this.$refs.form.reset();
       // console.log(this.nameList);
     },
-    submit() {
+
+    submitPressed() {
       // console.log("submit pressed");
+      let newPkg = {
+        name: this.packageName,
+        package_type: 0,
+        bandwidth: this.bandwidth,
+        up_speed: this.upSpeed,
+        down_speed: this.downSpeed,
+        duration: this.duration,
+        price: this.price,
+        ongoing: true,
+        isRealIp: true,
+        downTime: this.downtime,
+        responseTime: this.responseTime,
+        areas: this.areas,
+      };
       axios
-        .post("/api/package/insert", {
-          name: this.packageName,
-          package_type: 0,
-          bandwidth: this.bandwidth,
-          up_speed: this.upSpeed,
-          down_speed: this.downSpeed,
-          duration: this.duration,
-          price: this.price,
-          ongoing: true,
-          isRealIp: true,
-          downTime: this.downtime,
-          responseTime: this.responseTime,
-          areas: this.areas,
-        })
+        .post("/api/package/insert", newPkg)
         .then((res) => {
           if (res.status === 201) {
             this.dialog = false;
-            axios
-              .post("/api/package/fetchByQuery", {
-                packageCreator: "Nttn",
-              })
-              .then((ress) => {
-                this.allPkgs = ress.data.data;
-                this.pkgs = this.allPkgs;
-                this.nameList = [];
-                for (let pkg in this.pkgs) {
-                  this.nameList.push(pkg.name);
-                }
-              })
-              .catch((err) => {
-                console.log(err);
-              });
+
+            this.allPkgs.push(newPkg);
+            this.pkgs = this.allPkgs;
+            this.nameList.push(newPkg.name);
           } else {
             this.error = true;
           }
@@ -404,6 +481,50 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+    },
+
+    doFilter() {
+      let minPrice =
+        this.filterPrice[0] < this.filterPrice[1]
+          ? this.filterPrice[0]
+          : this.filterPrice[1];
+      let maxPrice =
+        this.filterPrice[0] > this.filterPrice[1]
+          ? this.filterPrice[0]
+          : this.filterPrice[1];
+
+      let minBandwidth =
+        this.filterBW[0] < this.filterBW[1]
+          ? this.filterBW[0]
+          : this.filterBW[1];
+      let maxBandwidth =
+        this.filterBW[0] > this.filterBW[1]
+          ? this.filterBW[0]
+          : this.filterBW[1];
+
+      let minDuration =
+        this.filterDuration[0] < this.filterDuration[1]
+          ? this.filterDuration[0]
+          : this.filterDuration[1];
+      let maxDuration =
+        this.filterDuration[0] > this.filterDuration[1]
+          ? this.filterDuration[0]
+          : this.filterDuration[1];
+
+      this.pkgs = [];
+      console.log(minPrice, maxPrice);
+      for (let pkg in this.allPkgs) {
+        if (
+          this.allPkgs[pkg].price >= minPrice &&
+          this.allPkgs[pkg].price <= maxPrice &&
+          this.allPkgs[pkg].bandwidth >= minBandwidth &&
+          this.allPkgs[pkg].bandwidth <= maxBandwidth &&
+          this.allPkgs[pkg].duration >= minDuration &&
+          this.allPkgs[pkg].duration <= maxDuration
+        ) {
+          this.pkgs.push(this.allPkgs[pkg]);
+        }
+      }
     },
   },
 };

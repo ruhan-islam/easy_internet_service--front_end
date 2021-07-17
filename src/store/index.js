@@ -9,11 +9,11 @@ export default new Vuex.Store({
     state: {
         // baseUrl: 'https://mindshare-backend.df.r.appspot.com',
         baseUrl: '',
+        authToken: '',
         userName: '',
         userEmail: '',
-        authToken: '',
+        
         loggedIn: false,
-        templateCampaign: [],
         selectedPackage: '',
         currentPage: 'home',
         selPkgName: '',

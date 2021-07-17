@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-bottom-navigation dark shift>
+    <v-bottom-navigation color="teal" grow dark shift>
       <!-- <v-btn router-link to="/NTTN" exact>
         <span>Home</span>
         <v-icon>mdi-home</v-icon>
@@ -105,7 +105,9 @@ import axios from "axios";
 import { mapGetters, mapMutations } from "vuex";
 
 export default {
-  // data: () => ({ value: -1 }),
+  data() {
+    return {};
+  },
 
   computed: {
     ...mapGetters(["isLoggedIn", "getAuthToken"]),
