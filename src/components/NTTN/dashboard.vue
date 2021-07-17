@@ -77,100 +77,156 @@
                 </v-btn>
               </template>
 
-              <v-card>
-                <v-card-title class="text-h5">
-                  Offer Creation Wizard
-                </v-card-title>
-
-                <v-card-text>
-                  <template>
-                    <v-form ref="form" v-model="valid" lazy-validation>
-                      <v-row>
-                        <v-col>
-                          <v-row class="ma-12">
-                            <v-text-field
-                              v-model="offerName"
-                              :counter="nameLen"
-                              :rules="nameRules"
-                              label="Offer Name"
-                              required
-                            ></v-text-field>
+              <v-card style="padding: 30px">
+                <h2>New Offer</h2>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-expansion-panels>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header>
+                        <template v-slot:default="{ open }">
+                          <v-row no-gutters>
+                            <v-col cols="4"> Offer Name </v-col>
+                            <v-col cols="8" class="text--secondary">
+                              <v-fade-transition leave-absolute>
+                                <span v-if="open" key="0">
+                                  Enter the name of the offer
+                                </span>
+                                <span v-else key="1">
+                                  {{ offerName }}
+                                </span>
+                              </v-fade-transition>
+                            </v-col>
                           </v-row>
-                          <v-row class="ma-12">
-                            <v-slider
-                              v-model="reduction"
-                              :min="1"
-                              :max="100"
-                              label="Reduction (%)"
-                              thumb-label="always"
-                            >
-                            </v-slider>
+                        </template>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content>
+                        <v-text-field
+                          placeholder="e.g. Super_cheap"
+                          v-model="offerName"
+                          :counter="nameLen"
+                          :rules="nameRules"
+                          label="Offer Name"
+                          required
+                        ></v-text-field>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+
+                    <v-expansion-panel>
+                      <v-expansion-panel-header>
+                        <template v-slot:default="{ open }">
+                          <v-row no-gutters>
+                            <v-col cols="4"> Reduction(%) </v-col>
+                            <v-col cols="8" class="text--secondary">
+                              <v-fade-transition leave-absolute>
+                                <span v-if="open" key="0">
+                                  Enter the reduced percentage
+                                </span>
+                                <span v-else key="1">
+                                  {{ reduction }}
+                                </span>
+                              </v-fade-transition>
+                            </v-col>
                           </v-row>
-                        </v-col>
+                        </template>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content>
+                        <v-slider
+                          v-model="reduction"
+                          :min="1"
+                          :max="100"
+                          label="Reduction (%)"
+                          thumb-label="always"
+                        >
+                        </v-slider>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
 
-                        <v-col>
-                          <v-row>
-                            <v-menu
-                              v-model="menu"
-                              :close-on-content-click="false"
-                              :close-on-click="false"
-                              :nudge-right="40"
-                              transition="scale-transition"
-                              offset-y
-                              min-width="auto"
-                            >
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-text-field
-                                  v-model="dateRangeText"
-                                  label="Date range"
-                                  prepend-icon="mdi-calendar"
-                                  readonly
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  :rules="dateRules"
-                                ></v-text-field>
-                              </template>
-                              <v-date-picker
-                                v-model="dates"
-                                :min="today"
-                                @input="
-                                  menu = dates.length === 2 ? false : true
-                                "
-                                year-icon="mdi-calendar-blank"
-                                prev-icon="mdi-skip-previous"
-                                next-icon="mdi-skip-next"
-                                range
-                              ></v-date-picker>
-                            </v-menu>
-                          </v-row>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </template>
-                </v-card-text>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header v-slot="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4"> Start and end dates </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open"
+                                >When do you want to start the offer?</span
+                              >
+                              <v-row v-else no-gutters style="width: 100%">
+                                <v-col cols="6">
+                                  Start date: {{ dates[0] || "Not set" }}
+                                </v-col>
+                                <v-col cols="6">
+                                  End date: {{ dates[1] || "Not set" }}
+                                </v-col>
+                              </v-row>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </v-expansion-panel-header>
 
-                <v-card-actions>
-                  <v-btn
-                    :disabled="isResetDisabled"
-                    color="error"
-                    class="mr-4"
-                    @click="resetPressed"
-                  >
-                    Reset
-                  </v-btn>
+                      <v-expansion-panel-content>
+                        <v-row>
+                          <v-menu
+                            v-model="menu"
+                            :close-on-content-click="false"
+                            :close-on-click="false"
+                            :nudge-right="40"
+                            transition="scale-transition"
+                            offset-y
+                            min-width="auto"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                v-model="dateRangeText"
+                                label="Date range"
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                                :rules="dateRules"
+                              ></v-text-field>
+                            </template>
+                            <v-date-picker
+                              v-model="dates"
+                              :min="today"
+                              @input="menu = dates.length === 2 ? false : true"
+                              year-icon="mdi-calendar-blank"
+                              prev-icon="mdi-skip-previous"
+                              next-icon="mdi-skip-next"
+                              range
+                            ></v-date-picker>
+                          </v-menu>
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
 
-                  <v-btn
-                    :disabled="isSubmitDisabled"
-                    color="success"
-                    class="mr-4"
-                    @click="submitPressed"
-                  >
-                    Confirm
-                  </v-btn>
-                  <v-btn color="green darken-1" text @click="dialog = false">
-                    Cancel
-                  </v-btn>
-                </v-card-actions>
+                    <v-card-actions>
+                      <v-btn
+                        :disabled="isResetDisabled"
+                        color="error"
+                        class="mr-4"
+                        @click="resetPressed"
+                      >
+                        Reset
+                      </v-btn>
+
+                      <v-btn
+                        :disabled="isSubmitDisabled"
+                        color="success"
+                        class="mr-4"
+                        @click="submitPressed"
+                      >
+                        Confirm
+                      </v-btn>
+                      <v-btn
+                        color="green darken-1"
+                        text
+                        @click="dialog = false"
+                      >
+                        Cancel
+                      </v-btn>
+                    </v-card-actions>
+                  </v-expansion-panels>
+                </v-form>
               </v-card>
             </v-dialog>
           </v-row>
@@ -184,35 +240,53 @@
                 overlap
                 icon="mdi-home"
               >
-                <v-card>
-                  <v-img height="250" src="./../../assets/images.jpg"></v-img>
+                <v-card class="mx-auto" max-width="344">
+                  <v-img src="./../../assets/offer.jpg" height="200px"></v-img>
 
                   <v-card-title> {{ offer.name }} </v-card-title>
 
-                  <v-card-text>
-                    <div class="text-subtitle-1">
-                      Reduction: {{ offer.reduction }}% <br />
-                      {{ offer.startTime.slice(0, 10) }} to
-                      {{ offer.expirationTime.slice(0, 10) }} <br />
-                      status: {{ offer.status ? "Active" : "Disabled" }}
-                    </div>
-                  </v-card-text>
+                  <v-card-subtitle>
+                    <h2 style="color:red">{{ offer.reduction }}% off</h2>
+                  </v-card-subtitle>
 
                   <v-card-actions>
-                    <v-btn
-                      color="deep-purple lighten-2"
-                      @click="detailsPressed(i)"
-                      text
-                    >
-                      Details
-                    </v-btn>
-                    <v-btn color="deep-purple lighten-2" text>
-                      Mark
-                    </v-btn>
-                    <v-btn color="deep-purple lighten-2" text>
-                      Disable
+                    <v-btn color="orange lighten-2" text> Details </v-btn>
+
+                    <v-spacer></v-spacer>
+
+                    <v-btn icon @click="show = !show">
+                      <v-icon>{{
+                        show ? "mdi-chevron-up" : "mdi-chevron-down"
+                      }}</v-icon>
                     </v-btn>
                   </v-card-actions>
+
+                  <v-expand-transition>
+                    <div v-show="show">
+                      <v-divider></v-divider>
+
+                      <v-card-text>
+                        <v-timeline align-top dense>
+                          <v-timeline-item color="green" small>
+                            <div>
+                              <div class="font-weight-normal">
+                                <strong>Start Time</strong> @
+                                {{ offer.startTime.slice(0, 10) }}
+                              </div>
+                            </div>
+                          </v-timeline-item>
+                          <v-timeline-item color="red" small>
+                            <div>
+                              <div class="font-weight-normal">
+                                <strong>Expiry Time</strong> @
+                                {{ offer.expirationTime.slice(0, 10) }}
+                              </div>
+                            </div>
+                          </v-timeline-item>
+                        </v-timeline>
+                      </v-card-text>
+                    </div>
+                  </v-expand-transition>
                 </v-card>
               </v-badge>
             </div>
@@ -241,6 +315,7 @@ export default {
   data() {
     return {
       valid: false,
+      show: false,
 
       offerName: "",
       nameLen: 20,

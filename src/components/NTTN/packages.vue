@@ -13,18 +13,24 @@
       >
         <v-col cols="2">
           <v-btn color="deep-purple lighten-2" @click="selectallMethod" dark>
-            {{ selectallTitle }}
+            Add Offer To All
           </v-btn>
         </v-col>
-        <v-col>
-          <v-dialog v-model="dialog" persistent max-width="50%">
+
+        <v-col cols="2">
+          <v-btn color="deep-purple lighten-2" @click="selectallMethod" dark>
+            Disable All
+          </v-btn>
+        </v-col>
+        <v-col cols="3">
+          <v-dialog v-model="dialog" persistent max-width="80%">
             <template v-slot:activator="{ on, attrs }">
               <v-btn
                 color="deep-purple lighten-2"
                 dark
                 v-bind="attrs"
                 v-on="on"
-                max-width="50%"
+                max-width="100%"
               >
                 Create new package
                 <!-- color="deep-purple lighten-2"
@@ -33,35 +39,87 @@
               </v-btn>
             </template>
 
-            <v-card>
-              <v-card-title class="text-h5"> New Package </v-card-title>
+            <v-card style="padding:30px">
+              <h2>New Package</h2>
+              <v-form ref="form" v-model="valid" lazy-validation>
+                <v-expansion-panels>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      <template v-slot:default="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4"> Package Name </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open" key="0">
+                                Enter a name for new package
+                              </span>
+                              <span v-else key="1">
+                                {{ packageName }}
+                              </span>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-text-field
+                        placeholder="e.g. Ultra_premium"
+                        v-model="packageName"
+                        :counter="nameLen"
+                        :rules="nameRules"
+                        label="Package Name"
+                        required
+                      ></v-text-field>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-              <v-card-text>
-                <template>
-                  <v-form ref="form" v-model="valid" lazy-validation>
-                    <v-row>
-                      <v-col>
-                        <v-text-field
-                          v-model="packageName"
-                          :counter="nameLen"
-                          :rules="nameRules"
-                          label="Package Name"
-                          required
-                        ></v-text-field>
-                      </v-col>
-                    </v-row>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      <template v-slot:default="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4"> Price(BDT) </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open" key="0">
+                                Enter price of the package
+                              </span>
+                              <span v-else key="1">
+                                {{ price }}
+                              </span>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-text-field
+                        v-model="price"
+                        :rules="priceRules"
+                        label="Price (BDT)"
+                        required
+                      ></v-text-field>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-                    <v-row>
-                      <v-col>
-                        <v-text-field
-                          v-model="price"
-                          :rules="priceRules"
-                          label="Price (BDT)"
-                          required
-                        ></v-text-field>
-                      </v-col>
-
-                      <v-col>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header v-slot="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Coverage Area </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Select package coverage areas
+                            </span>
+                            <span v-else key="1">
+                              {{ areas.length === 0 ? "" : areas }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-row no-gutters>
+                        <v-spacer></v-spacer>
                         <v-autocomplete
                           v-model="areas"
                           :items="areaList"
@@ -69,113 +127,322 @@
                           :rules="areaRules"
                           multiple
                         ></v-autocomplete>
-                      </v-col>
-                    </v-row>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-                    <v-row>
-                      <v-col>
-                        <v-slider
-                          v-model="bandwidth"
-                          :min="minBW"
-                          :max="maxBW"
-                          label="Bandwidth (GBPS)"
-                          class="align-center"
-                          thumb-label="always"
-                        >
-                        </v-slider>
-                      </v-col>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      <template v-slot:default="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4"> Bandwidth(GBPS) </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open" key="0">
+                                Enter bandwidth of the package
+                              </span>
+                              <span v-else key="1">
+                                {{ bandwidth }}
+                              </span>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-slider
+                        v-model="bandwidth"
+                        :min="minBW"
+                        :max="maxBW"
+                        label="Bandwidth (GBPS)"
+                        class="align-center"
+                        thumb-label="always"
+                      >
+                      </v-slider>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-                      <v-col>
-                        <v-slider
-                          v-model="duration"
-                          :min="minDur"
-                          :step="stepDur"
-                          :max="maxDur"
-                          label="Duration (month)"
-                          class="align-center"
-                          thumb-label="always"
-                        >
-                        </v-slider>
-                      </v-col>
-                    </v-row>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      <template v-slot:default="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4"> Duration(month) </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open" key="0">
+                                Enter bandwidth of the package
+                              </span>
+                              <span v-else key="1">
+                                {{ duration }}
+                              </span>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-slider
+                        v-model="duration"
+                        :min="minDur"
+                        :step="stepDur"
+                        :max="maxDur"
+                        label="Duration (month)"
+                        class="align-center"
+                        thumb-label="always"
+                      >
+                      </v-slider>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-                    <v-row>
-                      <v-col>
-                        <v-slider
-                          v-model="downSpeed"
-                          :min="minBW"
-                          :max="maxBW"
-                          label="Download speed (GBPS)"
-                          thumb-label="always"
-                          :rules="speedRules"
-                        >
-                        </v-slider>
-                      </v-col>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      <template v-slot:default="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4"> Download Speed(GBPS) </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open" key="0">
+                                Enter download speed of the package
+                              </span>
+                              <span v-else key="1">
+                                {{ downSpeed }}
+                              </span>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-slider
+                        v-model="downSpeed"
+                        :min="minBW"
+                        :max="maxBW"
+                        label="Download speed (GBPS)"
+                        thumb-label="always"
+                        :rules="speedRules"
+                      >
+                      </v-slider>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-                      <v-col>
-                        <v-slider
-                          v-model="upSpeed"
-                          :min="minBW"
-                          :max="maxBW"
-                          label="Upload speed (GBPS)"
-                          thumb-label="always"
-                          :rules="speedRules"
-                        >
-                        </v-slider>
-                      </v-col>
-                    </v-row>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      <template v-slot:default="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4"> Upload Speed(GBPS) </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open" key="0">
+                                Enter upload speed of the package
+                              </span>
+                              <span v-else key="1">
+                                {{ upSpeed }}
+                              </span>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-slider
+                        v-model="upSpeed"
+                        :min="minBW"
+                        :max="maxBW"
+                        label="Upload speed (GBPS)"
+                        thumb-label="always"
+                        :rules="speedRules"
+                      >
+                      </v-slider>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-                    <v-row>
-                      <v-col>
-                        <v-slider
-                          v-model="downtime"
-                          :min="minDT"
-                          :step="stepDT"
-                          :max="maxDT"
-                          label="Down-time (hour)"
-                          thumb-label="always"
-                        >
-                        </v-slider>
-                      </v-col>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      <template v-slot:default="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4">Estimated Down Time(hours) </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open" key="0">
+                                Enter estimated down time of the package
+                              </span>
+                              <span v-else key="1">
+                                {{ downTime }}
+                              </span>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-slider
+                        v-model="downTime"
+                        :min="minDT"
+                        :step="stepDT"
+                        :max="maxDT"
+                        label="Down-time (hour)"
+                        thumb-label="always"
+                      >
+                      </v-slider>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-                      <v-col>
-                        <v-slider
-                          v-model="responseTime"
-                          :min="minRT"
-                          :step="stepRT"
-                          :max="maxRT"
-                          label="Response Time (milliseconds)"
-                          thumb-label="always"
-                        >
-                        </v-slider>
-                      </v-col>
-                    </v-row>
-                  </v-form>
-                </template>
-              </v-card-text>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      <template v-slot:default="{ open }">
+                        <v-row no-gutters>
+                          <v-col cols="4"> Response Time(milliseconds) </v-col>
+                          <v-col cols="8" class="text--secondary">
+                            <v-fade-transition leave-absolute>
+                              <span v-if="open" key="0">
+                                Enter response time of the package
+                              </span>
+                              <span v-else key="1">
+                                {{ responseTime }}
+                              </span>
+                            </v-fade-transition>
+                          </v-col>
+                        </v-row>
+                      </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-slider
+                        v-model="responseTime"
+                        :min="minRT"
+                        :step="stepRT"
+                        :max="maxRT"
+                        label="Response Time (milliseconds)"
+                        thumb-label="always"
+                      >
+                      </v-slider>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
 
-              <v-card-actions>
-                <v-btn
-                  :disabled="isResetDisabled"
-                  color="error"
-                  class="mr-4"
-                  @click="resetPressed"
-                >
-                  Reset
-                </v-btn>
+                  <v-card-actions>
+                    <v-btn
+                      :disabled="isResetDisabled"
+                      color="error"
+                      class="mr-4"
+                      @click="resetPressed"
+                    >
+                      Reset
+                    </v-btn>
 
-                <v-btn
-                  :disabled="isSubmitDisabled"
-                  color="success"
-                  class="mr-4"
-                  @click="submitPressed"
-                >
-                  Confirm
-                </v-btn>
-                <v-btn color="green darken-1" text @click="dialog = false">
-                  Cancel
-                </v-btn>
-              </v-card-actions>
+                    <v-btn
+                      :disabled="isSubmitDisabled"
+                      color="success"
+                      class="mr-4"
+                      @click="newPkgConfirmPressed"
+                    >
+                      Confirm
+                    </v-btn>
+                    <v-btn color="green darken-1" text @click="dialog = false">
+                      Cancel
+                    </v-btn>
+                  </v-card-actions>
+
+                  <!-- <v-expansion-panel>
+                <v-expansion-panel-header v-slot="{ open }">
+                  <v-row no-gutters>
+                    <v-col cols="4"> Start and end dates </v-col>
+                    <v-col cols="8" class="text--secondary">
+                      <v-fade-transition leave-absolute>
+                        <span v-if="open">When do you want to travel?</span>
+                        <v-row v-else no-gutters style="width: 100%">
+                          <v-col cols="6">
+                            Start date: {{ trip.start || "Not set" }}
+                          </v-col>
+                          <v-col cols="6">
+                            End date: {{ trip.end || "Not set" }}
+                          </v-col>
+                        </v-row>
+                      </v-fade-transition>
+                    </v-col>
+                  </v-row>
+                </v-expansion-panel-header>
+
+                <v-expansion-panel-content>
+                  <v-row justify="space-around" no-gutters>
+                    <v-col cols="3">
+                      <v-menu
+                        ref="startMenu"
+                        :close-on-content-click="false"
+                        :return-value.sync="trip.start"
+                        offset-y
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="trip.start"
+                            label="Start date"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker v-model="date" no-title scrollable>
+                          <v-spacer></v-spacer>
+                          <v-btn
+                            text
+                            color="primary"
+                            @click="$refs.startMenu.isActive = false"
+                          >
+                            Cancel
+                          </v-btn>
+                          <v-btn
+                            text
+                            color="primary"
+                            @click="$refs.startMenu.save(date)"
+                          >
+                            OK
+                          </v-btn>
+                        </v-date-picker>
+                      </v-menu>
+                    </v-col>
+
+                    <v-col cols="3">
+                      <v-menu
+                        ref="endMenu"
+                        :close-on-content-click="false"
+                        :return-value.sync="trip.end"
+                        offset-y
+                        min-width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="trip.end"
+                            label="End date"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker v-model="date" no-title scrollable>
+                          <v-spacer></v-spacer>
+                          <v-btn
+                            text
+                            color="primary"
+                            @click="$refs.endMenu.isActive = false"
+                          >
+                            Cancel
+                          </v-btn>
+                          <v-btn
+                            text
+                            color="primary"
+                            @click="$refs.endMenu.save(date)"
+                          >
+                            OK
+                          </v-btn>
+                        </v-date-picker>
+                      </v-menu>
+                    </v-col>
+                  </v-row>
+                </v-expansion-panel-content>
+              </v-expansion-panel> -->
+                </v-expansion-panels>
+              </v-form>
             </v-card>
           </v-dialog>
         </v-col>
@@ -255,17 +522,18 @@
             <v-card>
               <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
-              <v-card-title> {{ pkg.name }} </v-card-title>
+              <v-card-title>
+                {{ pkg.name }} &nbsp;
+                <v-chip v-if="!pkg.ongoing" color="red"> Disabled </v-chip>
+              </v-card-title>
 
               <v-card-text>
                 <div class="my-4 text-subtitle-1">Taka {{ pkg.price }}</div>
                 <v-chip-group
-                  v-model="selection"
                   active-class="deep-purple accent-4 white--text"
                   column
                 >
                   <v-chip>{{ pkg.bandwidth }} GBPS</v-chip>
-
                   <v-chip>{{ pkg.duration }} months</v-chip>
                 </v-chip-group>
                 <div>
@@ -282,8 +550,22 @@
                 >
                   Details
                 </v-btn>
-                <v-btn color="deep-purple lighten-2" text> Mark </v-btn>
-                <v-btn color="deep-purple lighten-2" text> Disable </v-btn>
+                <v-btn
+                  @click="toggleOfferPressed(i)"
+                  color="deep-purple lighten-2"
+                  text
+                >
+                  <span v-if="pkg.offerId === '-1'"> Add Offer </span>
+                  <span v-else> Remove Offer </span>
+                </v-btn>
+                <v-btn
+                  @click="toggleStatusPressed(i)"
+                  color="deep-purple lighten-2"
+                  text
+                >
+                  <span v-if="pkg.ongoing"> Disable </span>
+                  <span v-if="!pkg.ongoing"> Enable </span>
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-badge>
@@ -294,7 +576,7 @@
         <v-dialog v-model="dialog2" max-width="40%" dark>
           <v-card>
             <v-card-title class="text-h5">
-              {{ nameList[currPkgIdx] }}
+              {{ pkgNameList[currPkgIdx] }}
             </v-card-title>
 
             <v-card-text>
@@ -358,13 +640,81 @@
             </v-card-text>
 
             <v-card-actions>
-              <v-btn color="green darken-1" text @click="dialog2 = false">
+              <v-btn
+                color="green darken-1"
+                text
+                @click="
+                  dialog2 = false;
+                  currPkgIdx = -1;
+                "
+              >
                 Close
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
+
+        <v-dialog v-model="dialog3" max-width="60%">
+          <v-card>
+            <v-card-title class="text-h5">
+              Offer List
+            </v-card-title>
+
+            <v-card-text>
+              <!-- object: {{ allPkgs[currPkgIdx] }} <br />
+              name: {{ allPkgs[currPkgIdx].name }} <br />
+              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} GBPS <br />-->
+              <!-- :label="`Radio ${n}`" -->
+              <v-radio-group mandatory v-model="selectedOffer">
+                <v-radio
+                  v-for="(offer, i) in allOffers"
+                  :key="i"
+                  :label="
+                    `${offer.name} - ${
+                      offer.reduction
+                    }%, ${offer.startTime.slice(
+                      0,
+                      10
+                    )} to ${offer.expirationTime.slice(0, 10)}`
+                  "
+                  :value="offer._id"
+                >
+                </v-radio>
+              </v-radio-group>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-btn color="green darken-1" text @click="offerConfirmPressed">
+                Confirm
+              </v-btn>
+              <v-btn
+                color="green darken-1"
+                text
+                @click="
+                  dialog3 = false;
+                  currPkgIdx = -1;
+                "
+              >
+                Cancel
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-row>
+
+      <v-snackbar :value="showSuccessOverlay">
+        Package Successfully Added!
+      </v-snackbar>
+
+      <!-- <v-overlay
+        v-if="showSuccessOverlay"
+        :absolute="absolute"
+        :value="showSuccessOverlay"
+      >
+        <v-btn color="success" @click="showSuccessOverlay = false">
+          Package Successfully Added!
+        </v-btn>
+      </v-overlay> -->
     </div>
 
     <bottombar></bottombar>
@@ -384,7 +734,10 @@ export default {
       valid: false,
       dialog: false,
       dialog2: false,
+      dialog3: false,
       currPkgIdx: -1,
+      showSuccessOverlay: false,
+      selectedOffer: "",
 
       areas: [],
       areaList: [
@@ -410,7 +763,7 @@ export default {
       nameLen: 20,
       nameRules: [
         (v) => !!v || "Name is required",
-        (v) => !this.nameList.includes(v.trim()) || "Name already in use",
+        (v) => !this.pkgNameList.includes(v.trim()) || "Name already in use",
         (v) =>
           (v && v.length <= this.nameLen) ||
           `Name must be less than ${this.nameLen} characters`,
@@ -435,7 +788,7 @@ export default {
       stepDur: 3,
       maxDur: 24,
 
-      downtime: "",
+      downTime: "",
       minDT: 0,
       stepDT: 0.5,
       maxDT: 12,
@@ -448,14 +801,13 @@ export default {
       allPkgs: [],
       pkgs: [],
       dummyPkg: "",
+      pkgNameList: [],
 
-      nameList: [],
+      allOffers: [],
 
       filterPrice: [0, 1000000],
       filterBW: [0, 200],
       filterDuration: [0, 24],
-
-      showSuccessOverlay: false,
 
       markVal: 0,
       selectallTitle: "Select All",
@@ -469,6 +821,10 @@ export default {
         this.packageName &&
         this.bandwidth &&
         this.duration &&
+        this.downSpeed &&
+        this.upSpeed &&
+        this.responseTime &&
+        this.downTime &&
         this.price &&
         this.areas.length
       );
@@ -483,7 +839,7 @@ export default {
         this.duration > this.minDur ||
         this.upSpeed > this.bandwidth ||
         this.downSpeed > this.bandwidth ||
-        this.downtime > 0 ||
+        this.downTime > 0 ||
         this.responseTime > this.minRT
       );
     },
@@ -491,13 +847,23 @@ export default {
 
   created() {
     axios
+      .get("/api/offer/fetch")
+      .then((res) => {
+        this.allOffers = res.data.Data.data;
+        console.log(this.allOffers);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
       .post("/api/package/fetchByQuery", {
         packageCreator: "Nttn",
       })
       .then((res) => {
         this.allPkgs = res.data.data;
         this.pkgs = this.allPkgs;
-        this.nameList = [];
+        this.pkgNameList = [];
         this.markVal = 0;
         // let minPrice = Infinity;
         // let maxPrice = -1;
@@ -507,8 +873,7 @@ export default {
         // let maxDuration = -1;
 
         for (let i in this.pkgs) {
-          this.nameList.push(this.allPkgs[i].name);
-
+          this.pkgNameList.push(this.allPkgs[i].name);
           // if (this.allPkgs[i].price < minPrice)
           //   minPrice = this.allPkgs[i].price;
           // if (this.allPkgs[i].price > maxPrice)
@@ -538,15 +903,72 @@ export default {
   },
 
   methods: {
-    detailsPressed(i) {
+    offerConfirmPressed() {
+      console.log(this.selectedOffer);
+      this.dialog3 = false;
+      axios
+        .post("/api/package/addOffer", {
+          name: this.pkgs[this.currPkgIdx].name,
+          packageCreator: "Nttn",
+          offerId: this.selectedOffer,
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            this.pkgs[this.currPkgIdx].offerId = this.selectedOffer;
+            this.currPkgIdx = -1;
+            this.selectedOffer = "";
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    toggleOfferPressed(i) {
       this.currPkgIdx = i;
-      this.dialog2 = true;
+      this.dialog3 = true;
       console.log(this.currPkgIdx);
     },
 
+    toggleStatusPressed(i) {
+      axios
+        .post("/api/package/updateStatus", {
+          name: this.pkgs[i].name,
+          packageCreator: "Nttn",
+          ongoing: !this.pkgs[i].ongoing,
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.pkgs[i].ongoing = !this.pkgs[i].ongoing;
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    detailsPressed(i) {
+      this.currPkgIdx = i;
+      this.dialog2 = true;
+      // console.log(this.currPkgIdx);
+    },
+
     resetPressed() {
-      this.$refs.form.reset();
-      // console.log(this.nameList);
+      // this.$refs.form.reset();
+      this.packageName = "";
+      this.price = "";
+      this.areas = [];
+      this.bandwidth = "";
+      this.duration = "";
+      this.downSpeed = "";
+      this.upSpeed = "";
+      this.downTime = "";
+      this.responseTime = "";
     },
 
     selectallMethod() {
@@ -556,7 +978,8 @@ export default {
       else this.selectallTitle = "Select All";
     },
 
-    submitPressed() {
+    newPkgConfirmPressed() {
+      this.dialog = false;
       // console.log("submit pressed");
       let newPkg = {
         name: this.packageName,
@@ -568,7 +991,7 @@ export default {
         price: this.price,
         ongoing: true,
         isRealIp: true,
-        downTime: this.downtime,
+        downTime: this.downTime,
         responseTime: this.responseTime,
         areas: this.areas,
       };
@@ -577,12 +1000,15 @@ export default {
         .post("/api/package/insert", newPkg)
         .then((res) => {
           if (res.status === 201) {
-            this.dialog = false;
-            this.showSuccessOverlay = true;
-
+            // this.$refs.form.reset();
+            this.resetPressed();
             this.allPkgs.push(newPkg);
             this.pkgs = this.allPkgs;
-            this.nameList.push(newPkg.name);
+            this.pkgNameList.push(newPkg.name);
+            this.filterPrice = [0, 1000000];
+            this.filterBW = [0, 200];
+            this.filterDuration = [0, 24];
+            this.showSuccessOverlay = true;
           } else {
             this.error = true;
           }
