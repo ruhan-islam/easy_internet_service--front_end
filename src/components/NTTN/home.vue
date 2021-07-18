@@ -2,8 +2,8 @@
   <div>
     <topbar></topbar>
 
-    <div class="container mt-5">
-      <H1>Welcome to Shaon Communications Limited</H1>
+    <div style="background-color:#E8F0F2;padding:100px 200px">
+      <H1 style="padding-bottom:50px">Welcome to Amader Internet</H1>
       <div
         id="carouselExampleCaptions"
         class="carousel slide"
@@ -34,44 +34,133 @@
         <div class="carousel-inner">
           <div class="carousel-item active">
             <img
-              style="height:500px"
-              src="./../../assets/c1.jpg"
+              style="height: 500px"
+              src="https://ak.picdn.net/shutterstock/videos/28588675/thumb/1.jpg"
               class="d-block w-100"
               alt="..."
             />
             <div class="carousel-caption d-none d-md-block">
-              <h5>First slide label</h5>
-              <p>
-                Some representative placeholder content for the first slide.
-              </p>
+              <v-row>
+                <h2>Manage your ISP package and payments with ease</h2>
+              </v-row>
             </div>
           </div>
           <div class="carousel-item">
             <img
-              style="height:500px"
-              src="./../../assets/c2.png"
-              class="d-block w-100"
-              alt="..."
-            />
-            <div class="carousel-caption d-none d-md-block">
-              <h5>Second slide label</h5>
-              <p>
-                Some representative placeholder content for the second slide.
-              </p>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <img
-              style="height:500px"
+              style="height: 500px"
               src="./../../assets/c3.jpg"
               class="d-block w-100"
               alt="..."
             />
             <div class="carousel-caption d-none d-md-block">
-              <h5>Third slide label</h5>
-              <p>
-                Some representative placeholder content for the third slide.
-              </p>
+              <v-row>
+                <v-col cols="5" style="padding-top:10%">
+                  <v-card>
+                    <v-img height="250" src="./../../assets/images.jpg"></v-img>
+
+                    <v-card-title>
+                      {{ pkgs[0].name }}
+                    </v-card-title>
+
+                    <v-card-text>
+                      <v-chip-group
+                        active-class="deep-purple accent-4 white--text"
+                        column
+                      >
+                        <v-chip>{{ pkgs[0].bandwidth }} GBPS</v-chip>
+                        <v-chip>{{ pkgs[0].duration }} months</v-chip>
+                      </v-chip-group>
+                      <div>
+                        {{ pkgs[0].bandwidth }} GBPS speed relentless speed of
+                        unlimited traffic with 24/7 service.
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                <v-col style="padding-top:20%">
+                  <v-simple-table dark>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">Features</th>
+                          <th class="text-left">Availibility</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- <tr v-for="item in pkgDetails" :key="item.name"> -->
+                        <tr>
+                          <td>Package Name</td>
+                          <td>{{ pkgs[0].name }}</td>
+                        </tr>
+                        <tr>
+                          <td>Price (Taka)</td>
+                          <td>Tk. {{ pkgs[0].price }} /ISP</td>
+                        </tr>
+                        <tr>
+                          <td>Bandwidth (GBPS)</td>
+                          <td>{{ pkgs[0].bandwidth }} GBPS</td>
+                        </tr>
+                        <tr>
+                          <td>Duration (months)</td>
+                          <td>{{ pkgs[0].duration }} months</td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                  <v-btn
+                    color="white"
+                    @click="detailsPressed"
+                    style="margin:50px 0px 0px 190px"
+                  >
+                    Manage Now...
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </div>
+          </div>
+
+          <div class="carousel-item">
+            <img
+              style="height: 500px"
+              src="https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg"
+              class="d-block w-100"
+              alt="..."
+            />
+            <div class="carousel-caption d-none d-md-block">
+              <v-row>
+                <v-col cols="5" style="padding-top:10%">
+                  <v-card class="mx-auto" max-width="344">
+                    <v-img
+                      src="./../../assets/offer.jpg"
+                      height="200px"
+                    ></v-img>
+
+                    <v-card-title> {{ allOffers[0].name }} </v-card-title>
+
+                    <v-card-subtitle>
+                      <h2 style="color:red">
+                        {{ allOffers[0].reduction }}% off
+                      </h2>
+                    </v-card-subtitle>
+
+                    <v-expand-transition>
+                      <div>
+                        <v-divider></v-divider>
+                      </div>
+                    </v-expand-transition>
+                  </v-card>
+                </v-col>
+                <v-col style="padding-top:20%">
+                  <h3>Create, provide and manage your offers with ease</h3>
+                  <v-btn
+                    color="white"
+                    @click="offerMore"
+                    style="margin:50px 0px 0px 190px"
+                  >
+                    Manage Now...
+                  </v-btn>
+                </v-col>
+              </v-row>
             </div>
           </div>
         </div>
@@ -101,6 +190,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
 // import { mapGetters } from "vuex";
@@ -108,18 +198,61 @@ import bottombar from "./bottombar.vue";
 export default {
   components: { topbar, bottombar },
   data() {
-    return {};
+    return {
+      allPkgs: [],
+      pkgs: [],
+      allOffers: [],
+      validOffers: [],
+    };
   },
-  methods: {},
+  methods: {
+    detailsPressed() {
+      this.$router.push("/NTTN/packages");
+    },
+
+    offerMore() {
+      this.$router.push("/NTTN/dashboard");
+    },
+  },
   computed: {
     // ...mapGetters(["getSelectedPackage", "getIsPaid"]),
   },
-  mounted() {
-    // this.pkg = this.getSelectedPackage;
-    // if (this.pkg != "") {
-    //   this.show = false;
-    // }
-    // console.log(this.pkg);
+
+  created() {
+    axios
+      .post("/api/offer/fetchByQuery", {
+        creator: "Nttn",
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          this.allOffers = res.data.data;
+          // console.log(this.allOffers);
+          this.validOffers = [];
+          for (let i in this.allOffers) {
+            if (
+              this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
+            ) {
+              this.validOffers.push(this.allOffers[i]);
+            }
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .post("/api/package/fetchByQuery", {
+        packageCreator: "Nttn",
+      })
+      .then((res) => {
+        this.allPkgs = res.data.data;
+        this.pkgs = this.allPkgs;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
+  mounted() {},
 };
 </script>

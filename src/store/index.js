@@ -12,8 +12,8 @@ export default new Vuex.Store({
         authToken: '',
         userName: '',
         userEmail: '',
-        
         loggedIn: false,
+        notificationCount: 0,
         selectedPackage: '',
         currentPage: 'home',
         selPkgName: '',
@@ -21,7 +21,7 @@ export default new Vuex.Store({
         selPkgBand: '',
         selPkgDur: '',
         isPaid: false,
-        comparedPkgs: []
+        comparedPkgs: [],
     },
     getters: {
         isLoggedIn: state => {
@@ -32,6 +32,9 @@ export default new Vuex.Store({
         },
         getAuthToken: state => {
             return state.authToken;
+        },
+        getNtfCount: state => {
+            return state.notificationCount;
         },
         getUserName: state => {
             return state.userName;
@@ -83,6 +86,9 @@ export default new Vuex.Store({
         },
         setAuthToken: (state, authToken) => {
             state.authToken = authToken;
+        },
+        setNtfCount: (state, notificationCount) => {
+            state.notificationCount = notificationCount;
         },
         setUserName: (state, userName) => {
             state.userName = userName;

@@ -68,8 +68,11 @@ export default {
 
   methods: {
     validateLogin() {
+      let api = "/api/" + this.type.toLowerCase() + "/login";
+      let dest = "/" + this.type + "/home";
+
       axios
-        .post("/api/isp/login", {
+        .post(api, {
           name: this.username,
           password: this.password,
         })
@@ -78,9 +81,9 @@ export default {
           if (res.status === 201) {
             this.setLoggedIn();
             this.setAuthToken(res.data.token);
-            this.setUserName(this.username);
-            this.$router.push("/NTTN/home");
-          } else if (res.status === 203) {
+            this.setUserName("Nttn");
+            this.$router.push(dest);
+          } else {
             this.error = true;
           }
         })

@@ -243,13 +243,16 @@
                 <v-card class="mx-auto" max-width="344">
                   <v-img src="./../../assets/offer.jpg" height="200px"></v-img>
 
-                  <v-card-title> {{ offer.name }} </v-card-title>
+                  <v-card-title>
+                    {{ offer.name }} &nbsp;
+                    <v-chip v-if="!offer.status" color="red"> Expired </v-chip>
+                  </v-card-title>
 
                   <v-card-subtitle>
                     <h2 style="color:red">{{ offer.reduction }}% off</h2>
                   </v-card-subtitle>
 
-                  <v-card-actions>
+                  <!-- <v-card-actions>
                     <v-btn color="orange lighten-2" text> Details </v-btn>
 
                     <v-spacer></v-spacer>
@@ -259,10 +262,10 @@
                         show ? "mdi-chevron-up" : "mdi-chevron-down"
                       }}</v-icon>
                     </v-btn>
-                  </v-card-actions>
+                  </v-card-actions> -->
 
                   <v-expand-transition>
-                    <div v-show="show">
+                    <div>
                       <v-divider></v-divider>
 
                       <v-card-text>
@@ -345,13 +348,18 @@ export default {
 
   created() {
     axios
-      .get("/api/offer/fetch")
+      .post("/api/offer/fetchByQuery", {
+        creator: "Nttn",
+      })
       .then((res) => {
-        this.allOffers = res.data.Data.data;
-        // console.log(this.allOffers);
-        this.nameList = [];
-        for (let i in this.allOffers) {
-          this.nameList.push(this.allOffers[i].name);
+        if (res.status === 200) {
+          this.allOffers = res.data.data;
+          this.nameList = [];
+          for (let i in this.allOffers) {
+            this.nameList.push(this.allOffers[i].name);
+          }
+        } else {
+          this.error = true;
         }
       })
       .catch((err) => {
@@ -369,18 +377,6 @@ export default {
     isInOffer() {
       return this.pageInfo === "offers";
     },
-    // getColor() {
-    //   switch (this.pageInfo) {
-    //     case "offers":
-    //       return "primary";
-    //     case "tickets":
-    //       return "primary";
-    //     case "stats":
-    //       return "primary";
-    //     default:
-    //       return "";
-    //   }
-    // },
     dateRangeText() {
       return this.dates.join(" ~ ");
     },
@@ -412,6 +408,7 @@ export default {
         reduction: this.reduction,
         startTime: this.dates[0],
         expirationTime: this.dates[1],
+        creator: "Nttn",
         // minPrice: this.minPrice,
       };
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-bottom-navigation color="teal" grow dark shift>
+    <v-bottom-navigation horizontal color="teal" grow dark>
       <!-- <v-btn router-link to="/NTTN" exact>
         <span>Home</span>
         <v-icon>mdi-home</v-icon>
@@ -58,6 +58,7 @@
           >
             <span> Notifications </span>
             <v-icon> mdi-bell </v-icon>
+            <v-badge v-if="getNtfCount !== 0" :content="getNtfCount"> </v-badge>
           </v-btn>
         </template>
         <span> Notifications </span>
@@ -106,11 +107,13 @@ import { mapGetters, mapMutations } from "vuex";
 
 export default {
   data() {
-    return {};
+    return {
+      // ntfCount: 0,
+    };
   },
 
   computed: {
-    ...mapGetters(["isLoggedIn", "getAuthToken"]),
+    ...mapGetters(["isLoggedIn", "getAuthToken", "getNtfCount"]),
     ...mapMutations(["setLoggedIn", "setLoggedOut", "resetAuthToken"]),
   },
 
@@ -123,7 +126,7 @@ export default {
   methods: {
     logOut() {
       axios
-        .post("/api/isp/logout", {
+        .post("/api/nttn/logout", {
           token: this.getAuthToken,
         })
         .then((res) => {
