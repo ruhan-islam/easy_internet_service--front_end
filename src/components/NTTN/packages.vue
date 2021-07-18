@@ -914,10 +914,11 @@ export default {
         // this.bwMax = maxBW;
         // this.dMin = minDuration;
         // this.dMax = maxDuration;
-        // this.pkgs.sort(this.compareByPrice);
-        // this.pkgs.sort(this.compareByBandwidth);
-        // this.pkgs.sort(this.compareByDuration);
-        this.pkgs.sort(this.compareByName);
+
+        // this.pkgs.sort(this.orderByPriceAscending);
+        // this.pkgs.sort(this.orderByBandwidthAscending);
+        // this.pkgs.sort(this.orderByDurationAscending);
+        this.pkgs.sort(this.orderByNameAscending);
       })
       .catch((err) => {
         console.log(err);
@@ -925,7 +926,7 @@ export default {
   },
 
   methods: {
-    compareByName(a, b) {
+    orderByNameAscending(a, b) {
       if (a.name.toUpperCase() < b.name.toUpperCase()) {
         return -1;
       }
@@ -935,7 +936,7 @@ export default {
       return 0;
     },
 
-    compareByPrice(a, b) {
+    orderByPriceAscending(a, b) {
       if (a.price < b.price) {
         return -1;
       }
@@ -945,7 +946,7 @@ export default {
       return 0;
     },
 
-    compareByBandwidth(a, b) {
+    orderByBandwidthAscending(a, b) {
       if (a.bandwidth < b.bandwidth) {
         return -1;
       }
@@ -955,11 +956,51 @@ export default {
       return 0;
     },
 
-    compareByDuration(a, b) {
+    orderByDurationAscending(a, b) {
       if (a.duration < b.duration) {
         return -1;
       }
       if (a.duration > b.duration) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByNameDescending(a, b) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+        return -1;
+      }
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByPriceDescending(a, b) {
+      if (a.price > b.price) {
+        return -1;
+      }
+      if (a.price < b.price) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByBandwidthDescending(a, b) {
+      if (a.bandwidth > b.bandwidth) {
+        return -1;
+      }
+      if (a.bandwidth < b.bandwidth) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByDurationDescending(a, b) {
+      if (a.duration > b.duration) {
+        return -1;
+      }
+      if (a.duration < b.duration) {
         return 1;
       }
       return 0;
