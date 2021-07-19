@@ -51,11 +51,11 @@
                   <v-list-item-title> Tickets </v-list-item-title>
                 </v-list-item>
 
-                <v-list-item link @click="pageInfo = 'stats'">
+                <v-list-item link @click="pageInfo = 'notify'">
                   <v-list-item-icon>
                     <v-icon color="getColor"> mdi-star </v-icon>
                   </v-list-item-icon>
-                  <v-list-item-title> Statistics </v-list-item-title>
+                  <v-list-item-title> Notify </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-navigation-drawer>
@@ -298,7 +298,7 @@
 
         <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'tickets'">
         </v-col>
-        <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'stats'">
+        <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'notify'">
         </v-col>
       </v-row>
     </div>
