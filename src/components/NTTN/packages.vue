@@ -3,7 +3,7 @@
     <topbar></topbar>
 
     <div class="container mt-5">
-      <v-row justify="left">
+      <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
             <v-col cols="1">

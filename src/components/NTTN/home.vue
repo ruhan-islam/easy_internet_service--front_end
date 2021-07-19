@@ -48,14 +48,14 @@
           <div class="carousel-item">
             <img
               style="height: 500px"
-              src="./../../assets/c3.jpg"
+              src="https://ak.picdn.net/shutterstock/videos/28588675/thumb/1.jpg"
               class="d-block w-100"
               alt="..."
             />
             <div class="carousel-caption d-none d-md-block">
               <v-row>
                 <v-col cols="5" style="padding-top:10%">
-                  <v-card>
+                  <v-card v-if="pkgs.length > 0">
                     <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
                     <v-card-title>
@@ -79,7 +79,7 @@
                 </v-col>
                 <v-col style="padding-top:20%">
                   <v-simple-table dark>
-                    <template v-slot:default>
+                    <template v-if="pkgs.length > 0" v-slot:default>
                       <thead>
                         <tr>
                           <th class="text-left">Features</th>
@@ -129,17 +129,21 @@
             <div class="carousel-caption d-none d-md-block">
               <v-row>
                 <v-col cols="5" style="padding-top:10%">
-                  <v-card class="mx-auto" max-width="344">
+                  <v-card
+                    v-if="validOffers.length > 0"
+                    class="mx-auto"
+                    max-width="344"
+                  >
                     <v-img
                       src="./../../assets/offer.jpg"
                       height="200px"
                     ></v-img>
 
-                    <v-card-title> {{ allOffers[0].name }} </v-card-title>
+                    <v-card-title> {{ validOffers[0].name }} </v-card-title>
 
                     <v-card-subtitle>
                       <h2 style="color:red">
-                        {{ allOffers[0].reduction }}% off
+                        {{ validOffers[0].reduction }}% off
                       </h2>
                     </v-card-subtitle>
 
@@ -205,7 +209,14 @@ export default {
       validOffers: [],
     };
   },
+
   methods: {
+    getToday() {
+      let today = new Date();
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      return today.toISOString().slice(0, 10);
+    },
+
     detailsPressed() {
       this.$router.push("/NTTN/packages");
     },
