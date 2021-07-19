@@ -90,6 +90,10 @@ export default new Vuex.Store({
         setNtfCount: (state, notificationCount) => {
             state.notificationCount = notificationCount;
         },
+        decNtfCount: state => {
+            if (state.notificationCount > 0)
+                state.notificationCount--;
+        },
         setUserName: (state, userName) => {
             state.userName = userName;
         },

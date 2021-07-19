@@ -7,7 +7,7 @@
       </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/NTTN/home" exact>
+          <v-btn v-bind="attrs" v-on="on" router-link to="/ISP/home" exact>
             <span> Home </span>
             <v-icon> mdi-home </v-icon>
           </v-btn>
@@ -21,7 +21,7 @@
       </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/NTTN/packages" exact>
+          <v-btn v-bind="attrs" v-on="on" router-link to="/ISP/packages" exact>
             <span> Packages </span>
             <v-icon> mdi-package-variant </v-icon>
           </v-btn>
@@ -35,7 +35,7 @@
       </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/NTTN/payments" exact>
+          <v-btn v-bind="attrs" v-on="on" router-link to="/ISP/payments" exact>
             <span> Payments </span>
             <v-icon> mdi-credit-card </v-icon>
           </v-btn>
@@ -53,7 +53,7 @@
             v-bind="attrs"
             v-on="on"
             router-link
-            to="/NTTN/notifications"
+            to="/ISP/notifications"
             exact
           >
             <span> Notifications </span>
@@ -70,13 +70,7 @@
       </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            v-bind="attrs"
-            v-on="on"
-            router-link
-            to="/NTTN/dashboard"
-            exact
-          >
+          <v-btn v-bind="attrs" v-on="on" router-link to="/ISP/dashboard" exact>
             <span> Dashboard </span>
             <v-icon> mdi-widgets </v-icon>
           </v-btn>
@@ -118,7 +112,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["isLoggedIn", "getAuthToken", "getNtfCount"]),
+    ...mapGetters(["isLoggedIn", "getAuthToken", "getNtfCount", "getUserName"]),
   },
 
   mounted() {
@@ -151,7 +145,7 @@ export default {
 
     logOut() {
       axios
-        .post("/api/nttn/logout", {
+        .post("/api/isp/logout", {
           token: this.getAuthToken,
         })
         .then((res) => {

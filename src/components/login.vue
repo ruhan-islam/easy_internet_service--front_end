@@ -42,29 +42,32 @@ import axios from "axios";
 import { mapMutations, mapGetters } from "vuex";
 
 export default {
-  data: () => ({
-    ...mapMutations(["setLoggedIn", "setAuthToken", "setUserName"]),
-    ...mapGetters(["getUserName"]),
-    valid: false,
-    username: "",
-    password: "",
-    error: false,
-    items: ["NTTN", "ISP", "USER"],
-    checkbox: true,
-    type: "",
+  data() {
+    return {
+      ...mapMutations(["setLoggedIn", "setAuthToken", "setUserName"]),
+      ...mapGetters(["getUserName"]),
+      valid: false,
+      username: "",
+      password: "",
+      error: false,
+      items: ["NTTN", "ISP", "USER"],
+      checkbox: true,
+      type: "",
 
-    nameRules: [
-      (v) => !!v || "username is required",
-      (v) =>
-        (v && v.length <= 10) || "usernameame must be less than 10 characters",
-    ],
+      nameRules: [
+        (v) => !!v || "username is required",
+        (v) =>
+          (v && v.length <= 10) ||
+          "usernameame must be less than 10 characters",
+      ],
 
-    show1: false,
-    rules: {
-      required: (value) => !!value || "password is required.",
-      min: (v) => v.length >= 6 || "Min 6 characters",
-    },
-  }),
+      show1: false,
+      rules: {
+        required: (value) => !!value || "password is required.",
+        min: (v) => v.length >= 6 || "Min 6 characters",
+      },
+    };
+  },
 
   methods: {
     validateLogin() {
@@ -81,7 +84,7 @@ export default {
           if (res.status === 201) {
             this.setLoggedIn();
             this.setAuthToken(res.data.token);
-            this.setUserName("Nttn");
+            this.setUserName(this.username);
             this.$router.push(dest);
           } else {
             this.error = true;

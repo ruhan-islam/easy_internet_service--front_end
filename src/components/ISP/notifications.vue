@@ -16,13 +16,16 @@
                 @click="expandClicked(i)"
                 disable-icon-rotate
               >
-                {{ notification.subject }} &nbsp;
+                <strong> {{ notification.subject }} </strong> &nbsp;
                 <!-- <small>
                   {{ notification.notificationArrivalTime.slice(0, 10) }}
                   @ {{ notification.notificationArrivalTime.slice(11, 19) }}
                 </small> -->
                 <small>
-                  @ {{ notification.notificationArrivalTime.slice(0, 10) }}
+                  @
+                  {{
+                    notification.notificationArrivalTime.toString().slice(0, 24)
+                  }}
                 </small>
                 <template v-if="notification.seenStatus" v-slot:actions>
                   <v-icon color="teal">
@@ -45,18 +48,49 @@
 
 <script>
 import axios from "axios";
-import { mapMutations } from "vuex";
+import { mapMutations, mapGetters } from "vuex";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
 
 export default {
   components: { topbar, bottombar },
-
   data() {
     return {
       panel: "",
       allNotifications: [],
     };
+  },
+
+  computed: {
+    ...mapGetters(["getUserName"]),
+  },
+
+  created() {
+    // console.log(this.getUserName);
+    // console.log(new Date());
+
+    axios
+      .post("/api/notification/fetchByQuery", {
+        receiverID: this.getUserName,
+        receiverType: 2, // for ISP
+      })
+      .then((res) => {
+        // console.log(res);
+        if (res.status === 200) {
+          this.allNotifications = res.data.data.reverse();
+          // console.log(this.allNotifications);
+          for (let i in this.allNotifications) {
+            this.allNotifications[i].notificationArrivalTime = new Date(
+              this.allNotifications[i].notificationArrivalTime
+            );
+          }
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
   methods: {
@@ -87,33 +121,6 @@ export default {
           });
       }
     },
-  },
-
-  created() {
-    axios
-      .post("/api/notification/fetchByQuery", {
-        receiverID: "Nttn",
-        receiverType: 1, // for NTTN
-      })
-      .then((res) => {
-        // console.log(res);
-        if (res.status === 200) {
-          this.allNotifications = res.data.data;
-          // console.log(this.allNotifications);
-          // for (let i in this.allNotifications) {
-          //   let today = new Date(
-          //     this.allNotifications[i].notificationArrivalTime
-          //   );
-          //   today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-          //   this.allNotifications[i].notificationArrivalTime = today;
-          // }
-        } else {
-          this.error = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   },
 };
 </script>

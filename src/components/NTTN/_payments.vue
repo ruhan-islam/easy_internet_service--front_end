@@ -87,13 +87,16 @@ import bottombar from "./bottombar.vue";
 
 export default {
   components: { topbar, bottombar },
+
   data() {
     return {
       page: 0,
       dialog: false,
     };
   },
+
   methods: {},
+
   computed: {},
 };
 </script>

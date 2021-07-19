@@ -53,6 +53,7 @@ import { mapGetters } from "vuex";
 
 export default {
   components: { topbar, bottombar },
+
   data() {
     return {
       pkg: "",
@@ -67,6 +68,7 @@ export default {
       },
     };
   },
+
   methods: {
     goToPkg() {
       this.$router.push("packages");
@@ -75,9 +77,11 @@ export default {
       this.$router.push("paymentOptions");
     },
   },
+
   computed: {
     ...mapGetters(["getSelectedPackage", "getIsPaid"]),
   },
+
   mounted() {
     this.pkg = this.getSelectedPackage;
     if (this.pkg != "") {

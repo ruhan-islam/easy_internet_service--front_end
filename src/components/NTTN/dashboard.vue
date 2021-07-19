@@ -378,8 +378,10 @@ export default {
         //   (v && v.length <= this.nameLen) ||
         //   `Name must be less than ${this.nameLen} characters`,
       ],
+
       subject: "",
       subjectRules: [(v) => !!v || "Subject is required"],
+
       details: "",
       detailsRules: [(v) => !!v || "Details is required"],
 
@@ -448,7 +450,7 @@ export default {
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
-            console.log(res.data.data);
+            // console.log(res.data.data);
             this.ispList = res.data.data;
             this.ispNameList = [];
             for (let i in this.ispList) {
@@ -498,7 +500,7 @@ export default {
     },
 
     sendPressed() {
-      console.log("send pressed");
+      // console.log("send pressed");
 
       let newNotification = {
         senderId: "Nttn",
@@ -510,10 +512,12 @@ export default {
         category: "",
       };
 
+      // console.log(newNotification);
+
       axios
         .post("/api/notification/insert", newNotification)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.status === 201) {
             this.$refs.form.reset();
             this.showSnackbar = true;

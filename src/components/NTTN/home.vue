@@ -197,7 +197,6 @@
 import axios from "axios";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
-// import { mapGetters } from "vuex";
 
 export default {
   components: { topbar, bottombar },
@@ -224,9 +223,6 @@ export default {
     offerMore() {
       this.$router.push("/NTTN/dashboard");
     },
-  },
-  computed: {
-    // ...mapGetters(["getSelectedPackage", "getIsPaid"]),
   },
 
   created() {
@@ -264,6 +260,5 @@ export default {
         console.log(err);
       });
   },
-  mounted() {},
 };
 </script>

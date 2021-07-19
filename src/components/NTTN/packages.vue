@@ -3,6 +3,7 @@
     <topbar></topbar>
 
     <div class="container mt-5">
+      <!-- create new package  -->
       <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
@@ -133,6 +134,7 @@
                       </v-row>
                     </template>
                   </v-expansion-panel-header>
+
                   <v-expansion-panel-content>
                     <v-slider
                       v-model="bandwidth"
@@ -164,6 +166,7 @@
                       </v-row>
                     </template>
                   </v-expansion-panel-header>
+
                   <v-expansion-panel-content>
                     <v-slider
                       v-model="duration"
@@ -196,6 +199,7 @@
                       </v-row>
                     </template>
                   </v-expansion-panel-header>
+
                   <v-expansion-panel-content>
                     <v-slider
                       v-model="downSpeed"
@@ -227,6 +231,7 @@
                       </v-row>
                     </template>
                   </v-expansion-panel-header>
+
                   <v-expansion-panel-content>
                     <v-slider
                       v-model="upSpeed"
@@ -258,6 +263,7 @@
                       </v-row>
                     </template>
                   </v-expansion-panel-header>
+
                   <v-expansion-panel-content>
                     <v-slider
                       v-model="downTime"
@@ -289,6 +295,7 @@
                       </v-row>
                     </template>
                   </v-expansion-panel-header>
+
                   <v-expansion-panel-content>
                     <v-slider
                       v-model="responseTime"
@@ -330,168 +337,166 @@
         </v-dialog>
       </v-row>
 
+      <!-- package filters  -->
       <v-row class="ma-1" justify="center">
         <v-card style="padding:0px 20px">
           <v-card-title>Search ISP Packages</v-card-title>
-          <v-form ref="form" v-model="valid" lazy-validation>
-            <v-expansion-panels>
-              <v-col>
-                Price Range:
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <template v-slot:default="{ open }">
-                      <v-row no-gutters>
-                        <v-col class="text--secondary">
-                          <v-fade-transition leave-absolute>
-                            <span v-if="open"
-                              >Select the max and min price:</span
-                            >
-                            <v-row v-else no-gutters style="width: 100%">
-                              <v-col cols="6" style="color: green">
-                                Min Cost:
-                                {{ filterPrice[0] || "Not set" }}
-                              </v-col>
-                              <v-col cols="6" style="color: red">
-                                Max Cost: {{ filterPrice[1] || "Not set" }}
-                              </v-col>
-                            </v-row>
-                          </v-fade-transition>
-                        </v-col>
-                      </v-row>
-                    </template>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <v-range-slider
-                      v-model="filterPrice"
-                      label="Price (Taka)"
-                      min="0"
-                      max="1000000"
-                      step="1000"
-                    >
-                    </v-range-slider>
-                    <label style="color: rgb(97, 91, 91)"
-                      >price(min): {{ filterPrice[0] }} <br />
-                      price(max): {{ filterPrice[1] }}</label
-                    >
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-col>
-              <v-col>
-                Bandwidth Range:
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <template v-slot:default="{ open }">
-                      <v-row no-gutters>
-                        <v-col class="text--secondary">
-                          <v-fade-transition leave-absolute>
-                            <span v-if="open"
-                              >Select the max and min bandwidth:</span
-                            >
-                            <v-row v-else no-gutters style="width: 100%">
-                              <v-col cols="6" style="color: green">
-                                Min BW:
-                                {{ filterBW[0] || "Not set" }}
-                              </v-col>
-                              <v-col cols="6" style="color: red">
-                                Max BW: {{ filterBW[1] || "Not set" }}
-                              </v-col>
-                            </v-row>
-                          </v-fade-transition>
-                        </v-col>
-                      </v-row>
-                    </template>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <v-range-slider
-                      v-model="filterBW"
-                      label="Bandwidth (GBPS)"
-                      min="0"
-                      max="100"
-                      thumb-label="always"
-                    >
-                    </v-range-slider>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-col>
-
-              <v-col>
-                Duration Range(months):
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    <template v-slot:default="{ open }">
-                      <v-row no-gutters>
-                        <v-col class="text--secondary">
-                          <v-fade-transition leave-absolute>
-                            <span v-if="open"
-                              >Select the max and min duration:</span
-                            >
-                            <v-row v-else no-gutters style="width: 100%">
-                              <v-col cols="6" style="color: green">
-                                Min Period:
-                                {{ filterDuration[0] || "Not set" }}
-                              </v-col>
-                              <v-col cols="6" style="color: red">
-                                Max Period: {{ filterDuration[1] || "Not set" }}
-                              </v-col>
-                            </v-row>
-                          </v-fade-transition>
-                        </v-col>
-                      </v-row>
-                    </template>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <v-range-slider
-                      v-model="filterDuration"
-                      label="Duration (Months)"
-                      min="0"
-                      max="24"
-                      thumb-label="always"
-                    >
-                    </v-range-slider>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-col>
-            </v-expansion-panels>
-            <v-card-actions>
-              <v-row align="center" justify="end">
-                <v-col cols="8"></v-col>
-                <v-col>
-                  <v-btn
-                    color="deep-purple lighten-2"
-                    @click="doFilter"
-                    dark
-                    max-width="80%"
-                    margin="10px"
+          <v-expansion-panels>
+            <v-col>
+              Price Range:
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template v-slot:default="{ open }">
+                    <v-row no-gutters>
+                      <v-col class="text--secondary">
+                        <v-fade-transition leave-absolute>
+                          <span v-if="open">Select the max and min price:</span>
+                          <v-row v-else no-gutters style="width: 100%">
+                            <v-col cols="6" style="color: green">
+                              Min Cost:
+                              {{ filterPrice[0] || "Not set" }}
+                            </v-col>
+                            <v-col cols="6" style="color: red">
+                              Max Cost: {{ filterPrice[1] || "Not set" }}
+                            </v-col>
+                          </v-row>
+                        </v-fade-transition>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-range-slider
+                    v-model="filterPrice"
+                    label="Price (Taka)"
+                    min="0"
+                    max="1000000"
+                    step="1000"
                   >
-                    Filter <v-icon>mdi-filter</v-icon>
-                  </v-btn>
-                </v-col>
-                <v-col>
-                  <v-menu offset-y>
-                    <template v-slot:activator="{ attrs, on }">
-                      <v-btn
-                        color="deep-purple lighten-2"
-                        class="white--text ma-5"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                        Sort <v-icon>mdi-sort</v-icon>
-                      </v-btn>
-                    </template>
+                  </v-range-slider>
+                  <label style="color: rgb(97, 91, 91)"
+                    >price(min): {{ filterPrice[0] }} <br />
+                    price(max): {{ filterPrice[1] }}</label
+                  >
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-col>
+            <v-col>
+              Bandwidth Range:
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template v-slot:default="{ open }">
+                    <v-row no-gutters>
+                      <v-col class="text--secondary">
+                        <v-fade-transition leave-absolute>
+                          <span v-if="open"
+                            >Select the max and min bandwidth:</span
+                          >
+                          <v-row v-else no-gutters style="width: 100%">
+                            <v-col cols="6" style="color: green">
+                              Min BW:
+                              {{ filterBW[0] || "Not set" }}
+                            </v-col>
+                            <v-col cols="6" style="color: red">
+                              Max BW: {{ filterBW[1] || "Not set" }}
+                            </v-col>
+                          </v-row>
+                        </v-fade-transition>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-range-slider
+                    v-model="filterBW"
+                    label="Bandwidth (GBPS)"
+                    min="0"
+                    max="100"
+                    thumb-label="always"
+                  >
+                  </v-range-slider>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-col>
 
-                    <v-list>
-                      <v-list-item v-for="item in sortedItems" :key="item" link>
-                        <v-list-item-title
-                          v-text="item"
-                          @click="doSort(item)"
-                        ></v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </v-col>
-              </v-row>
-            </v-card-actions>
-          </v-form>
+            <v-col>
+              Duration Range(months):
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template v-slot:default="{ open }">
+                    <v-row no-gutters>
+                      <v-col class="text--secondary">
+                        <v-fade-transition leave-absolute>
+                          <span v-if="open"
+                            >Select the max and min duration:</span
+                          >
+                          <v-row v-else no-gutters style="width: 100%">
+                            <v-col cols="6" style="color: green">
+                              Min Period:
+                              {{ filterDuration[0] || "Not set" }}
+                            </v-col>
+                            <v-col cols="6" style="color: red">
+                              Max Period: {{ filterDuration[1] || "Not set" }}
+                            </v-col>
+                          </v-row>
+                        </v-fade-transition>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-range-slider
+                    v-model="filterDuration"
+                    label="Duration (Months)"
+                    min="0"
+                    max="24"
+                    thumb-label="always"
+                  >
+                  </v-range-slider>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-col>
+          </v-expansion-panels>
+
+          <v-card-actions>
+            <v-row align="center" justify="end">
+              <v-col cols="8"></v-col>
+              <v-col>
+                <v-btn
+                  color="deep-purple lighten-2"
+                  @click="doFilter"
+                  dark
+                  max-width="80%"
+                  margin="10px"
+                >
+                  Filter <v-icon>mdi-filter</v-icon>
+                </v-btn>
+              </v-col>
+              <v-col>
+                <v-menu offset-y>
+                  <template v-slot:activator="{ attrs, on }">
+                    <v-btn
+                      color="deep-purple lighten-2"
+                      class="white--text ma-5"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      Sort <v-icon>mdi-sort</v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item v-for="item in sortedItems" :key="item" link>
+                      <v-list-item-title
+                        v-text="item"
+                        @click="doSort(item)"
+                      ></v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </v-col>
+            </v-row>
+          </v-card-actions>
         </v-card>
       </v-row>
 
@@ -499,6 +504,7 @@
         <v-btn color="deep-purple lighten-2" text> ISP Packages </v-btn>
       </v-row>
 
+      <!-- showing packages -->
       <v-row>
         <div class="col-lg-4" v-for="(pkg, i) in pkgs" :key="i">
           <v-badge
@@ -577,11 +583,13 @@
         </div>
       </v-row>
 
+      <!-- details & offer -->
       <v-row v-if="currPkgIdx != -1" justify="center">
+        <!-- package details -->
         <v-dialog v-model="dialog2" max-width="40%" dark>
           <v-card>
             <v-card-title class="text-h5">
-              {{ pkgNameList[currPkgIdx] }}
+              {{ allPkgs[currPkgIdx].name }}
             </v-card-title>
 
             <v-card-text>
@@ -659,6 +667,7 @@
           </v-card>
         </v-dialog>
 
+        <!-- offer -->
         <v-dialog v-model="dialog3" max-width="50%" dark>
           <v-card>
             <v-card-title class="text-h5"> Offer List </v-card-title>
@@ -708,16 +717,6 @@
       <v-snackbar :value="showSuccessOverlay">
         Package Successfully Added!
       </v-snackbar>
-
-      <!-- <v-overlay
-        v-if="showSuccessOverlay"
-        :absolute="absolute"
-        :value="showSuccessOverlay"
-      >
-        <v-btn color="success" @click="showSuccessOverlay = false">
-          Package Successfully Added!
-        </v-btn>
-      </v-overlay> -->
     </div>
 
     <bottombar></bottombar>
@@ -751,6 +750,7 @@ export default {
       showSuccessOverlay: false,
       selectedOffer: "",
       areas: [],
+
       areaList: [
         "Nation-wide",
         "Dhaka",
@@ -762,14 +762,17 @@ export default {
         "Sylhet",
         "Rangpur",
       ],
+
       areaRules: [
         (v) => !!v.length || "This field is required",
         (v) =>
           !(v.length > 1 && this.areas.includes(this.areaList[0])) ||
           "Invalid combination",
       ],
+
       packageName: "",
       nameLen: 20,
+
       nameRules: [
         (v) => !!v || "Name is required",
         (v) => !this.pkgNameList.includes(v.trim()) || "Name already in use",
@@ -778,10 +781,12 @@ export default {
           `Name must be less than ${this.nameLen} characters`,
       ],
       price: "",
+
       priceRules: [
         (v) => !!v || "price is required",
         (v) => /^\d*$/.test(v) || "price must be valid",
       ],
+
       bandwidth: "",
       upSpeed: "",
       downSpeed: "",
@@ -813,6 +818,7 @@ export default {
       selectallTitle: "Select All",
     };
   },
+
   computed: {
     isSubmitDisabled() {
       return !(
@@ -828,6 +834,7 @@ export default {
         this.areas.length
       );
     },
+
     isResetDisabled() {
       return !(
         this.packageName ||
@@ -1025,7 +1032,7 @@ export default {
     },
 
     offerConfirmPressed() {
-      console.log(this.selectedOffer);
+      // console.log(this.selectedOffer);
       this.dialog3 = false;
       axios
         .post("/api/package/addOffer", {
@@ -1034,7 +1041,7 @@ export default {
           offerId: this.selectedOffer,
         })
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.status === 200) {
             this.pkgs[this.currPkgIdx].offerId = this.selectedOffer;
             this.currPkgIdx = -1;
@@ -1062,7 +1069,7 @@ export default {
             offerId: this.selectedOffer,
           })
           .then((res) => {
-            console.log(res);
+            // console.log(res);
             if (res.status === 200) {
               this.pkgs[this.currPkgIdx].offerId = this.selectedOffer;
               this.currPkgIdx = -1;
@@ -1187,7 +1194,7 @@ export default {
           ? this.filterDuration[0]
           : this.filterDuration[1];
       this.pkgs = [];
-      console.log(minPrice, maxPrice);
+      // console.log(minPrice, maxPrice);
       for (let pkg in this.allPkgs) {
         if (
           this.allPkgs[pkg].price >= minPrice &&
