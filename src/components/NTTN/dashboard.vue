@@ -44,14 +44,14 @@
                   </v-list-item-title>
                 </v-list-item>
 
-                <v-list-item link @click="pageInfo = 'tickets'">
+                <v-list-item link @click="showTickets">
                   <v-list-item-icon>
                     <v-icon color="getColor"> mdi-account-multiple </v-icon>
                   </v-list-item-icon>
                   <v-list-item-title> Tickets </v-list-item-title>
                 </v-list-item>
 
-                <v-list-item link @click="pageInfo = 'notify'">
+                <v-list-item link @click="sendNotification">
                   <v-list-item-icon>
                     <v-icon color="getColor"> mdi-star </v-icon>
                   </v-list-item-icon>
@@ -104,7 +104,7 @@
                           placeholder="e.g. Super_cheap"
                           v-model="offerName"
                           :counter="nameLen"
-                          :rules="nameRules"
+                          :rules="offerNameRules"
                           label="Offer Name"
                           required
                         ></v-text-field>
@@ -298,7 +298,55 @@
 
         <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'tickets'">
         </v-col>
+
         <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'notify'">
+          <!-- contents here -->
+          <!-- <v-col cols="12">
+            <v-textarea color="teal">
+              <template v-slot:label>
+                <div>Bio</div>
+              </template>
+            </v-textarea>
+          </v-col> -->
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <div style="width:80%">
+              <v-text-field
+                v-model="ispName"
+                :rules="ispNameRules"
+                label="ISP name"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="subject"
+                :rules="subjectRules"
+                label="Subject"
+                required
+              ></v-text-field>
+              <v-textarea
+                color="teal"
+                v-model="details"
+                :rules="detailsRules"
+                label="Details"
+                required
+              >
+              </v-textarea>
+
+              <v-card-actions>
+                <v-btn
+                  :disabled="isSendDisabled"
+                  color="success"
+                  class="mr-4"
+                  @click="sendPressed"
+                >
+                  Send
+                </v-btn>
+              </v-card-actions>
+
+              <v-snackbar :value="showSnackbar">
+                Notification Sent
+              </v-snackbar>
+            </div>
+          </v-form>
         </v-col>
       </v-row>
     </div>
@@ -320,13 +368,29 @@ export default {
       valid: false,
       show: false,
 
+      ispList: [],
+      ispNameList: [],
+      ispName: "",
+      ispNameRules: [
+        (v) => !!v || "Name is required",
+        (v) => !(v && !this.ispNameList.includes(v.trim())) || "ISP not found",
+        // (v) =>
+        //   (v && v.length <= this.nameLen) ||
+        //   `Name must be less than ${this.nameLen} characters`,
+      ],
+      subject: "",
+      subjectRules: [(v) => !!v || "Subject is required"],
+      details: "",
+      detailsRules: [(v) => !!v || "Details is required"],
+
       offerName: "",
       nameLen: 20,
-      nameList: [],
-      nameRules: [
+      offerNameList: [],
+      offerNameRules: [
         (v) => !!v || "Name is required",
         (v) =>
-          !(v && this.nameList.includes(v.trim())) || "Name already in use",
+          !(v && this.offerNameList.includes(v.trim())) ||
+          "Name already in use",
         (v) =>
           (v && v.length <= this.nameLen) ||
           `Name must be less than ${this.nameLen} characters`,
@@ -336,6 +400,7 @@ export default {
       dialog: false,
       pageInfo: "",
       allOffers: [],
+      showSnackbar: false,
 
       menu: "",
       dates: [],
@@ -346,26 +411,7 @@ export default {
     };
   },
 
-  created() {
-    axios
-      .post("/api/offer/fetchByQuery", {
-        creator: "Nttn",
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          this.allOffers = res.data.data;
-          this.nameList = [];
-          for (let i in this.allOffers) {
-            this.nameList.push(this.allOffers[i].name);
-          }
-        } else {
-          this.error = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  },
+  created() {},
 
   computed: {
     getToday() {
@@ -377,9 +423,15 @@ export default {
     isInOffer() {
       return this.pageInfo === "offers";
     },
+
     dateRangeText() {
       return this.dates.join(" ~ ");
     },
+
+    isSendDisabled() {
+      return !(this.ispName && this.subject && this.details && this.valid);
+    },
+
     isSubmitDisabled() {
       return !(this.offerName && this.dates.length === 2 && this.valid);
     },
@@ -390,7 +442,53 @@ export default {
   },
 
   methods: {
+    sendNotification() {
+      axios
+        .get("/api/isp/fetch")
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            console.log(res.data.data);
+            this.ispList = res.data.data;
+            this.ispNameList = [];
+            for (let i in this.ispList) {
+              this.ispNameList.push(this.ispList[i].name);
+            }
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      this.pageInfo = "notify";
+    },
+
+    showTickets() {
+      this.pageInfo = "tickets";
+    },
+
     showOffers() {
+      axios
+        .post("/api/offer/fetchByQuery", {
+          creator: "Nttn",
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.allOffers = res.data.data;
+            this.offerNameList = [];
+            for (let i in this.allOffers) {
+              this.offerNameList.push(this.allOffers[i].name);
+            }
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
       this.pageInfo = "offers";
     },
 
@@ -399,8 +497,41 @@ export default {
       this.dates = [];
     },
 
+    sendPressed() {
+      console.log("send pressed");
+
+      let newNotification = {
+        senderId: "Nttn",
+        receiverID: this.ispName,
+        senderType: 1,
+        receiverType: 2,
+        subject: this.subject,
+        details: this.details,
+        category: "",
+      };
+
+      axios
+        .post("/api/notification/insert", newNotification)
+        .then((res) => {
+          console.log(res);
+          if (res.status === 201) {
+            this.$refs.form.reset();
+            this.showSnackbar = true;
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      setTimeout(() => {
+        this.showSnackbar = false;
+      }, 2000);
+    },
+
     submitPressed() {
-      console.log("submit pressed");
+      // console.log("submit pressed");
 
       let newOffer = {
         name: this.offerName,
@@ -418,8 +549,8 @@ export default {
           if (res.status === 201) {
             this.allOffers.push(newOffer);
             // console.log(this.allOffers);
-            this.nameList = [];
-            this.nameList.push(newOffer.name);
+            this.offerNameList = [];
+            this.offerNameList.push(newOffer.name);
           } else {
             this.error = true;
           }
