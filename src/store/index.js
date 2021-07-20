@@ -9,59 +9,44 @@ export default new Vuex.Store({
     state: {
         // baseUrl: 'https://mindshare-backend.df.r.appspot.com',
         baseUrl: '',
+        loggedIn: false,
         authToken: '',
         userName: '',
+        userType: '',
         userEmail: '',
-        loggedIn: false,
+        // 
+        intervalID: null,
         notificationCount: 0,
         selectedPackage: '',
         currentPage: 'home',
-        selPkgName: '',
-        selPkgPrice: '',
-        selPkgBand: '',
-        selPkgDur: '',
         isPaid: false,
         comparedPkgs: [],
     },
     getters: {
+        getBaseUrl: state => {
+            return state.baseUrl;
+        },
         isLoggedIn: state => {
             return state.loggedIn;
-        },
-        getTemplateCampaign: state => {
-            return state.templateCampaign;
         },
         getAuthToken: state => {
             return state.authToken;
         },
-        getNtfCount: state => {
-            return state.notificationCount;
-        },
         getUserName: state => {
             return state.userName;
+        },
+        getUserType: state => {
+            return state.userType;
         },
         getUserEmail: state => {
             return state.userEmail;
         },
-        getBaseUrl: state => {
-            return state.baseUrl;
+        //
+        getNtfCount: state => {
+            return state.notificationCount;
         },
         getCurrentPage: state => {
             return state.currentPage;
-        },
-        getSelectedPackage: state => {
-            return state.selectedPackage;
-        },
-        getSelPkgName: state => {
-            return state.selPkgName;
-        },
-        getSelPkgPrice: state => {
-            return state.selPkgPrice;
-        },
-        getSelPkgBand: state => {
-            return state.selPkgBand;
-        },
-        getSelPkgDur: state => {
-            return state.selPkgDur;
         },
         getComapredPkgs: state => {
             return state.comparedPkgs;
@@ -72,21 +57,37 @@ export default new Vuex.Store({
     },
 
     mutations: {
+        setBaseUrl: (state, baseUrl) => {
+            state.baseUrl = baseUrl;
+        },
         setLoggedIn: state => {
             state.loggedIn = true;
         },
         setLoggedOut: state => {
             state.loggedIn = false;
         },
-        setTemplateCampaign: (state, templateCampaign) => {
-            state.templateCampaign = templateCampaign;
-        },
-        resetTemplateCampaign: state => {
-            state.templateCampaign = [];
-        },
         setAuthToken: (state, authToken) => {
             state.authToken = authToken;
         },
+        resetAuthToken: state => {
+            state.authToken = '';
+        },
+        setUserName: (state, userName) => {
+            state.userName = userName;
+        },
+        resetUserName: state => {
+            state.userName = '';
+        },
+        setUserType: (state, userType) => {
+            state.userType = userType;
+        },
+        resetUserType: state => {
+            state.userType = '';
+        },
+        setUserEmail: (state, userEmail) => {
+            state.userEmail = userEmail;
+        },
+        //
         setNtfCount: (state, notificationCount) => {
             state.notificationCount = notificationCount;
         },
@@ -94,38 +95,8 @@ export default new Vuex.Store({
             if (state.notificationCount > 0)
                 state.notificationCount--;
         },
-        setUserName: (state, userName) => {
-            state.userName = userName;
-        },
-        setUserEmail: (state, userEmail) => {
-            state.userEmail = userEmail;
-        },
-        setBaseUrl: (state, baseUrl) => {
-            state.baseUrl = baseUrl;
-        },
-        resetAuthToken: state => {
-            state.authToken = '';
-        },
-        resetUserEmail: state => {
-            state.userEmail = '';
-        },
         setCurrentPage: (state, currentPage) => {
             state.currentPage = currentPage;
-        },
-        setSelectedPackage: (state, selectedPackage) => {
-            state.selectedPackage = selectedPackage;
-        },
-        setSelPkgName: (state, name) => {
-            state.selPkgName = name;
-        },
-        setSelPkgPrice: (state, price) => {
-            state.selPkgPrice = price;
-        },
-        setSelPkgBand: (state, band) => {
-            state.selPkgBand = band;
-        },
-        setSelPkgDur: (state, dur) => {
-            state.selPkgDur = dur;
         },
         setComparedPkgs: (state, comPacks) => {
             state.comparedPkgs = comPacks;

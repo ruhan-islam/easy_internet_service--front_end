@@ -1,7 +1,5 @@
 <template>
   <div>
-    <topbar></topbar>
-
     <div class="container mt-5">
       <!-- contents here  -->
       <v-row justify="center">
@@ -1068,17 +1066,11 @@
     <v-snackbar :value="showSnackbar" style="margin: auto">
       Payment Successful
     </v-snackbar>
-
-    <bottombar></bottombar>
   </div>
 </template>
 
 <script>
-import topbar from "./topbar.vue";
-import bottombar from "./bottombar.vue";
-
 export default {
-  components: { topbar, bottombar },
   data() {
     return {
       cardtags: ["VISA", "MasterCard", "DBBL NEXUS"],

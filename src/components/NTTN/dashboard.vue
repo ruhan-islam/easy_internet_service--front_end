@@ -5,6 +5,7 @@
     <div class="container-flow">
       <!-- contents here  -->
       <v-row>
+        <!-- sidebar -->
         <v-col cols="2">
           <v-card height="500">
             <v-navigation-drawer width="100%">

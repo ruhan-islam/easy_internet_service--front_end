@@ -16,13 +16,12 @@
                 @click="expandClicked(i)"
                 disable-icon-rotate
               >
-                {{ notification.subject }} &nbsp;
-                <!-- <small>
-                  {{ notification.notificationArrivalTime.slice(0, 10) }}
-                  @ {{ notification.notificationArrivalTime.slice(11, 19) }}
-                </small> -->
-                <small>
-                  @ {{ notification.notificationArrivalTime.slice(0, 10) }}
+                <strong> {{ notification.subject }} </strong> &nbsp;
+                <small class="text-right">
+                  @
+                  {{
+                    notification.notificationArrivalTime.toString().slice(0, 24)
+                  }}
                 </small>
                 <template v-if="notification.seenStatus" v-slot:actions>
                   <v-icon color="teal">
@@ -34,6 +33,9 @@
                 {{ notification.details }}
               </v-expansion-panel-content>
             </v-expansion-panel>
+            <!-- <v-col class="text-right">
+              <v-btn color="info"> Next </v-btn>
+            </v-col> -->
           </v-expansion-panels>
         </v-row>
       </template>
@@ -98,15 +100,13 @@ export default {
       .then((res) => {
         // console.log(res);
         if (res.status === 200) {
-          this.allNotifications = res.data.data;
+          this.allNotifications = res.data.data.reverse();
           // console.log(this.allNotifications);
-          // for (let i in this.allNotifications) {
-          //   let today = new Date(
-          //     this.allNotifications[i].notificationArrivalTime
-          //   );
-          //   today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-          //   this.allNotifications[i].notificationArrivalTime = today;
-          // }
+          for (let i in this.allNotifications) {
+            this.allNotifications[i].notificationArrivalTime = new Date(
+              this.allNotifications[i].notificationArrivalTime
+            );
+          }
         } else {
           this.error = true;
         }

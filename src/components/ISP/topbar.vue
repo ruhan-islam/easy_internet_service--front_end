@@ -106,16 +106,24 @@ export default {
 
   created() {
     this.myCallback();
-    setInterval(this.myCallback, 5000);
+    this.intervalID = setInterval(this.myCallback, 5000);
   },
 
   computed: {
-    ...mapGetters(["isLoggedIn", "getAuthToken", "getNtfCount", "getUserName"]),
+    ...mapGetters([
+      "isLoggedIn",
+      "getAuthToken",
+      "getNtfCount",
+      "getUserName",
+      "getUserType",
+    ]),
   },
 
   mounted() {
     if (!this.isLoggedIn) {
       this.$router.push("login");
+    } else if (this.getUserType !== "ISP") {
+      this.$router.go(-1);
     }
   },
 
@@ -131,6 +139,7 @@ export default {
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
+            // console.log(res.data.unseenCount);
             this.setNtfCount(res.data.unseenCount);
           } else {
             this.error = true;
@@ -149,8 +158,12 @@ export default {
         .then((res) => {
           //console.log(res);
           if (res.status == 200) {
-            this.setLoggedOut;
+            clearInterval(this.intervalID);
+            this.setNtfCount(0);
+            this.resetUserName;
+            this.resetUserType;
             this.resetAuthToken;
+            this.setLoggedOut;
             this.$router.push("/login");
           }
         })

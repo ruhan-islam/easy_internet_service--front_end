@@ -354,10 +354,10 @@
                           <v-row v-else no-gutters style="width: 100%">
                             <v-col cols="6" style="color: green">
                               Min Cost:
-                              {{ filterPrice[0] || "Not set" }}
+                              {{ filterPrice[0] }}
                             </v-col>
                             <v-col cols="6" style="color: red">
-                              Max Cost: {{ filterPrice[1] || "Not set" }}
+                              Max Cost: {{ filterPrice[1] }}
                             </v-col>
                           </v-row>
                         </v-fade-transition>
@@ -395,10 +395,10 @@
                           <v-row v-else no-gutters style="width: 100%">
                             <v-col cols="6" style="color: green">
                               Min BW:
-                              {{ filterBW[0] || "Not set" }}
+                              {{ filterBW[0] }}
                             </v-col>
                             <v-col cols="6" style="color: red">
-                              Max BW: {{ filterBW[1] || "Not set" }}
+                              Max BW: {{ filterBW[1] }}
                             </v-col>
                           </v-row>
                         </v-fade-transition>
@@ -433,10 +433,10 @@
                           <v-row v-else no-gutters style="width: 100%">
                             <v-col cols="6" style="color: green">
                               Min Period:
-                              {{ filterDuration[0] || "Not set" }}
+                              {{ filterDuration[0] }}
                             </v-col>
                             <v-col cols="6" style="color: red">
-                              Max Period: {{ filterDuration[1] || "Not set" }}
+                              Max Period: {{ filterDuration[1] }}
                             </v-col>
                           </v-row>
                         </v-fade-transition>
@@ -460,7 +460,7 @@
 
           <v-card-actions>
             <v-row align="center" justify="end">
-              <v-col cols="8"></v-col>
+              <v-col cols="6"></v-col>
               <v-col>
                 <v-btn
                   color="deep-purple lighten-2"
@@ -472,6 +472,18 @@
                   Filter <v-icon>mdi-filter</v-icon>
                 </v-btn>
               </v-col>
+
+              <v-col>
+                <v-btn
+                  color="deep-purple lighten-2"
+                  @click="clearFilter"
+                  dark
+                  margin="10px"
+                >
+                  Clear Filter
+                </v-btn>
+              </v-col>
+
               <v-col>
                 <v-menu offset-y>
                   <template v-slot:activator="{ attrs, on }">
@@ -1041,7 +1053,7 @@ export default {
           offerId: this.selectedOffer,
         })
         .then((res) => {
-          // console.log(res);
+          console.log(res);
           if (res.status === 200) {
             this.pkgs[this.currPkgIdx].offerId = this.selectedOffer;
             this.currPkgIdx = -1;
@@ -1061,7 +1073,7 @@ export default {
       if (this.allPkgs[i].offerId === "-1") {
         this.dialog3 = true;
       } else {
-        this.selectedOffer = "-1";
+        this.selectedOffer = "-1"; // for removing offer
         axios
           .post("/api/package/addOffer", {
             name: this.pkgs[this.currPkgIdx].name,
@@ -1069,7 +1081,7 @@ export default {
             offerId: this.selectedOffer,
           })
           .then((res) => {
-            // console.log(res);
+            console.log(res);
             if (res.status === 200) {
               this.pkgs[this.currPkgIdx].offerId = this.selectedOffer;
               this.currPkgIdx = -1;
@@ -1208,6 +1220,13 @@ export default {
         }
       }
       this.markVal = 0;
+    },
+
+    clearFilter() {
+      this.filterPrice = [0, 1000000];
+      this.filterBW = [1, 200];
+      this.filterDuration = [1, 24];
+      this.pkgs = this.allPkgs;
     },
   },
 };

@@ -1,5 +1,7 @@
 <template>
   <div>
+    <!-- <topbar></topbar> -->
+
     <div class="container mt-5">
       <!-- contents here  -->
       <v-row>
@@ -12,6 +14,8 @@
       </v-row>
     </div>
   </div>
+
+  <!-- <bottombar></bottombar> -->
 </template>
 
 <script>

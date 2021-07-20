@@ -8,7 +8,6 @@ import ISP_packages from "../components/ISP/packages";
 import ISP_payments from "../components/ISP/payments";
 //
 import login from "../components/login";
-import notFound from "../components/notFound";
 //
 import NTTN_dashboard from "../components/NTTN/dashboard";
 import NTTN_home from "../components/NTTN/home";
@@ -74,8 +73,20 @@ const routes = [
   },
   //
   {
-    path: '*', 
-    component: notFound,
+    path: "/NTTN/*", 
+    component: () => import("../components/NTTN/notFound"),
+  },
+  {
+    path: "/ISP/*", 
+    component: () => import("../components/ISP/notFound"),
+  },
+  {
+    path: "/USER/*", 
+    component: () => import("../components/USER/notFound"),
+  },
+  {
+    path: "*", 
+    component: () => import("../components/notFound"),
   }
 ];
 

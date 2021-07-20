@@ -254,7 +254,11 @@ export default {
       })
       .then((res) => {
         this.allPkgs = res.data.data;
-        this.pkgs = this.allPkgs;
+        for (let i in this.allPkgs) {
+          if (this.allPkgs[i].ongoing) {
+            this.pkgs.push(this.allPkgs[i]);
+          }
+        }
       })
       .catch((err) => {
         console.log(err);

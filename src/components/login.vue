@@ -44,8 +44,6 @@ import { mapMutations, mapGetters } from "vuex";
 export default {
   data() {
     return {
-      ...mapMutations(["setLoggedIn", "setAuthToken", "setUserName"]),
-      ...mapGetters(["getUserName"]),
       valid: false,
       username: "",
       password: "",
@@ -69,7 +67,18 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters(["getUserName"]),
+  },
+
   methods: {
+    ...mapMutations([
+      "setLoggedIn",
+      "setAuthToken",
+      "setUserName",
+      "setUserType",
+    ]),
+
     validateLogin() {
       let api = "/api/" + this.type.toLowerCase() + "/login";
       let dest = "/" + this.type + "/home";
@@ -82,9 +91,15 @@ export default {
         .then((res) => {
           // console.log(res);
           if (res.status === 201) {
+            if (this.username === "nttn") {
+              this.username = "Nttn";
+            }
+
             this.setLoggedIn();
             this.setAuthToken(res.data.token);
+            this.setUserType(this.type);
             this.setUserName(this.username);
+
             this.$router.push(dest);
           } else {
             this.error = true;

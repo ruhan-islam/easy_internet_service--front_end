@@ -307,7 +307,7 @@
 
           <v-card v-show="page === 7">
             <v-card-text>
-              <div style="text-align:center;padding:3% 7%">
+              <div>
                 <img
                   padding
                   src="https://raw.githubusercontent.com/Shipu/bkash-example/master/bkash_payment_logo.png"
@@ -315,9 +315,9 @@
                   alt="bkash payment"
                 />
               </div>
-              <hr style="border: 2px solid #ff0000;border-radius: 15px;" />
+              <hr />
 
-              <v-row style="padding:0% 5%">
+              <v-row>
                 <v-col>
                   <strong>Amader Internet</strong>
                 </v-col>
@@ -326,23 +326,16 @@
                 </v-col>
               </v-row>
 
-              <div style="background-color:#F21170">
-                <p
-                  style="color: white;text-align:center;font-size: 15px;padding:10% 0%"
-                >
-                  Your bKash Account number
-                </p>
+              <div>
+                <p>Your bKash Account number</p>
                 <v-form ref="form" v-model="validBkashNo" lazy-validation>
                   <v-text-field
-                    style="margin:0% 20%;background-color:#ffffff"
                     v-model="accntnumber"
                     :rules="accntNoRules"
                     required
                   ></v-text-field>
                 </v-form>
-                <p
-                  style="color: white;text-align:center;font-size: 11px;padding:10% 0%"
-                >
+                <p>
                   By clicking on Confirm, you are agreeing to the
                   <a href="https://www.bkash.com/terms-of-use-checkout"
                     >terms & conditions</a

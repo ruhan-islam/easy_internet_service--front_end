@@ -17,11 +17,7 @@
                 disable-icon-rotate
               >
                 <strong> {{ notification.subject }} </strong> &nbsp;
-                <!-- <small>
-                  {{ notification.notificationArrivalTime.slice(0, 10) }}
-                  @ {{ notification.notificationArrivalTime.slice(11, 19) }}
-                </small> -->
-                <small>
+                <small class="text-right">
                   @
                   {{
                     notification.notificationArrivalTime.toString().slice(0, 24)
