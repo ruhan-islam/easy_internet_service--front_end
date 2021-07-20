@@ -38,7 +38,7 @@
       </template>
     </div>
 
-    <bottombar class="ma-12"></bottombar>
+    <bottombar></bottombar>
   </div>
 </template>
 
