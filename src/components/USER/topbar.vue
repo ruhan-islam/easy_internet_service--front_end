@@ -102,8 +102,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapGetters, mapMutations } from "vuex";
+import axios from "axios";
 
 export default {
   data() {
@@ -128,9 +128,10 @@ export default {
   },
 
   mounted() {
-    if (!this.isLoggedIn) {
-      this.$router.push("login");
-    } else if (this.getUserType !== "NTTN") {
+    // if (!this.isLoggedIn) {
+    //   this.$router.push("/login");
+    // } else
+    if (this.getUserType !== "USER") {
       this.$router.go(-1);
     }
   },

@@ -3,7 +3,7 @@
     <!-- contents here  -->
 
     <!-- package filters  -->
-    <v-row class="ma-1" justify="center">
+    <v-row v-if="myPackage === ''" class="ma-1" justify="center">
       <v-card style="padding:0px 20px">
         <v-card-title>Search ISP Packages</v-card-title>
         <v-expansion-panels>
@@ -176,7 +176,8 @@
       </v-card>
     </v-row>
 
-    <v-row>
+    <!-- show ISP packages -->
+    <v-row v-if="myPackage === ''">
       <div class="col-lg-4" v-for="(pkg, i) in pkgs" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
@@ -307,6 +308,135 @@
         </v-card>
       </v-dialog>
     </v-row>
+
+    <!-- show own package -->
+    <v-row v-if="myPackage !== ''">
+      <v-col class="col-lg-4">
+        <v-card>
+          <v-img height="250" src="./../../assets/images.jpg"></v-img>
+
+          <v-card-title>
+            {{ myPackage.name }} &nbsp;
+            <v-chip v-if="!myPackage.ongoing" color="red"> Disabled </v-chip>
+          </v-card-title>
+
+          <v-card-text>
+            <div class="my-4 text-subtitle-1">
+              Taka
+              <span v-if="myPackage.offerId === '-1'">
+                {{ myPackage.price }}
+              </span>
+              <template v-if="myPackage.offerId !== '-1'">
+                <s>{{ myPackage.price }}</s>
+                <span>
+                  &nbsp;
+                  {{
+                    calculateReducedPrice(myPackage.price, myPackage.offerId)
+                  }}
+                </span>
+                <v-chip color="deep-purple">
+                  <span style="color:white">
+                    {{ getOfferName(myPackage.offerId) }}
+                  </span>
+                </v-chip>
+              </template>
+            </div>
+            <v-chip-group
+              active-class="deep-purple accent-4 white--text"
+              column
+            >
+              <v-chip>{{ myPackage.bandwidth }} GBPS</v-chip>
+              <v-chip>{{ myPackage.duration }} months</v-chip>
+            </v-chip-group>
+            <div>
+              {{ myPackage.bandwidth }} GBPS speed relentless speed of unlimited
+              traffic with 24/7 service.
+            </div>
+          </v-card-text>
+
+          <!-- <v-card-actions>
+          <v-btn color="deep-purple lighten-2" @click="detailsPressed(i)" text>
+            Details
+          </v-btn>
+        </v-card-actions> -->
+        </v-card>
+      </v-col>
+
+      <v-col class="col-lg-1"> </v-col>
+
+      <v-col class="col-lg-6">
+        <v-card>
+          <!-- <v-card-text> -->
+          <v-simple-table dark>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Features</th>
+                  <th class="text-left">Availibility</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- <tr v-for="item in pkgDetails" :key="item.name"> -->
+                <tr>
+                  <td>Package Name</td>
+                  <td>{{ myPackage.name }}</td>
+                </tr>
+                <tr>
+                  <td>Price (Taka)</td>
+                  <td>Tk. {{ myPackage.price }} /ISP</td>
+                </tr>
+                <tr>
+                  <td>Bandwidth (GBPS)</td>
+                  <td>{{ myPackage.bandwidth }} GBPS</td>
+                </tr>
+                <tr>
+                  <td>Duration (months)</td>
+                  <td>{{ myPackage.duration }} months</td>
+                </tr>
+                <tr>
+                  <td>Coverage Area</td>
+                  <td>{{ myPackage.areas }}</td>
+                </tr>
+                <tr>
+                  <td>Upload Speed (GBPS)</td>
+                  <td>{{ myPackage.up_speed }} GBPS</td>
+                </tr>
+                <tr>
+                  <td>Download Speed (GBPS)</td>
+                  <td>{{ myPackage.down_speed }} GBPS</td>
+                </tr>
+                <tr>
+                  <td>Data Limit</td>
+                  <td>Unlimited</td>
+                </tr>
+                <tr>
+                  <td>Estimated Down Time (hours)</td>
+                  <td>{{ myPackage.downTime }} hrs</td>
+                </tr>
+                <tr>
+                  <td>Estimated Response Time (milliseconds)</td>
+                  <td>{{ myPackage.responseTime }} ms</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+          <!-- </v-card-text> -->
+
+          <!-- <v-card-actions>
+            <v-btn
+              color="green darken-1"
+              text
+              @click="
+                dialog2 = false;
+                currPkgIdx = -1;
+              "
+            >
+              Close
+            </v-btn>
+          </v-card-actions> -->
+        </v-card>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -317,6 +447,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      myPackage: "",
       allOffers: [],
       validOffers: [],
       allPkgs: [],
@@ -340,7 +471,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserID"]),
+    ...mapGetters(["getUserPkgID"]),
   },
 
   created() {
@@ -350,31 +481,32 @@ export default {
   },
 
   updated() {
-    this.fetchOffers();
-    this.fetchPackages();
+    // this.fetchOffers();
+    // this.fetchPackages();
     // this.fetchOwnPackage();
   },
 
   methods: {
     fetchOwnPackage() {
       // console.log("in");
-      console.log(this.getUserID);
-      // axios
-      //   .post("/api/isp/fetchOwnPackage", {
-      //     package_id: this.getUser.package_id,
-      //   })
-      //   .then((res) => {
-      //     console.log(res);
-      //     // if (res.status === 200) {
-      //     //   this.allPkgs = res.data.data;
-      //     //   this.pkgs = this.allPkgs;
-      //     // } else {
-      //     //   this.error = true;
-      //     // }
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
+      // console.log(this.getUserPkgID);
+      axios
+        .post("/api/isp/fetchOwnPackage", {
+          package_id: this.getUserPkgID,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            // console.log(res.data[0]);
+            this.myPackage = res.data[0];
+            // console.log(this.myPackage);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     fetchPackages() {

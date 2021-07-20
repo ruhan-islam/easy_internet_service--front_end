@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mt-5">
     <v-footer dark padless>
       <v-card
         style="width:100%"

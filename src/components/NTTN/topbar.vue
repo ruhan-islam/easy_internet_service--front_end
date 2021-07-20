@@ -113,8 +113,8 @@ export default {
   },
 
   created() {
-    this.myCallback();
-    this.intervalID = setInterval(this.myCallback, 5000);
+    this.fetchNotificationCount();
+    this.intervalID = setInterval(this.fetchNotificationCount, 2000);
   },
 
   computed: {
@@ -128,9 +128,10 @@ export default {
   },
 
   mounted() {
-    if (!this.isLoggedIn) {
-      this.$router.push("login");
-    } else if (this.getUserType !== "NTTN") {
+    // if (!this.isLoggedIn) {
+    //   this.$router.push("login");
+    // } else
+    if (this.getUserType !== "NTTN") {
       this.$router.go(-1);
     }
   },
@@ -145,7 +146,7 @@ export default {
       "setNtfCount",
     ]),
 
-    myCallback() {
+    fetchNotificationCount() {
       axios
         .post("/api/notification/unseenNotificationCount", {
           receiverID: "Nttn",

@@ -11,6 +11,16 @@ export default new Vuex.Store({
         baseUrl: '',
         loggedIn: false,
         authToken: '',
+        // userData: {
+        //     name: "",
+        //     estTime: "",
+        //     expTime: "",
+        //     connStatus: false,
+        //     balance: 0,
+        //     pkgID: "",
+        //     licenseID: "",
+        //     remBW: 0,
+        // },
         userID: '',
         userName: '',
         userType: '',
@@ -24,6 +34,7 @@ export default new Vuex.Store({
         isPaid: false,
         comparedPkgs: [],
     },
+
     getters: {
         getBaseUrl: state => {
             return state.baseUrl;
@@ -34,6 +45,9 @@ export default new Vuex.Store({
         getAuthToken: state => {
             return state.authToken;
         },
+        // getUserData: state => {
+        //     return state.userData;
+        // },
         getUserID: state => {
             return state.userID;
         },
@@ -80,6 +94,16 @@ export default new Vuex.Store({
         resetAuthToken: state => {
             state.authToken = '';
         },
+        // setUserData: (state, userData) => {
+        //     state.userData.name = userData.name;
+        //     state.userData.estTime = userData.connection_establishment_time;
+        //     state.userData.expTime = userData.connection_expiration_time;
+        //     state.userData.balance = userData.balance;
+        //     state.userData.licenseID = userData.license_id;
+        //     state.userData.pkgID = userData.package_id;
+        //     state.userData.connStatus = userData.connection_status;
+        //     state.userData.remBW = userData.remaining_bandwidth;
+        // },
         setUserID: (state, userID) => {
             state.userID = userID;
         },

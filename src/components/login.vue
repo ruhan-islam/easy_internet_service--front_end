@@ -39,7 +39,7 @@
 
 <script>
 import axios from "axios";
-import { mapMutations } from "vuex";
+import { mapMutations, mapGetters } from "vuex";
 
 export default {
   data() {
@@ -67,6 +67,17 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters([
+      "isLoggedIn",
+      "getUserData",
+      "getAuthToken",
+      "getNtfCount",
+      "getUserName",
+      "getUserType",
+    ]),
+  },
+
   created() {
     this.show1 = false;
     this.valid = false;
@@ -76,7 +87,7 @@ export default {
     ...mapMutations([
       "setLoggedIn",
       "setAuthToken",
-      "setUser",
+      "setUserData",
       "setUserID",
       "setUserName",
       "setUserType",
@@ -93,7 +104,7 @@ export default {
           password: this.password,
         })
         .then((res) => {
-          // console.log(res);
+          console.log(res);
           if (res.status === 201) {
             if (this.username === "nttn") {
               this.username = "Nttn";
@@ -102,12 +113,14 @@ export default {
             }
 
             this.setAuthToken(res.data.token);
+            this.setUserData(res.data.user);
             this.setUserID(res.data.user._id);
-            this.setUserType(this.type);
+            this.setUserType(this.type.toUpperCase());
             this.setUserName(this.username);
             this.setLoggedIn();
             this.$router.push(dest);
             this.$router.go();
+            // console.log(this.getUserData);
           } else {
             this.error = true;
           }

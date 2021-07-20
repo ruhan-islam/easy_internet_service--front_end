@@ -23,6 +23,9 @@ export default {
   data() {
     return {};
   },
+  mounted() {
+    this.$router.push("/");
+  },
   methods: {},
   computed: {},
 };

@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 
 export default {
@@ -77,12 +78,28 @@ export default {
   },
 
   computed: {
+    ...mapGetters([
+      // "isLoggedIn",
+      // "getAuthToken",
+      // "getNtfCount",
+      // "getUserName",
+      // "getUserType",
+    ]),
+
     isSendDisabled() {
-      return !(this.ispName && this.subject && this.details && this.valid);
+      return !(this.userName && this.subject && this.details && this.valid);
     },
   },
 
   methods: {
+    ...mapMutations([
+      // "setLoggedOut",
+      // "resetAuthToken",
+      // "setNtfCount",
+      // "resetUserName",
+      // "resetUserType",
+    ]),
+
     fetchUserNameList() {
       axios
         .get("/api/user/fetch")
@@ -109,10 +126,10 @@ export default {
       // console.log("send pressed");
 
       let newNotification = {
-        senderId: "Nttn",
-        receiverID: this.ispName,
-        senderType: 1,
-        receiverType: 2,
+        senderId: this.getUserName,
+        receiverID: this.userName,
+        senderType: 2,
+        receiverType: 3,
         subject: this.subject,
         details: this.details,
         category: "",
@@ -127,6 +144,9 @@ export default {
           if (res.status === 201) {
             this.$refs.form.reset();
             this.showSnackbar = true;
+            setTimeout(() => {
+              this.showSnackbar = false;
+            }, 2000);
           } else {
             this.error = true;
           }
@@ -134,10 +154,6 @@ export default {
         .catch((err) => {
           console.log(err);
         });
-
-      setTimeout(() => {
-        this.showSnackbar = false;
-      }, 2000);
     },
   },
 };

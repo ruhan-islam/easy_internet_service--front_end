@@ -14,6 +14,8 @@ import NTTN_home from "../components/NTTN/home";
 import NTTN_notifications from "../components/NTTN/notifications";
 import NTTN_packages from "../components/NTTN/packages";
 import NTTN_payments from "../components/NTTN/payments";
+//
+import store from '../store/index';
 
 
 
@@ -23,76 +25,139 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
+    meta: {
+			requireLoggedIn: false
+		},
     component: login,
   },
   {
     path: "/login",
+    meta: {
+			requireLoggedIn: false
+		},
     component: login,
   },
   //
   {
     path: "/ISP/home",
+    meta: {
+			requireLoggedIn: true
+		},
     component: ISP_home,
   },
   {
     path: "/ISP/packages",
+    meta: {
+			requireLoggedIn: true
+		},
     component: ISP_packages,
   },
   {
     path: "/ISP/payments",
+    meta: {
+			requireLoggedIn: true
+		},
     component: ISP_payments,
   },
   {
     path: "/ISP/notifications",
+    meta: {
+			requireLoggedIn: true
+		},
     component: ISP_notifications,
   },
   {
     path: "/ISP/dashboard",
+    meta: {
+			requireLoggedIn: true
+		},
     component: ISP_dashboard,
   },
   //
   {
     path: "/NTTN/home",
+    meta: {
+			requireLoggedIn: true
+		},
     component: NTTN_home,
   },
   {
     path: "/NTTN/packages",
+    meta: {
+			requireLoggedIn: true
+		},
     component: NTTN_packages,
   },
   {
     path: "/NTTN/payments",
+    meta: {
+			requireLoggedIn: true
+		},
     component: NTTN_payments,
   },
   {
     path: "/NTTN/notifications",
+    meta: {
+			requireLoggedIn: true
+		},
     component: NTTN_notifications,
   },
   {
     path: "/NTTN/dashboard",
+    meta: {
+			requireLoggedIn: true
+		},
     component: NTTN_dashboard,
   },
   //
   {
-    path: "/NTTN/*", 
+    path: "/NTTN/*",
+    meta: {
+			requireLoggedIn: true
+		},
     component: () => import("../components/NTTN/notFound"),
   },
   {
-    path: "/ISP/*", 
+    path: "/ISP/*",
+    meta: {
+			requireLoggedIn: true
+		},
     component: () => import("../components/ISP/notFound"),
   },
   {
-    path: "/USER/*", 
+    path: "/USER/*",
+    meta: {
+			requireLoggedIn: true
+		},
     component: () => import("../components/USER/notFound"),
   },
   {
-    path: "*", 
+    path: "*",
+    meta: {
+			requireLoggedIn: true
+		},
     component: () => import("../components/notFound"),
   }
 ];
 
 const router = new VueRouter({
-  mode: "history",
-  routes,
+  routes: routes,
+  mode: 'history',
+  history: 'enable',
+  scrollBehavior() {
+    return {x: 0, y: 0}
+  }
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requireLoggedIn && !store.getters.isLoggedIn) {
+    next({
+      path: '/'
+    });
+  } else {
+    next();
+  }
+})
+
 
 export default router;
