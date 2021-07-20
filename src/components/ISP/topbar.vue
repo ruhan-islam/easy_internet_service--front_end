@@ -128,7 +128,13 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["setLoggedOut", "resetAuthToken", "setNtfCount"]),
+    ...mapMutations([
+      "resetUser",
+      "resetUserName",
+      "setLoggedOut",
+      "resetAuthToken",
+      "setNtfCount",
+    ]),
 
     myCallback() {
       axios
@@ -160,6 +166,7 @@ export default {
           if (res.status == 200) {
             clearInterval(this.intervalID);
             this.setNtfCount(0);
+            this.resetUser;
             this.resetUserName;
             this.resetUserType;
             this.resetAuthToken;

@@ -62,42 +62,42 @@ export default {
   },
 
   created() {
-    // console.log(this.getUserName);
-    // console.log(new Date());
+    this.fetchNotifications();
+  },
 
-    axios
-      .post("/api/notification/fetchByQuery", {
-        receiverID: this.getUserName,
-        receiverType: 2, // for ISP
-      })
-      .then((res) => {
-        // console.log(res);
-        if (res.status === 200) {
-          this.allNotifications = res.data.data.reverse();
-          // console.log(this.allNotifications);
-          for (let i in this.allNotifications) {
-            this.allNotifications[i].notificationArrivalTime = new Date(
-              this.allNotifications[i].notificationArrivalTime
-            );
-          }
-        } else {
-          this.error = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  updated() {
+    this.fetchNotifications();
   },
 
   methods: {
     ...mapMutations(["decNtfCount"]),
 
-    expandClicked(i) {
-      // console.log(this.allNotifications[i]._id);
-      // if (!this.allNotifications[i].seenStatus) {
-      //   this.allNotifications[i].seenStatus = true;
-      // }
+    fetchNotifications() {
+      axios
+        .post("/api/notification/fetchByQuery", {
+          receiverID: this.getUserName,
+          receiverType: 2, // for ISP
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            this.allNotifications = res.data.data.reverse();
+            // console.log(this.allNotifications);
+            for (let i in this.allNotifications) {
+              this.allNotifications[i].notificationArrivalTime = new Date(
+                this.allNotifications[i].notificationArrivalTime
+              );
+            }
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
 
+    expandClicked(i) {
       if (!this.allNotifications[i].seenStatus) {
         axios
           .post("/api/notification/updateSeenStatus", {

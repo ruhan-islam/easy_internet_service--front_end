@@ -1,4 +1,4 @@
-import * as Cookies from 'js-cookie';
+import Cookies from 'js-cookie';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
@@ -11,9 +11,11 @@ export default new Vuex.Store({
         baseUrl: '',
         loggedIn: false,
         authToken: '',
+        userID: '',
         userName: '',
         userType: '',
         userEmail: '',
+        userPkgID: '',
         // 
         intervalID: null,
         notificationCount: 0,
@@ -32,6 +34,9 @@ export default new Vuex.Store({
         getAuthToken: state => {
             return state.authToken;
         },
+        getUserID: state => {
+            return state.userID;
+        },
         getUserName: state => {
             return state.userName;
         },
@@ -40,6 +45,9 @@ export default new Vuex.Store({
         },
         getUserEmail: state => {
             return state.userEmail;
+        },
+        getUserPkgID: state => {
+            return state.userPkgID;
         },
         //
         getNtfCount: state => {
@@ -72,6 +80,9 @@ export default new Vuex.Store({
         resetAuthToken: state => {
             state.authToken = '';
         },
+        setUserID: (state, userID) => {
+            state.userID = userID;
+        },
         setUserName: (state, userName) => {
             state.userName = userName;
         },
@@ -86,6 +97,9 @@ export default new Vuex.Store({
         },
         setUserEmail: (state, userEmail) => {
             state.userEmail = userEmail;
+        },
+        setUserPkgID: (state, userPkgID) => {
+            state.userPkgID = userPkgID;
         },
         //
         setNtfCount: (state, notificationCount) => {

@@ -228,6 +228,7 @@
       </div>
     </v-row>
 
+    <!-- details -->
     <v-row v-if="currPkgIdx !== -1" justify="center">
       <v-dialog v-model="dialog2" max-width="40%" dark>
         <v-card>
@@ -236,10 +237,6 @@
           </v-card-title>
 
           <v-card-text>
-            <!-- object: {{ allPkgs[currPkgIdx] }} <br />
-              name: {{ allPkgs[currPkgIdx].name }} <br />
-              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} GBPS <br />-->
-
             <v-simple-table dark>
               <template v-slot:default>
                 <thead>
@@ -314,6 +311,7 @@
 </template>
 
 <script>
+import { mapGetters /* mapMutations, */ } from "vuex";
 import axios from "axios";
 
 export default {
@@ -341,49 +339,88 @@ export default {
     };
   },
 
-  created() {
-    axios
-      .post("/api/offer/fetchByQuery", {
-        creator: "Nttn",
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          this.allOffers = res.data.data;
-          // console.log(this.allOffers);
-          this.validOffers = [];
-          for (let i in this.allOffers) {
-            if (
-              this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
-            ) {
-              this.validOffers.push(this.allOffers[i]);
-            }
-          }
-        } else {
-          this.error = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  computed: {
+    ...mapGetters(["getUserID"]),
+  },
 
-    axios
-      .post("/api/package/fetchByQuery", {
-        packageCreator: "Nttn",
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          this.allPkgs = res.data.data;
-          this.pkgs = this.allPkgs;
-        } else {
-          this.error = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  created() {
+    this.fetchOffers();
+    this.fetchPackages();
+    this.fetchOwnPackage();
+  },
+
+  updated() {
+    this.fetchOffers();
+    this.fetchPackages();
+    // this.fetchOwnPackage();
   },
 
   methods: {
+    fetchOwnPackage() {
+      // console.log("in");
+      console.log(this.getUserID);
+      // axios
+      //   .post("/api/isp/fetchOwnPackage", {
+      //     package_id: this.getUser.package_id,
+      //   })
+      //   .then((res) => {
+      //     console.log(res);
+      //     // if (res.status === 200) {
+      //     //   this.allPkgs = res.data.data;
+      //     //   this.pkgs = this.allPkgs;
+      //     // } else {
+      //     //   this.error = true;
+      //     // }
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
+    },
+
+    fetchPackages() {
+      axios
+        .post("/api/package/fetchByQuery", {
+          packageCreator: "Nttn",
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.allPkgs = res.data.data;
+            this.pkgs = this.allPkgs;
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    fetchOffers() {
+      axios
+        .post("/api/offer/fetchByQuery", {
+          creator: "Nttn",
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.allOffers = res.data.data;
+            // console.log(this.allOffers);
+            this.validOffers = [];
+            for (let i in this.allOffers) {
+              if (
+                this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
+              ) {
+                this.validOffers.push(this.allOffers[i]);
+              }
+            }
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     getOfferName(offerId) {
       if (offerId === "-1") {
         return;
@@ -570,7 +607,5 @@ export default {
       this.pkgs = this.allPkgs;
     },
   },
-
-  computed: {},
 };
 </script>

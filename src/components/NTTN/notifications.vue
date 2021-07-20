@@ -33,9 +33,6 @@
                 {{ notification.details }}
               </v-expansion-panel-content>
             </v-expansion-panel>
-            <!-- <v-col class="text-right">
-              <v-btn color="info"> Next </v-btn>
-            </v-col> -->
           </v-expansion-panels>
         </v-row>
       </template>
@@ -61,15 +58,43 @@ export default {
     };
   },
 
+  created() {
+    this.fetchNotifications();
+  },
+
+  updated() {
+    this.fetchNotifications();
+  },
+
   methods: {
     ...mapMutations(["decNtfCount"]),
 
-    expandClicked(i) {
-      // console.log(this.allNotifications[i]._id);
-      // if (!this.allNotifications[i].seenStatus) {
-      //   this.allNotifications[i].seenStatus = true;
-      // }
+    fetchNotifications() {
+      axios
+        .post("/api/notification/fetchByQuery", {
+          receiverID: "Nttn",
+          receiverType: 1, // for NTTN
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            this.allNotifications = res.data.data.reverse();
+            // console.log(this.allNotifications);
+            for (let i in this.allNotifications) {
+              this.allNotifications[i].notificationArrivalTime = new Date(
+                this.allNotifications[i].notificationArrivalTime
+              );
+            }
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
 
+    expandClicked(i) {
       if (!this.allNotifications[i].seenStatus) {
         axios
           .post("/api/notification/updateSeenStatus", {
@@ -89,31 +114,6 @@ export default {
           });
       }
     },
-  },
-
-  created() {
-    axios
-      .post("/api/notification/fetchByQuery", {
-        receiverID: "Nttn",
-        receiverType: 1, // for NTTN
-      })
-      .then((res) => {
-        // console.log(res);
-        if (res.status === 200) {
-          this.allNotifications = res.data.data.reverse();
-          // console.log(this.allNotifications);
-          for (let i in this.allNotifications) {
-            this.allNotifications[i].notificationArrivalTime = new Date(
-              this.allNotifications[i].notificationArrivalTime
-            );
-          }
-        } else {
-          this.error = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   },
 };
 </script>

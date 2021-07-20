@@ -137,11 +137,12 @@ export default {
 
   methods: {
     ...mapMutations([
+      "resetUser",
+      "resetUserName",
+      "resetUserType",
       "setLoggedOut",
       "resetAuthToken",
       "setNtfCount",
-      "resetUserName",
-      "resetUserType",
     ]),
 
     myCallback() {
@@ -174,6 +175,7 @@ export default {
           if (res.status == 200) {
             clearInterval(this.intervalID);
             this.setNtfCount(0);
+            this.resetUser;
             this.resetUserName;
             this.resetUserType;
             this.resetAuthToken;
