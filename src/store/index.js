@@ -9,7 +9,7 @@ export default new Vuex.Store({
     state: {
         // baseUrl: 'https://mindshare-backend.df.r.appspot.com',
         baseUrl: '',
-        loggedIn: false,
+        loginState: false,
         authToken: '',
         // userData: {
         //     name: "",
@@ -39,15 +39,12 @@ export default new Vuex.Store({
         getBaseUrl: state => {
             return state.baseUrl;
         },
-        isLoggedIn: state => {
-            return state.loggedIn;
+        getLoginState: state => {
+            return state.loginState;
         },
         getAuthToken: state => {
             return state.authToken;
         },
-        // getUserData: state => {
-        //     return state.userData;
-        // },
         getUserID: state => {
             return state.userID;
         },
@@ -82,42 +79,20 @@ export default new Vuex.Store({
         setBaseUrl: (state, baseUrl) => {
             state.baseUrl = baseUrl;
         },
-        setLoggedIn: state => {
-            state.loggedIn = true;
-        },
-        setLoggedOut: state => {
-            state.loggedIn = false;
+        setLoginState: (state, loginState) => {
+            state.loginState = loginState;
         },
         setAuthToken: (state, authToken) => {
             state.authToken = authToken;
         },
-        resetAuthToken: state => {
-            state.authToken = '';
-        },
-        // setUserData: (state, userData) => {
-        //     state.userData.name = userData.name;
-        //     state.userData.estTime = userData.connection_establishment_time;
-        //     state.userData.expTime = userData.connection_expiration_time;
-        //     state.userData.balance = userData.balance;
-        //     state.userData.licenseID = userData.license_id;
-        //     state.userData.pkgID = userData.package_id;
-        //     state.userData.connStatus = userData.connection_status;
-        //     state.userData.remBW = userData.remaining_bandwidth;
-        // },
         setUserID: (state, userID) => {
             state.userID = userID;
         },
         setUserName: (state, userName) => {
             state.userName = userName;
         },
-        resetUserName: state => {
-            state.userName = '';
-        },
         setUserType: (state, userType) => {
             state.userType = userType;
-        },
-        resetUserType: state => {
-            state.userType = '';
         },
         setUserEmail: (state, userEmail) => {
             state.userEmail = userEmail;

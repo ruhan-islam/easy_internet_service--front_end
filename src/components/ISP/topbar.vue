@@ -1,7 +1,7 @@
 <template>
-  <div class="mb-12">
+  <div>
     <v-bottom-navigation horizontal color="teal" grow dark>
-      <!-- <v-btn router-link to="/NTTN" exact>
+      <!-- <v-btn router-link to="/ISP" exact>
         <span>Home</span>
         <v-icon>mdi-home</v-icon>
       </v-btn> -->
@@ -15,7 +15,7 @@
         <span> Home </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/NTTN/packages" exact>
+      <!-- <v-btn router-link to="/ISP/packages" exact>
         <span>Packages</span>
         <v-icon>mdi-package-variant</v-icon>
       </v-btn> -->
@@ -29,7 +29,7 @@
         <span> Packages </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/NTTN/payments" exact>
+      <!-- <v-btn router-link to="/ISP/payments" exact>
         <span>Payments</span>
         <v-icon>mdi-credit-card</v-icon>
       </v-btn> -->
@@ -43,7 +43,7 @@
         <span> Payments </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/NTTN/notifications" exact>
+      <!-- <v-btn router-link to="/ISP/notifications" exact>
         <span>Notifications</span>
         <v-icon>mdi-bell</v-icon>
       </v-btn> -->
@@ -64,13 +64,19 @@
         <span> Notifications </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/NTTN/profile" exact>
+      <!-- <v-btn router-link to="/ISP/profile" exact>
         <span>Profile</span>
         <v-icon>mdi-account</v-icon>
       </v-btn> -->
       <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/ISP/dashboard" exact>
+        <template v-slot:activator="{ on, attrsDashboard }">
+          <v-btn
+            v-bind="attrsDashboard"
+            v-on="on"
+            router-link
+            to="/ISP/dashboard"
+            exact
+          >
             <span> Dashboard </span>
             <v-icon> mdi-widgets </v-icon>
           </v-btn>
@@ -96,8 +102,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapGetters, mapMutations } from "vuex";
+import axios from "axios";
 
 export default {
   data() {
@@ -107,17 +113,19 @@ export default {
   },
 
   created() {
+    // if (!this.getLoginState) {
+    //   this.$router.push("/");
+    // } else
+    if (this.getUserType !== "ISP") {
+      this.$router.go(-1);
+    }
     this.fetchNotificationCount();
     this.intervalID = setInterval(this.fetchNotificationCount, 2000);
   },
 
-  // updated() {
-  //   this.fetchNotificationCount();
-  // },
-
   computed: {
     ...mapGetters([
-      "isLoggedIn",
+      "getLoginState",
       "getAuthToken",
       "getNtfCount",
       "getUserName",
@@ -125,22 +133,12 @@ export default {
     ]),
   },
 
-  mounted() {
-    // if (!this.isLoggedIn) {
-    //   this.$router.push("login");
-    // } else
-    if (this.getUserType !== "ISP") {
-      this.$router.go(-1);
-    }
-    // console.log(this.getUserData);
-  },
-
   methods: {
     ...mapMutations([
-      "resetUser",
-      "resetUserName",
-      "setLoggedOut",
-      "resetAuthToken",
+      "setUserName",
+      "setUserType",
+      "setLoginState",
+      "setAuthToken",
       "setNtfCount",
     ]),
 
@@ -173,13 +171,12 @@ export default {
           //console.log(res);
           if (res.status == 200) {
             clearInterval(this.intervalID);
+            this.setLoginState(false);
             this.setNtfCount(0);
-            this.resetUser;
-            this.resetUserName;
-            this.resetUserType;
-            this.resetAuthToken;
-            this.setLoggedOut;
-            this.$router.push("/login");
+            this.setUserName("");
+            this.setUserType("");
+            this.setAuthToken("");
+            this.$router.push("/");
           }
         })
         .catch((err) => {

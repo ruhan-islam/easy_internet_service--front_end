@@ -1,13 +1,13 @@
 <template>
   <div>
     <v-bottom-navigation horizontal color="teal" grow dark>
-      <!-- <v-btn router-link to="/NTTN" exact>
+      <!-- <v-btn router-link to="/USER" exact>
         <span>Home</span>
         <v-icon>mdi-home</v-icon>
       </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/NTTN/home" exact>
+          <v-btn v-bind="attrs" v-on="on" router-link to="/USER/home" exact>
             <span> Home </span>
             <v-icon> mdi-home </v-icon>
           </v-btn>
@@ -15,13 +15,13 @@
         <span> Home </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/NTTN/packages" exact>
+      <!-- <v-btn router-link to="/USER/packages" exact>
         <span>Packages</span>
         <v-icon>mdi-package-variant</v-icon>
       </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/NTTN/packages" exact>
+          <v-btn v-bind="attrs" v-on="on" router-link to="/USER/packages" exact>
             <span> Packages </span>
             <v-icon> mdi-package-variant </v-icon>
           </v-btn>
@@ -29,13 +29,13 @@
         <span> Packages </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/NTTN/payments" exact>
+      <!-- <v-btn router-link to="/USER/payments" exact>
         <span>Payments</span>
         <v-icon>mdi-credit-card</v-icon>
       </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/NTTN/payments" exact>
+          <v-btn v-bind="attrs" v-on="on" router-link to="/USER/payments" exact>
             <span> Payments </span>
             <v-icon> mdi-credit-card </v-icon>
           </v-btn>
@@ -43,7 +43,7 @@
         <span> Payments </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/NTTN/notifications" exact>
+      <!-- <v-btn router-link to="/USER/notifications" exact>
         <span>Notifications</span>
         <v-icon>mdi-bell</v-icon>
       </v-btn> -->
@@ -53,7 +53,7 @@
             v-bind="attrs"
             v-on="on"
             router-link
-            to="/NTTN/notifications"
+            to="/USER/notifications"
             exact
           >
             <span> Notifications </span>
@@ -64,7 +64,7 @@
         <span> Notifications </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/NTTN/profile" exact>
+      <!-- <v-btn router-link to="/USER/profile" exact>
         <span>Profile</span>
         <v-icon>mdi-account</v-icon>
       </v-btn> -->
@@ -74,7 +74,7 @@
             v-bind="attrs"
             v-on="on"
             router-link
-            to="/NTTN/dashboard"
+            to="/USER/dashboard"
             exact
           >
             <span> Dashboard </span>
@@ -113,13 +113,19 @@ export default {
   },
 
   created() {
+    // if (!this.getLoginState) {
+    //   this.$router.push("/");
+    // } else
+    if (this.getUserType !== "USER") {
+      this.$router.go(-1);
+    }
     this.myCallback();
     this.intervalID = setInterval(this.myCallback, 5000);
   },
 
   computed: {
     ...mapGetters([
-      "isLoggedIn",
+      "getLoginState",
       "getAuthToken",
       "getNtfCount",
       "getUserName",
@@ -127,29 +133,20 @@ export default {
     ]),
   },
 
-  mounted() {
-    // if (!this.isLoggedIn) {
-    //   this.$router.push("/login");
-    // } else
-    if (this.getUserType !== "USER") {
-      this.$router.go(-1);
-    }
-  },
-
   methods: {
     ...mapMutations([
-      "setLoggedOut",
-      "resetAuthToken",
+      "setLoginState",
+      "setAuthToken",
       "setNtfCount",
-      "resetUserName",
-      "resetUserType",
+      "setUserName",
+      "setUserType",
     ]),
 
     myCallback() {
       axios
         .post("/api/notification/unseenNotificationCount", {
-          receiverID: "Nttn",
-          receiverType: 1, // for NTTN
+          receiverID: this.getUserName,
+          receiverType: 3, // for USER
         })
         .then((res) => {
           // console.log(res);
@@ -167,19 +164,19 @@ export default {
 
     logOut() {
       axios
-        .post("/api/nttn/logout", {
+        .post("/api/user/logout", {
           token: this.getAuthToken,
         })
         .then((res) => {
           //console.log(res);
           if (res.status == 200) {
             clearInterval(this.intervalID);
+            this.setLoginState(false);
             this.setNtfCount(0);
-            this.resetUserName;
-            this.resetUserType;
-            this.resetAuthToken;
-            this.setLoggedOut;
-            this.$router.push("/login");
+            this.setUserName("");
+            this.setUserType("");
+            this.setAuthToken("");
+            this.$router.push("/");
           }
         })
         .catch((err) => {

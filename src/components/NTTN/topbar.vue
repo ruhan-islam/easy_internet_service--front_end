@@ -102,8 +102,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapGetters, mapMutations } from "vuex";
+import axios from "axios";
 
 export default {
   data() {
@@ -113,13 +113,19 @@ export default {
   },
 
   created() {
+    // if (!this.getLoginState) {
+    //   this.$router.push("/");
+    // } else
+    if (this.getUserType !== "NTTN") {
+      this.$router.go(-1);
+    }
     this.fetchNotificationCount();
     this.intervalID = setInterval(this.fetchNotificationCount, 2000);
   },
 
   computed: {
     ...mapGetters([
-      "isLoggedIn",
+      "getLoginState",
       "getAuthToken",
       "getNtfCount",
       "getUserName",
@@ -127,22 +133,12 @@ export default {
     ]),
   },
 
-  mounted() {
-    // if (!this.isLoggedIn) {
-    //   this.$router.push("login");
-    // } else
-    if (this.getUserType !== "NTTN") {
-      this.$router.go(-1);
-    }
-  },
-
   methods: {
     ...mapMutations([
-      "resetUser",
-      "resetUserName",
-      "resetUserType",
-      "setLoggedOut",
-      "resetAuthToken",
+      "setUserName",
+      "setUserType",
+      "setLoginState",
+      "setAuthToken",
       "setNtfCount",
     ]),
 
@@ -175,13 +171,12 @@ export default {
           //console.log(res);
           if (res.status == 200) {
             clearInterval(this.intervalID);
+            this.setLoginState(false);
             this.setNtfCount(0);
-            this.resetUser;
-            this.resetUserName;
-            this.resetUserType;
-            this.resetAuthToken;
-            this.setLoggedOut;
-            this.$router.push("/login");
+            this.setUserName("");
+            this.setUserType("");
+            this.setAuthToken("");
+            this.$router.push("/");
           }
         })
         .catch((err) => {

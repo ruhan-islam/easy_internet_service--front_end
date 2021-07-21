@@ -1232,11 +1232,9 @@ export default {
 
   computed: {
     ...mapGetters([
-      // "getUserData",
       "getUserID",
       "getUserName",
       "getUserPkgID",
-      // "isLoggedIn",
       // "getAuthToken",
       // "getNtfCount",
       // "getUserName",
@@ -1281,18 +1279,13 @@ export default {
   },
 
   created() {
-    console.log(this.getUserData);
     // this.fetchOwnPackage();
     // this.fetchPaymentDetails();
   },
 
   methods: {
     ...mapMutations([
-      // "setLoggedOut",
-      // "resetAuthToken",
       // "setNtfCount",
-      // "resetUserName",
-      // "resetUserType",
     ]),
 
     fetchOwnPackage() {

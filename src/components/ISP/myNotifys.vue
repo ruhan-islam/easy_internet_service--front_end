@@ -79,7 +79,6 @@ export default {
 
   computed: {
     ...mapGetters([
-      // "isLoggedIn",
       // "getAuthToken",
       // "getNtfCount",
       // "getUserName",
@@ -93,11 +92,7 @@ export default {
 
   methods: {
     ...mapMutations([
-      // "setLoggedOut",
-      // "resetAuthToken",
       // "setNtfCount",
-      // "resetUserName",
-      // "resetUserType",
     ]),
 
     fetchUserNameList() {

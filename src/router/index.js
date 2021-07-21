@@ -150,9 +150,14 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requireLoggedIn && !store.getters.isLoggedIn) {
+  // if (to.path === "/" && store.getters.getLoginState) {
+  //   next({
+  //     path: '/' + store.getters.getUserType + '/home',
+  //   });
+  // }
+  if (to.meta.requireLoggedIn && !store.getters.getLoginState) {
     next({
-      path: '/'
+      path: '/',
     });
   } else {
     next();

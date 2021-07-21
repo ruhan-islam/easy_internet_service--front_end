@@ -69,8 +69,7 @@ export default {
 
   computed: {
     ...mapGetters([
-      "isLoggedIn",
-      "getUserData",
+      "getLoginState",
       "getAuthToken",
       "getNtfCount",
       "getUserName",
@@ -78,16 +77,19 @@ export default {
     ]),
   },
 
-  created() {
+  mounted() {
+    if (this.getLoginState) {
+      this.$router.push("/" + this.getUserType + "/home");
+    }
+
     this.show1 = false;
     this.valid = false;
   },
 
   methods: {
     ...mapMutations([
-      "setLoggedIn",
+      "setLoginState",
       "setAuthToken",
-      "setUserData",
       "setUserID",
       "setUserName",
       "setUserType",
@@ -112,15 +114,13 @@ export default {
               this.setUserPkgID(res.data.user.package_id);
             }
 
+            this.setLoginState(true);
             this.setAuthToken(res.data.token);
-            this.setUserData(res.data.user);
             this.setUserID(res.data.user._id);
             this.setUserType(this.type.toUpperCase());
             this.setUserName(this.username);
-            this.setLoggedIn();
             this.$router.push(dest);
             this.$router.go();
-            // console.log(this.getUserData);
           } else {
             this.error = true;
           }
