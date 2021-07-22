@@ -73,9 +73,9 @@
           </v-card>
         </v-col>
 
-        <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'myOffers'">
+        <!-- <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'myOffers'">
           <myOffers></myOffers>
-        </v-col>
+        </v-col> -->
 
         <v-col class="mt-5 mb-5" cols="10" v-show="pageInfo === 'myPackages'">
           <myPackages></myPackages>
@@ -103,7 +103,7 @@ import { mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
-import myOffers from "./myOffers.vue";
+// import myOffers from "./offers.vue";
 import myNotifys from "./myNotifys.vue";
 import myPackages from "./myPackages.vue";
 import myPayments from "./myPayments.vue";
@@ -113,7 +113,7 @@ export default {
     topbar,
     bottombar,
     myNotifys,
-    myOffers,
+    // myOffers,
     myPackages,
     myPayments,
   },

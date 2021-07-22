@@ -64,6 +64,54 @@
         <span> Notifications </span>
       </v-tooltip>
 
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrsOffer }">
+          <v-btn
+            v-bind="attrsOffer"
+            v-on="on"
+            router-link
+            to="/ISP/offers"
+            exact
+          >
+            <span> Offers </span>
+            <v-icon> mdi-widgets </v-icon>
+          </v-btn>
+        </template>
+        <span> Offer </span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrsNotify }">
+          <v-btn
+            v-bind="attrsNotify"
+            v-on="on"
+            router-link
+            to="/ISP/notify"
+            exact
+          >
+            <span> Notify </span>
+            <v-icon> mdi-widgets </v-icon>
+          </v-btn>
+        </template>
+        <span> Notify </span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrsTickets }">
+          <v-btn
+            v-bind="attrsTickets"
+            v-on="on"
+            router-link
+            to="/ISP/tickets"
+            exact
+          >
+            <span> Tickets </span>
+            <v-icon> mdi-widgets </v-icon>
+          </v-btn>
+        </template>
+        <span> Tickets </span>
+      </v-tooltip>
+
       <!-- <v-btn router-link to="/ISP/profile" exact>
         <span>Profile</span>
         <v-icon>mdi-account</v-icon>
@@ -113,9 +161,6 @@ export default {
   },
 
   created() {
-    // if (!this.getLoginState) {
-    //   this.$router.push("/");
-    // } else
     if (this.getUserType !== "ISP") {
       this.$router.go(-1);
     }
@@ -143,44 +188,6 @@ export default {
       "setNtfCount",
       "setUserData",
     ]),
-
-    // fetchNotificationCount() {
-    //   axios
-    //     .post("/api/notification/unseenNotificationCount", {
-    //       receiverID: this.getUserName,
-    //       receiverType: 2, // for ISP
-    //     })
-    //     .then((res) => {
-    //       // console.log(res);
-    //       if (res.status === 200) {
-    //         // console.log(res.data.unseenCount);
-    //         this.setNtfCount(res.data.unseenCount);
-    //       } else {
-    //         this.error = true;
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-
-    //   axios
-    //     .post("/api/isp/fetchOwnData", {
-    //       id: this.getUserID,
-    //     })
-    //     .then((res) => {
-    //       console.log(res);
-    //       if (res.status === 200) {
-    //         // console.log(res.data);
-    //         this.setUserData(res.data);
-    //         // console.log(this.userData);
-    //       } else {
-    //         this.error = true;
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    // },
 
     updateInfo() {
       axios

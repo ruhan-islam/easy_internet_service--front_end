@@ -1,7 +1,9 @@
 <template>
   <div>
+    <topbar></topbar>
+
     <!-- contents here  -->
-    <v-row justify="center">
+    <v-row class="ma-12 mb-12" justify="center">
       <v-dialog v-model="dialog" persistent max-width="80%">
         <template v-slot:activator="{ on, attrs }">
           <v-btn max-width="95%" color="primary" dark v-bind="attrs" v-on="on">
@@ -216,13 +218,22 @@
         </v-badge>
       </div>
     </v-row>
+
+    <bottombar></bottombar>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import topbar from "./topbar.vue";
+import bottombar from "./bottombar.vue";
 
 export default {
+  components: {
+    topbar,
+    bottombar,
+  },
+
   data() {
     return {
       valid: false,

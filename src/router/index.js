@@ -1,14 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 //
-import ISP_dashboard from "../components/ISP/dashboard";
-import ISP_home from "../components/ISP/home";
-import ISP_notifications from "../components/ISP/notifications";
-import ISP_packages from "../components/ISP/packages";
-import ISP_payments from "../components/ISP/payments";
-//
-import login from "../components/login";
-//
 import NTTN_dashboard from "../components/NTTN/dashboard";
 import NTTN_home from "../components/NTTN/home";
 import NTTN_notifications from "../components/NTTN/notifications";
@@ -28,14 +20,14 @@ const routes = [
     meta: {
 			requireLoggedIn: false
 		},
-    component: login,
+    component: () => import("../components/login"),
   },
   {
     path: "/login",
     meta: {
 			requireLoggedIn: false
 		},
-    component: login,
+    component: () => import("../components/login"),
   },
   //
   {
@@ -43,35 +35,56 @@ const routes = [
     meta: {
 			requireLoggedIn: true
 		},
-    component: ISP_home,
+    component: () => import("../components/ISP/home"),
   },
   {
     path: "/ISP/packages",
     meta: {
 			requireLoggedIn: true
 		},
-    component: ISP_packages,
+    component: () => import("../components/ISP/packages"),
   },
   {
     path: "/ISP/payments",
     meta: {
 			requireLoggedIn: true
 		},
-    component: ISP_payments,
+    component: () => import("../components/ISP/payments"),
   },
   {
     path: "/ISP/notifications",
     meta: {
 			requireLoggedIn: true
 		},
-    component: ISP_notifications,
+    component: () => import("../components/ISP/notifications"),
+  },
+  {
+    path: "/ISP/offers",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/ISP/offers"),
+  },
+  {
+    path: "/ISP/notify",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/ISP/notify"),
+  },
+  {
+    path: "/ISP/tickets",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/ISP/tickets"),
   },
   {
     path: "/ISP/dashboard",
     meta: {
 			requireLoggedIn: true
 		},
-    component: ISP_dashboard,
+    component: () => import("../components/ISP/dashboard"),
   },
   //
   {
