@@ -58,10 +58,13 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserName"]),
+    ...mapGetters(["getUserID", "getUserData", "getUserName"]),
   },
 
   created() {
+    if (!this.getUserData) {
+      this.fetchOwnData();
+    }
     this.fetchNotifications();
   },
 
@@ -70,7 +73,26 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["decNtfCount"]),
+    ...mapMutations(["setUserData", "decNtfCount"]),
+
+    fetchOwnData() {
+      axios
+        .post("/api/isp/fetchOwnData", {
+          id: this.getUserID,
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            // console.log(res.data);
+            this.setUserData(res.data);
+            // console.log(this.userData);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
 
     fetchNotifications() {
       axios
@@ -107,7 +129,7 @@ export default {
             // console.log(res);
             if (res.status === 200) {
               this.allNotifications[i].seenStatus = true;
-              this.decNtfCount;
+              this.decNtfCount(true);
             } else {
               this.error = true;
             }

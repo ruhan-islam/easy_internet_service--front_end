@@ -119,8 +119,8 @@ export default {
     if (this.getUserType !== "ISP") {
       this.$router.go(-1);
     }
-    this.fetchNotificationCount();
-    this.intervalID = setInterval(this.fetchNotificationCount, 2000);
+    this.updateInfo();
+    this.intervalID = setInterval(this.updateInfo, 2000);
   },
 
   computed: {
@@ -130,6 +130,7 @@ export default {
       "getNtfCount",
       "getUserName",
       "getUserType",
+      "getUserID",
     ]),
   },
 
@@ -140,9 +141,48 @@ export default {
       "setLoginState",
       "setAuthToken",
       "setNtfCount",
+      "setUserData",
     ]),
 
-    fetchNotificationCount() {
+    // fetchNotificationCount() {
+    //   axios
+    //     .post("/api/notification/unseenNotificationCount", {
+    //       receiverID: this.getUserName,
+    //       receiverType: 2, // for ISP
+    //     })
+    //     .then((res) => {
+    //       // console.log(res);
+    //       if (res.status === 200) {
+    //         // console.log(res.data.unseenCount);
+    //         this.setNtfCount(res.data.unseenCount);
+    //       } else {
+    //         this.error = true;
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+
+    //   axios
+    //     .post("/api/isp/fetchOwnData", {
+    //       id: this.getUserID,
+    //     })
+    //     .then((res) => {
+    //       console.log(res);
+    //       if (res.status === 200) {
+    //         // console.log(res.data);
+    //         this.setUserData(res.data);
+    //         // console.log(this.userData);
+    //       } else {
+    //         this.error = true;
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    // },
+
+    updateInfo() {
       axios
         .post("/api/notification/unseenNotificationCount", {
           receiverID: this.getUserName,
@@ -153,6 +193,24 @@ export default {
           if (res.status === 200) {
             // console.log(res.data.unseenCount);
             this.setNtfCount(res.data.unseenCount);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      axios
+        .post("/api/isp/fetchOwnData", {
+          id: this.getUserID,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            // console.log(res.data);
+            this.setUserData(res.data);
+            // console.log(this.userData);
           } else {
             this.error = true;
           }

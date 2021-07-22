@@ -104,7 +104,7 @@ export default {
             // console.log(res);
             if (res.status === 200) {
               this.allNotifications[i].seenStatus = true;
-              this.decNtfCount;
+              this.decNtfCount(true);
             } else {
               this.error = true;
             }

@@ -1136,10 +1136,21 @@ import { mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 
 export default {
+  props: {
+    isRedirected: Boolean,
+    givenPkg: Object,
+    // booleanProp: Boolean,
+    // stringProp: String,
+    // numberProp: Number,
+    // arrayProp: Array,
+    // objectProp: Object,
+    // callbackProp: Function,
+    // contactsPromise: Promise, // or any other constructor
+  },
+
   data() {
     return {
       dialog: false,
-
       cardtags: ["VISA", "MasterCard", "DBBL NEXUS"],
       mobiletags: ["bKash", "ROCKET", "NAGAD"],
       valid: false,
@@ -1174,6 +1185,14 @@ export default {
       showPIN: false,
 
       validBkashNo: false,
+
+      redAmountRules: [
+        (v) => !!v || "Amount mustn't be empty",
+        (v) => /^\d*$/.test(v) || "Amount must be valid",
+        (v) =>
+          parseInt(v) >= this.redPackage.price + this.userData.balance ||
+          "Amount not sufficient",
+      ],
 
       amountRules: [
         (v) => !!v || "Amount mustn't be empty",
@@ -1280,7 +1299,7 @@ export default {
 
   created() {
     // this.fetchOwnPackage();
-    // this.fetchPaymentDetails();
+    this.fetchOwnData();
   },
 
   methods: {
@@ -1310,7 +1329,7 @@ export default {
         });
     },
 
-    fetchPaymentDetails() {
+    fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
           id: this.getUserID,

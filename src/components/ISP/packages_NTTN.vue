@@ -2,8 +2,10 @@
   <div class="container mt-5">
     <!-- contents here  -->
 
+    <!-- <span> {{ getUserData }} </span> -->
+
     <!-- package filters  -->
-    <v-row v-if="myPackage === ''" class="ma-1" justify="center">
+    <v-row v-if="!getUserData.package_id" justify="center">
       <v-card style="padding:0px 20px">
         <v-card-title>Search ISP Packages</v-card-title>
         <v-expansion-panels>
@@ -177,7 +179,7 @@
     </v-row>
 
     <!-- show ISP packages -->
-    <v-row v-if="myPackage === ''">
+    <v-row v-if="!getUserData.package_id" justify="center">
       <div class="col-lg-4" v-for="(pkg, i) in pkgs" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
@@ -207,9 +209,18 @@
               active-class="deep-purple accent-4 white--text"
               column
             >
+              <v-chip v-for="(area, i) in pkg.areas" :key="i"
+                >{{ area }}
+              </v-chip>
+            </v-chip-group>
+            <v-chip-group
+              active-class="deep-purple accent-4 white--text"
+              column
+            >
               <v-chip>{{ pkg.bandwidth }} GBPS</v-chip>
               <v-chip>{{ pkg.duration }} months</v-chip>
             </v-chip-group>
+
             <div>
               {{ pkg.bandwidth }} GBPS speed relentless speed of unlimited
               traffic with 24/7 service.
@@ -217,36 +228,43 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-btn
-              color="deep-purple lighten-2"
-              @click="detailsPressed(i)"
-              text
-            >
-              Details
-            </v-btn>
-            <v-btn
-              :disabled="!allPkgs[i].ongoing"
-              color="deep-purple lighten-2"
-              @click="selectPressed(i)"
-              text
-            >
-              Select
-            </v-btn>
+            <v-col></v-col>
+            <v-col>
+              <v-btn
+                color="deep-purple lighten-2"
+                @click="detailsPressed(i)"
+                text
+              >
+                Details
+              </v-btn>
+            </v-col>
+            <v-col></v-col>
+            <v-col>
+              <v-btn
+                :disabled="!allPkgs[i].ongoing"
+                color="deep-purple lighten-2"
+                @click="selectPressed(i)"
+                text
+              >
+                Select
+              </v-btn>
+            </v-col>
+            <v-col></v-col>
           </v-card-actions>
         </v-card>
       </div>
     </v-row>
 
     <!-- details -->
-    <v-row v-if="!currPkgIdx" justify="center">
-      <v-dialog v-model="dialog2" max-width="40%" dark>
+    <v-row v-if="currPkgIdx !== -1" justify="center">
+      <v-dialog v-model="dialog2" max-width="70%">
         <v-card>
           <v-card-title class="text-h5">
             {{ allPkgs[currPkgIdx].name }}
           </v-card-title>
 
           <v-card-text>
-            <v-simple-table dark>
+            <v-simple-table>
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -260,15 +278,15 @@
                     <td>{{ allPkgs[currPkgIdx].name }}</td>
                   </tr>
                   <tr>
-                    <td>Price (Taka)</td>
+                    <td>Price</td>
                     <td>Tk. {{ allPkgs[currPkgIdx].price }} /ISP</td>
                   </tr>
                   <tr>
-                    <td>Bandwidth (GBPS)</td>
+                    <td>Bandwidth</td>
                     <td>{{ allPkgs[currPkgIdx].bandwidth }} GBPS</td>
                   </tr>
                   <tr>
-                    <td>Duration (months)</td>
+                    <td>Duration</td>
                     <td>{{ allPkgs[currPkgIdx].duration }} months</td>
                   </tr>
                   <tr>
@@ -276,11 +294,11 @@
                     <td>{{ allPkgs[currPkgIdx].areas }}</td>
                   </tr>
                   <tr>
-                    <td>Upload Speed (GBPS)</td>
+                    <td>Upload Speed</td>
                     <td>{{ allPkgs[currPkgIdx].up_speed }} GBPS</td>
                   </tr>
                   <tr>
-                    <td>Download Speed (GBPS)</td>
+                    <td>Download Speed</td>
                     <td>{{ allPkgs[currPkgIdx].down_speed }} GBPS</td>
                   </tr>
                   <tr>
@@ -288,12 +306,12 @@
                     <td>Unlimited</td>
                   </tr>
                   <tr>
-                    <td>Estimated Down Time (hours)</td>
+                    <td>Estimated Down Time</td>
                     <td>{{ allPkgs[currPkgIdx].downTime }} hrs</td>
                   </tr>
                   <tr>
-                    <td>Estimated Response Time (milliseconds)</td>
-                    <td>{{ allPkgs[currPkgIdx].responseTime }} ms</td>
+                    <td>Estimated Response Time</td>
+                    <td>{{ allPkgs[currPkgIdx].responseTime }} milliseconds</td>
                   </tr>
                 </tbody>
               </template>
@@ -301,26 +319,33 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="
-                dialog2 = false;
-                currPkgIdx = -1;
-              "
-            >
-              Close
-            </v-btn>
-            <v-btn color="green darken-1" text @click="selectPressed">
-              Select
-            </v-btn>
+            <v-col></v-col>
+            <v-col>
+              <v-btn
+                color="green darken-1"
+                text
+                @click="
+                  dialog2 = false;
+                  currPkgIdx = -1;
+                "
+              >
+                Close
+              </v-btn>
+            </v-col>
+            <v-col></v-col>
+            <v-col>
+              <v-btn color="green darken-1" text @click="selectPressed">
+                Select
+              </v-btn>
+            </v-col>
+            <v-col></v-col>
           </v-card-actions>
         </v-card>
       </v-dialog>
     </v-row>
 
     <!-- show own package -->
-    <v-row v-if="myPackage !== ''">
+    <v-row v-if="!!getUserData.package_id" justify="center">
       <v-col class="col-lg-4">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
@@ -384,15 +409,25 @@
                   <td>{{ myPackage.name }}</td>
                 </tr>
                 <tr>
-                  <td>Price (Taka)</td>
+                  <td>Base Price</td>
                   <td>Tk. {{ myPackage.price }} /ISP</td>
                 </tr>
+                <tr v-if="!!myPackage.offerId">
+                  <td>Reduced Price</td>
+                  <td>
+                    Tk.
+                    {{
+                      calculateReducedPrice(myPackage.price, myPackage.offerId)
+                    }}
+                    /ISP
+                  </td>
+                </tr>
                 <tr>
-                  <td>Bandwidth (GBPS)</td>
+                  <td>Bandwidth</td>
                   <td>{{ myPackage.bandwidth }} GBPS</td>
                 </tr>
                 <tr>
-                  <td>Duration (months)</td>
+                  <td>Duration</td>
                   <td>{{ myPackage.duration }} months</td>
                 </tr>
                 <tr>
@@ -400,11 +435,11 @@
                   <td>{{ myPackage.areas }}</td>
                 </tr>
                 <tr>
-                  <td>Upload Speed (GBPS)</td>
+                  <td>Upload Speed</td>
                   <td>{{ myPackage.up_speed }} GBPS</td>
                 </tr>
                 <tr>
-                  <td>Download Speed (GBPS)</td>
+                  <td>Download Speed</td>
                   <td>{{ myPackage.down_speed }} GBPS</td>
                 </tr>
                 <tr>
@@ -412,12 +447,12 @@
                   <td>Unlimited</td>
                 </tr>
                 <tr>
-                  <td>Estimated Down Time (hours)</td>
-                  <td>{{ myPackage.downTime }} hrs</td>
+                  <td>Estimated Down Time</td>
+                  <td>{{ myPackage.downTime }} hours</td>
                 </tr>
                 <tr>
-                  <td>Estimated Response Time (milliseconds)</td>
-                  <td>{{ myPackage.responseTime }} ms</td>
+                  <td>Estimated Response Time</td>
+                  <td>{{ myPackage.responseTime }} milliseconds</td>
                 </tr>
               </tbody>
             </template>
@@ -425,23 +460,34 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- <v-row v-if="showPayment" justify="center">
+      <v-dialog v-model="showPayment" max-width="70%">
+        <v-card>
+          <v-card-text>
+            <payments :isRedirected="true" :givenPkg="sele"></payments>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </v-row> -->
   </div>
 </template>
 
 <script>
-import { mapGetters /* mapMutations, */ } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 import axios from "axios";
+// import payments from "./payments";
 
 export default {
-  components: {},
+  // components: { payments },
 
   data() {
     return {
       valid: false,
-
-      dialog: true,
       dialog2: false,
       showPayment: false,
+      selectedPkg: {},
+
       showSnackbar: false,
       pageInfo: "",
       myInfo: {},
@@ -468,24 +514,31 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserPkgID", "getUserID"]),
+    ...mapGetters([
+      "getUserData",
+      "getUserPkgID",
+      "getUserID",
+      "getSelectedPkg",
+    ]),
   },
 
-  created() {
+  mounted() {
     this.fetchOwnData();
-    this.fetchOffers();
+    this.fetchAllOffers();
     this.fetchPackages();
     this.fetchOwnPackage();
     this.showPayment = false;
   },
 
   updated() {
-    // this.fetchOffers();
+    // this.fetchAllOffers();
     // this.fetchPackages();
     // this.fetchOwnPackage();
   },
 
   methods: {
+    ...mapMutations(["setSelectedPkg"]),
+
     fetchOwnData() {
       // console.log("in");
       // console.log(this.getUserPkgID);
@@ -512,7 +565,7 @@ export default {
       // console.log(this.getUserPkgID);
       axios
         .post("/api/isp/fetchOwnPackage", {
-          package_id: this.getUserPkgID,
+          package_id: this.getUserData.package_id,
         })
         .then((res) => {
           // console.log(res);
@@ -560,7 +613,7 @@ export default {
         });
     },
 
-    fetchOffers() {
+    fetchAllOffers() {
       axios
         .post("/api/offer/fetchByQuery", {
           creator: "Nttn",
@@ -587,10 +640,11 @@ export default {
     },
 
     selectPressed(i) {
-      console.log(i);
-      // this.myPackage = this.allPkgs[i];
-      this.showPayment = true;
-      // this.dialog = true;
+      // console.log(i);
+      this.setSelectedPkg(this.allPkgs[i]);
+      // console.log(this.getSelectedPkg);
+      this.$router.push("/ISP/payments");
+      // this.showPayment = true;
     },
 
     detailsPressed(i) {
@@ -626,6 +680,12 @@ export default {
         }
       }
       return price - (price * percentage) / 100.0;
+    },
+
+    getToday() {
+      let today = new Date();
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      return today.toISOString().slice(0, 10);
     },
 
     doSort(item) {
@@ -726,12 +786,6 @@ export default {
         return 1;
       }
       return 0;
-    },
-
-    getToday() {
-      let today = new Date();
-      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-      return today.toISOString().slice(0, 10);
     },
 
     doFilter() {

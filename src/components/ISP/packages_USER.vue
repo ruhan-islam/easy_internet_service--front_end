@@ -1,7 +1,5 @@
 <template>
   <div>
-    <topbar></topbar>
-
     <div class="container mt-5">
       <!-- create new package  -->
       <v-row justify="start">
@@ -83,36 +81,6 @@
                       label="Price (BDT)"
                       required
                     ></v-text-field>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-
-                <v-expansion-panel>
-                  <v-expansion-panel-header v-slot="{ open }">
-                    <v-row no-gutters>
-                      <v-col cols="4"> Coverage Area </v-col>
-                      <v-col cols="8" class="text--secondary">
-                        <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Select package coverage areas
-                          </span>
-                          <span v-else key="1">
-                            {{ areas.length === 0 ? "" : areas }}
-                          </span>
-                        </v-fade-transition>
-                      </v-col>
-                    </v-row>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <v-row no-gutters>
-                      <v-spacer></v-spacer>
-                      <v-autocomplete
-                        v-model="areas"
-                        :items="areaList"
-                        label="Coverage Area"
-                        :rules="areaRules"
-                        multiple
-                      ></v-autocomplete>
-                    </v-row>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
 
@@ -381,6 +349,7 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-col>
+
             <v-col>
               Bandwidth Range:
               <v-expansion-panel>
@@ -513,7 +482,7 @@
       </v-row>
 
       <v-row justify="center">
-        <v-btn color="deep-purple lighten-2" text> ISP Packages </v-btn>
+        <v-btn color="deep-purple lighten-2" text> USER Packages </v-btn>
       </v-row>
 
       <!-- showing packages -->
@@ -537,8 +506,8 @@
               <v-card-text>
                 <div class="my-4 text-subtitle-1">
                   Taka
-                  <span v-if="!pkg.offerId"> {{ pkg.price }} </span>
-                  <template v-if="!!pkg.offerId">
+                  <span v-if="!!pkg.offerId"> {{ pkg.price }} </span>
+                  <template v-if="!pkg.offerId">
                     <s>{{ pkg.price }}</s>
                     <span>
                       &nbsp; {{ calculateReducedPrice(pkg.price, pkg.offerId) }}
@@ -577,8 +546,8 @@
                   color="deep-purple lighten-2"
                   text
                 >
-                  <span v-if="!pkg.offerId"> Add Offer </span>
-                  <span v-if="!!pkg.offerId"> Remove Offer </span>
+                  <span v-if="!!pkg.offerId"> Add Offer </span>
+                  <span v-if="!pkg.offerId"> Remove Offer </span>
                 </v-btn>
 
                 <v-btn
@@ -634,10 +603,6 @@
                     <tr>
                       <td>Duration (months)</td>
                       <td>{{ allPkgs[currPkgIdx].duration }} months</td>
-                    </tr>
-                    <tr>
-                      <td>Coverage Area</td>
-                      <td>{{ allPkgs[currPkgIdx].areas }}</td>
                     </tr>
                     <tr>
                       <td>Upload Speed (GBPS)</td>
@@ -730,17 +695,18 @@
         Package Successfully Added!
       </v-snackbar>
     </div>
-
-    <bottombar></bottombar>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import topbar from "./topbar.vue";
-import bottombar from "./bottombar.vue";
+import { mapGetters } from "vuex";
+// import topbar from "./topbar.vue";
+// import bottombar from "./bottombar.vue";
+
 export default {
-  components: { topbar, bottombar },
+  // components: { topbar, bottombar },
+
   data() {
     return {
       sortedItems: [
@@ -761,26 +727,6 @@ export default {
       currPkgIdx: -1,
       showSuccessOverlay: false,
       selectedOffer: "",
-      areas: [],
-
-      areaList: [
-        "Nation-wide",
-        "Dhaka",
-        "Rajshahi",
-        "Chittagong",
-        "Mymensingh",
-        "Khulna",
-        "Barishal",
-        "Sylhet",
-        "Rangpur",
-      ],
-
-      areaRules: [
-        (v) => !!v.length || "This field is required",
-        (v) =>
-          !(v.length > 1 && this.areas.includes(this.areaList[0])) ||
-          "Invalid combination",
-      ],
 
       packageName: "",
       nameLen: 20,
@@ -832,6 +778,8 @@ export default {
   },
 
   computed: {
+    ...mapGetters(["getUserName"]),
+
     isSubmitDisabled() {
       return !(
         this.valid &&
@@ -842,8 +790,7 @@ export default {
         this.upSpeed &&
         this.responseTime &&
         this.downTime &&
-        this.price &&
-        this.areas.length
+        this.price
       );
     },
 
@@ -851,7 +798,6 @@ export default {
       return !(
         this.packageName ||
         this.price ||
-        this.areas.length ||
         this.bandwidth > this.minBW ||
         this.duration > this.minDur ||
         this.upSpeed > this.bandwidth ||
@@ -865,7 +811,7 @@ export default {
   created() {
     axios
       .post("/api/offer/fetchByQuery", {
-        creator: "Nttn",
+        creator: this.getUserName,
       })
       .then((res) => {
         if (res.status === 200) {
@@ -889,7 +835,7 @@ export default {
 
     axios
       .post("/api/package/fetchByQuery", {
-        packageCreator: "Nttn",
+        packageCreator: this.getUserName,
       })
       .then((res) => {
         if (res.status === 200) {
@@ -1046,10 +992,11 @@ export default {
     offerConfirmPressed() {
       // console.log(this.selectedOffer);
       this.dialog3 = false;
+
       axios
         .post("/api/package/addOffer", {
           name: this.pkgs[this.currPkgIdx].name,
-          packageCreator: "Nttn",
+          packageCreator: this.getUserName,
           offerId: this.selectedOffer,
         })
         .then((res) => {
@@ -1077,7 +1024,7 @@ export default {
         axios
           .post("/api/package/addOffer", {
             name: this.pkgs[this.currPkgIdx].name,
-            packageCreator: "Nttn",
+            packageCreator: this.getUserName,
             offerId: this.selectedOffer,
           })
           .then((res) => {
@@ -1100,7 +1047,7 @@ export default {
       axios
         .post("/api/package/updateStatus", {
           name: this.pkgs[i].name,
-          packageCreator: "Nttn",
+          packageCreator: this.getUserName,
           ongoing: !this.pkgs[i].ongoing,
         })
         .then((res) => {
@@ -1125,7 +1072,6 @@ export default {
       // this.$refs.form.reset();
       this.packageName = "";
       this.price = "";
-      this.areas = [];
       this.bandwidth = "";
       this.duration = "";
       this.downSpeed = "";
@@ -1156,7 +1102,7 @@ export default {
         isRealIp: true,
         downTime: this.downTime,
         responseTime: this.responseTime,
-        areas: this.areas,
+        areas: [],
       };
       axios
         .post("/api/package/insert", newPkg)

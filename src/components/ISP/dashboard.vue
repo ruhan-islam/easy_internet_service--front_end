@@ -99,8 +99,8 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-// import axios from "axios";
+import { mapGetters, mapMutations } from "vuex";
+import axios from "axios";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
 import myOffers from "./myOffers.vue";
@@ -124,11 +124,38 @@ export default {
     };
   },
 
+  created() {
+    if (!this.getUserData) {
+      this.fetchOwnData();
+    }
+  },
+
   computed: {
-    ...mapGetters(["getUserName"]),
+    ...mapGetters(["getUserID", "getUserData", "getUserName"]),
   },
 
   methods: {
+    ...mapMutations(["setUserData"]),
+
+    fetchOwnData() {
+      axios
+        .post("/api/isp/fetchOwnData", {
+          id: this.getUserID,
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            // console.log(res.data);
+            this.setUserData(res.data);
+            // console.log(this.userData);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     sendNotification() {
       this.pageInfo = "notify";
     },

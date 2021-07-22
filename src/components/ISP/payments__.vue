@@ -1,17 +1,15 @@
 <template>
   <div>
-    <topbar></topbar>
-
     <div class="container mt-5">
       <!-- contents here  -->
       <v-row justify="center">
-        <span>past payments dekhano lagbe</span>
+        past payments dekhano lagbe
         <v-dialog v-model="dialog" persistent max-width="40%">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              :disabled="!getUserData.package_id"
               @click="pageInfo = 'paymentHighlights'"
               color="primary"
+              dark
               v-bind="attrs"
               v-on="on"
             >
@@ -19,7 +17,7 @@
             </v-btn>
           </template>
 
-          <v-card v-if="pageInfo === 'paymentHighlights'">
+          <v-card v-show="pageInfo === 'paymentHighlights'">
             <v-card-title class="text-h6" style="background-color: #eeeeee">
               BILLING HIGHLIGHTS
             </v-card-title>
@@ -31,40 +29,32 @@
                       <tr>
                         <td>ISP Name:</td>
                         <td>
-                          <strong> {{ getUserData.name }} </strong>
+                          <strong> {{ userData.name }} </strong>
                         </td>
                       </tr>
                       <tr>
                         <td>Package Name:</td>
                         <td>
-                          <strong> {{ getSelectedPkg.name }} </strong>
+                          <strong> {{ pkgData.name }} </strong>
                         </td>
                       </tr>
                       <tr>
                         <td>Package Bill:</td>
                         <td>
-                          <strong>
-                            {{
-                              calculateReducedPrice(
-                                getSelectedPkg.price,
-                                getSelectedPkg.offerId
-                              )
-                            }}
-                            Taka
-                          </strong>
+                          <strong> {{ pkgData.price }} Taka </strong>
                         </td>
                       </tr>
                       <tr>
                         <td>Available Balance:</td>
                         <td>
-                          <strong> {{ getUserData.balance }} Taka </strong>
+                          <strong> {{ userData.balance }} Taka </strong>
                         </td>
                       </tr>
-                      <tr v-if="getUserData.expirationTime">
+                      <tr>
                         <td>Bill Due Date:</td>
                         <td>
                           <strong>
-                            {{ getUserData.expirationTime.slice(0, 10) }}
+                            {{ userData.expirationTime.slice(0, 10) }}
                           </strong>
                         </td>
                       </tr>
@@ -75,12 +65,6 @@
                             v-model="amount"
                             :rules="amountRules"
                             label="Price (BDT)"
-                            :placeholder="
-                              calculateReducedPrice(
-                                getSelectedPkg.price,
-                                getSelectedPkg.offerId
-                              ) + ''
-                            "
                             required
                           ></v-text-field>
                         </td>
@@ -90,14 +74,7 @@
                 </v-simple-table>
               </v-card-text>
               <v-card-actions>
-                <v-btn
-                  color="green darken-1"
-                  text
-                  @click="
-                    setSelectedPkg('');
-                    dialog = false;
-                  "
-                >
+                <v-btn color="green darken-1" text @click="dialog = false">
                   close
                 </v-btn>
                 <v-btn
@@ -1175,23 +1152,17 @@
         </v-snackbar>
       </v-row>
     </div>
-
-    <!-- <v-snackbar :value="showSnackbar" style="margin: auto">
-      Payment Successful
-    </v-snackbar> -->
-
-    <bottombar></bottombar>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import axios from "axios";
-import topbar from "./topbar.vue";
-import bottombar from "./bottombar.vue";
+// import topbar from "./topbar.vue";
+// import bottombar from "./bottombar.vue";
 
 export default {
-  components: { topbar, bottombar },
+  // components: { topbar, bottombar },
 
   props: {
     isRedirected: Boolean,
@@ -1207,11 +1178,9 @@ export default {
 
   data() {
     return {
-      userData: {},
-      pkgData: {},
-      pkgID: "",
+      userData: "",
+      pkgData: "",
       amount: "",
-      allOffers: "",
 
       dialog: false,
       cardtags: ["VISA", "MasterCard", "DBBL NEXUS"],
@@ -1249,16 +1218,20 @@ export default {
 
       validBkashNo: false,
 
+      redAmountRules: [
+        (v) => !!v || "Amount mustn't be empty",
+        (v) => /^\d*$/.test(v) || "Amount must be valid",
+        (v) =>
+          parseInt(v) >= this.redPackage.price + this.userData.balance ||
+          "Amount not sufficient",
+      ],
+
       amountRules: [
         (v) => !!v || "Amount mustn't be empty",
         (v) => /^\d*$/.test(v) || "Amount must be valid",
         (v) =>
-          parseInt(v) ===
-            this.calculateReducedPrice(
-              this.getSelectedPkg.price,
-              this.getSelectedPkg.offerId
-            ) -
-              this.getUserData.balance || "Amount not accurate",
+          parseInt(v) >= this.pkgData.price + this.userData.balance ||
+          "Amount not sufficient",
       ],
 
       numberRules: [
@@ -1307,10 +1280,8 @@ export default {
   computed: {
     ...mapGetters([
       "getUserID",
-      "getUserData",
       "getUserName",
       "getUserPkgID",
-      "getSelectedPkg",
       // "getAuthToken",
       // "getNtfCount",
       // "getUserName",
@@ -1354,24 +1325,20 @@ export default {
     },
   },
 
-  created() {},
+  created() {
+    this.fetchOwnData();
 
-  mounted() {
-    this.fetchAllOffers();
-
-    if (this.getUserData.package_id) {
+    if (this.isRedirected) {
+      console.log("redirected");
+    } else if (!this.userData.package_id) {
       this.fetchOwnPackage();
-    } else if (this.getSelectedPkg !== "") {
-      this.pageInfo = "paymentHighlights";
-      this.dialog = true;
     }
-
-    // console.log(this.userData);
-    // console.log(this.getUserData.package_id);
   },
 
   methods: {
-    ...mapMutations(["setUserData", "setSelectedPkg"]),
+    ...mapMutations([
+      // "setNtfCount",
+    ]),
 
     fetchOwnData() {
       axios
@@ -1381,8 +1348,7 @@ export default {
         .then((res) => {
           if (res.status === 200) {
             // console.log(res.data);
-            this.setUserData(res.data);
-            // console.log(this.userData);
+            this.userData = res.data;
           } else {
             this.error = true;
           }
@@ -1397,14 +1363,14 @@ export default {
       // console.log(this.getUserPkgID);
       axios
         .post("/api/isp/fetchOwnPackage", {
-          package_id: this.getUserData.package_id,
+          package_id: this.getUserPkgID,
         })
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.status === 200) {
             // console.log(res.data[0]);
-            this.setSelectedPkg(res.data[0]);
-            // console.log(this.getSelectedPkg);
+            this.pkgData = res.data[0];
+            // console.log(this.myPackage);
           } else {
             this.error = true;
           }
@@ -1412,47 +1378,6 @@ export default {
         .catch((err) => {
           console.log(err);
         });
-    },
-
-    fetchAllOffers() {
-      axios
-        .post("/api/offer/fetchByQuery", {
-          creator: "Nttn",
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            this.allOffers = res.data.data;
-            // console.log(this.allOffers);
-            // this.validOffers = [];
-            // for (let i in this.allOffers) {
-            //   if (
-            //     this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
-            //   ) {
-            //     this.validOffers.push(this.allOffers[i]);
-            //   }
-            // }
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    calculateReducedPrice(price, offerId) {
-      // console.log(price, offerId);
-      let percentage = 0;
-      if (!offerId) {
-        return;
-      }
-      for (let i in this.allOffers) {
-        if (this.allOffers[i]._id === offerId) {
-          percentage = this.allOffers[i].reduction;
-          break;
-        }
-      }
-      return price - (price * percentage) / 100.0;
     },
 
     payProcess(tag) {
@@ -1467,48 +1392,33 @@ export default {
         this.cardTitle = "DBBL NEXUS";
       } else if (tag === "bKash") {
         this.paymentPage = "bkashStart";
-        this.cardTitle = "bKash";
       } else if (tag === "ROCKET") {
         this.paymentPage = "rocketStart";
-        this.cardTitle = "Rocket";
       } else if (tag === "NAGAD") {
         this.paymentPage = "nagadStart";
-        this.cardTitle = "Nagad";
       }
 
       this.pageInfo = this.paymentPage;
     },
 
     paymentDone() {
-      console.log(this.pkgID);
       this.showSnackbar = true;
       this.dialog = false;
       this.pageInfo = "";
       setTimeout(() => {
         this.showSnackbar = false;
       }, 5000);
+      this.resetValue();
 
       axios
         .post("/api/payment/insert", {
-          user_type: 2, // for ISP
-          package_id: this.getSelectedPkg._id,
-          isp_id: this.getUserData._id,
-          gateway: this.cardTitle,
-          transaction_id: Math.random()
-            .toString(36)
-            .substring(10)
-            .toUpperCase(),
-          amount: this.amount,
-          method: this.cardTitle,
-          packageDuration: this.getSelectedPkg.duration,
+          user_type: 2,
+          package_id: this.getUserPkgID,
         })
         .then((res) => {
-          // console.log(res);
-          if (res.status === 201) {
-            this.resetValue();
-            this.setSelectedPkg("");
+          if (res.status === 200) {
             // console.log(res.data);
-            // this.userData = res.data;
+            this.userData = res.data;
           } else {
             this.error = true;
           }

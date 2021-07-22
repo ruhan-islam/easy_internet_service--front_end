@@ -11,23 +11,13 @@ export default new Vuex.Store({
         baseUrl: '',
         loginState: false,
         authToken: '',
-        // userData: {
-        //     name: "",
-        //     estTime: "",
-        //     expTime: "",
-        //     connStatus: false,
-        //     balance: 0,
-        //     pkgID: "",
-        //     licenseID: "",
-        //     remBW: 0,
-        // },
+        userData: '',
         userID: '',
         userName: '',
         userType: '',
         userEmail: '',
         userPkgID: '',
         // 
-        intervalID: null,
         notificationCount: 0,
         selectedPackage: '',
         currentPage: 'home',
@@ -44,6 +34,9 @@ export default new Vuex.Store({
         },
         getAuthToken: state => {
             return state.authToken;
+        },
+        getUserData: state => {
+            return state.userData;
         },
         getUserID: state => {
             return state.userID;
@@ -63,6 +56,9 @@ export default new Vuex.Store({
         //
         getNtfCount: state => {
             return state.notificationCount;
+        },
+        getSelectedPkg: state => {
+            return state.selectedPackage;
         },
         getCurrentPage: state => {
             return state.currentPage;
@@ -85,6 +81,9 @@ export default new Vuex.Store({
         setAuthToken: (state, authToken) => {
             state.authToken = authToken;
         },
+        setUserData: (state, userData) => {
+            state.userData = userData;
+        },
         setUserID: (state, userID) => {
             state.userID = userID;
         },
@@ -104,9 +103,12 @@ export default new Vuex.Store({
         setNtfCount: (state, notificationCount) => {
             state.notificationCount = notificationCount;
         },
-        decNtfCount: state => {
-            if (state.notificationCount > 0)
+        decNtfCount: (state, needToDecrease) => {
+            if (needToDecrease && state.notificationCount > 0)
                 state.notificationCount--;
+        },
+        setSelectedPkg: (state, selectedPackage) => {
+            state.selectedPackage = selectedPackage;
         },
         setCurrentPage: (state, currentPage) => {
             state.currentPage = currentPage;
