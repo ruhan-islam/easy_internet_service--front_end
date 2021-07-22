@@ -1,12 +1,5 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-//
-import NTTN_dashboard from "../components/NTTN/dashboard";
-import NTTN_home from "../components/NTTN/home";
-import NTTN_notifications from "../components/NTTN/notifications";
-import NTTN_packages from "../components/NTTN/packages";
-import NTTN_payments from "../components/NTTN/payments";
-//
 import store from '../store/index';
 
 
@@ -92,35 +85,35 @@ const routes = [
     meta: {
 			requireLoggedIn: true
 		},
-    component: NTTN_home,
+    component: () => import("../components/NTTN/home"),
   },
   {
     path: "/NTTN/packages",
     meta: {
 			requireLoggedIn: true
 		},
-    component: NTTN_packages,
+    component: () => import("../components/NTTN/packages"),
   },
   {
     path: "/NTTN/payments",
     meta: {
 			requireLoggedIn: true
 		},
-    component: NTTN_payments,
+    component: () => import("../components/NTTN/payments"),
   },
   {
     path: "/NTTN/notifications",
     meta: {
 			requireLoggedIn: true
 		},
-    component: NTTN_notifications,
+    component: () => import("../components/NTTN/notifications"),
   },
   {
     path: "/NTTN/dashboard",
     meta: {
 			requireLoggedIn: true
 		},
-    component: NTTN_dashboard,
+    component: () => import("../components/NTTN/dashboard"),
   },
   //
   {
