@@ -2,10 +2,79 @@
   <div class="container mt-5">
     <!-- contents here  -->
 
+    <!-- show own packages -->
+    <v-row v-if="!!myPackageList.length" justify="center">
+      <h2>My Packages</h2>
+      <v-col class="col-lg-4" v-for="(myPackage, i) in myPackageList" :key="i">
+        <v-card>
+          <v-img height="250" src="./../../assets/images.jpg"></v-img>
+
+          <v-card-title>
+            {{ myPackage.data.name }} &nbsp;
+            <v-chip v-if="!myPackage.data.ongoing" color="red">
+              Disabled
+            </v-chip>
+          </v-card-title>
+
+          <v-card-text>
+            <div class="my-4 text-subtitle-1">
+              Taka
+              <span v-if="!myPackage.data.offerId">
+                {{ myPackage.data.price }}
+              </span>
+              <template v-if="!!myPackage.data.offerId">
+                <s>{{ myPackage.data.price }}</s>
+                <span>
+                  &nbsp;
+                  {{
+                    calculateReducedPrice(
+                      myPackage.data.price,
+                      myPackage.data.offerId
+                    )
+                  }}
+                </span>
+                <v-chip color="deep-purple">
+                  <span style="color:white">
+                    {{ getOfferName(myPackage.data.offerId) }}
+                  </span>
+                </v-chip>
+              </template>
+            </div>
+            <v-chip-group
+              active-class="deep-purple accent-4 white--text"
+              column
+            >
+              <v-chip>{{ myPackage.data.bandwidth }} GBPS</v-chip>
+              <v-chip>{{ myPackage.data.duration }} months</v-chip>
+            </v-chip-group>
+            <div>
+              {{ myPackage.data.bandwidth }} GBPS speed relentless speed of
+              unlimited traffic with 24/7 service.
+            </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-row>
+              <v-col></v-col>
+              <v-col>
+                <v-btn
+                  color="deep-purple lighten-2"
+                  @click="findIdx(myPackage.data)"
+                  text
+                >
+                  Details
+                </v-btn>
+              </v-col>
+              <v-col></v-col>
+            </v-row>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <!-- <span> {{ getUserData }} </span> -->
 
     <!-- package filters  -->
-    <v-row v-if="!getUserData.package_id" justify="center">
+    <v-row justify="center">
       <v-card style="padding:0px 20px">
         <v-card-title>Search ISP Packages</v-card-title>
         <v-expansion-panels>
@@ -179,28 +248,29 @@
     </v-row>
 
     <!-- show ISP packages -->
-    <v-row v-if="!getUserData.package_id" justify="center">
-      <div class="col-lg-4" v-for="(pkg, i) in pkgs" :key="i">
+    <v-row justify="center">
+      <div class="col-lg-4" v-for="(pkg, i) in allPkgs" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
           <v-card-title>
-            {{ pkg.name }} &nbsp;
-            <v-chip v-if="!pkg.ongoing" color="red"> Disabled </v-chip>
+            {{ pkg.data.name }} &nbsp;
+            <v-chip v-if="!pkg.data.ongoing" color="red"> Disabled </v-chip>
           </v-card-title>
 
           <v-card-text>
             <div class="my-4 text-subtitle-1">
               Taka
-              <span v-if="!pkg.offerId"> {{ pkg.price }} </span>
-              <template v-if="!!pkg.offerId">
-                <s>{{ pkg.price }}</s>
+              <span v-if="!pkg.data.offerId"> {{ pkg.data.price }} </span>
+              <template v-if="!!pkg.data.offerId">
+                <s>{{ pkg.data.price }}</s>
                 <span>
-                  &nbsp; {{ calculateReducedPrice(pkg.price, pkg.offerId) }}
+                  &nbsp;
+                  {{ calculateReducedPrice(pkg.data.price, pkg.data.offerId) }}
                 </span>
                 <v-chip color="deep-purple">
                   <span style="color:white">
-                    {{ getOfferName(pkg.offerId) }}
+                    {{ getOfferName(pkg.data.offerId) }}
                   </span>
                 </v-chip>
               </template>
@@ -209,7 +279,7 @@
               active-class="deep-purple accent-4 white--text"
               column
             >
-              <v-chip v-for="(area, i) in pkg.areas" :key="i"
+              <v-chip v-for="(area, i) in pkg.data.areas" :key="i"
                 >{{ area }}
               </v-chip>
             </v-chip-group>
@@ -217,8 +287,8 @@
               active-class="deep-purple accent-4 white--text"
               column
             >
-              <v-chip>{{ pkg.bandwidth }} GBPS</v-chip>
-              <v-chip>{{ pkg.duration }} months</v-chip>
+              <v-chip>{{ pkg.data.bandwidth }} GBPS</v-chip>
+              <v-chip>{{ pkg.data.duration }} months</v-chip>
             </v-chip-group>
 
             <div>
@@ -241,7 +311,7 @@
             <v-col></v-col>
             <v-col>
               <v-btn
-                :disabled="!allPkgs[i].ongoing"
+                :disabled="!allPkgs[i].data.ongoing || !allPkgs[i].status"
                 color="deep-purple lighten-2"
                 @click="selectPressed(i)"
                 text
@@ -260,7 +330,7 @@
       <v-dialog v-model="dialog2" max-width="70%">
         <v-card>
           <v-card-title class="text-h5">
-            {{ allPkgs[currPkgIdx].name }}
+            {{ allPkgs[currPkgIdx].data.name }}
           </v-card-title>
 
           <v-card-text>
@@ -275,31 +345,31 @@
                 <tbody>
                   <tr>
                     <td>Package Name</td>
-                    <td>{{ allPkgs[currPkgIdx].name }}</td>
+                    <td>{{ allPkgs[currPkgIdx].data.name }}</td>
                   </tr>
                   <tr>
                     <td>Price</td>
-                    <td>Tk. {{ allPkgs[currPkgIdx].price }} /ISP</td>
+                    <td>Tk. {{ allPkgs[currPkgIdx].data.price }} /ISP</td>
                   </tr>
                   <tr>
                     <td>Bandwidth</td>
-                    <td>{{ allPkgs[currPkgIdx].bandwidth }} GBPS</td>
+                    <td>{{ allPkgs[currPkgIdx].data.bandwidth }} GBPS</td>
                   </tr>
                   <tr>
                     <td>Duration</td>
-                    <td>{{ allPkgs[currPkgIdx].duration }} months</td>
+                    <td>{{ allPkgs[currPkgIdx].data.duration }} months</td>
                   </tr>
                   <tr>
                     <td>Coverage Area</td>
-                    <td>{{ allPkgs[currPkgIdx].areas }}</td>
+                    <td>{{ allPkgs[currPkgIdx].data.areas }}</td>
                   </tr>
                   <tr>
                     <td>Upload Speed</td>
-                    <td>{{ allPkgs[currPkgIdx].up_speed }} GBPS</td>
+                    <td>{{ allPkgs[currPkgIdx].data.up_speed }} GBPS</td>
                   </tr>
                   <tr>
                     <td>Download Speed</td>
-                    <td>{{ allPkgs[currPkgIdx].down_speed }} GBPS</td>
+                    <td>{{ allPkgs[currPkgIdx].data.down_speed }} GBPS</td>
                   </tr>
                   <tr>
                     <td>Data Limit</td>
@@ -307,11 +377,13 @@
                   </tr>
                   <tr>
                     <td>Estimated Down Time</td>
-                    <td>{{ allPkgs[currPkgIdx].downTime }} hrs</td>
+                    <td>{{ allPkgs[currPkgIdx].data.downTime }} hrs</td>
                   </tr>
                   <tr>
                     <td>Estimated Response Time</td>
-                    <td>{{ allPkgs[currPkgIdx].responseTime }} milliseconds</td>
+                    <td>
+                      {{ allPkgs[currPkgIdx].data.responseTime }} milliseconds
+                    </td>
                   </tr>
                 </tbody>
               </template>
@@ -334,7 +406,15 @@
             </v-col>
             <v-col></v-col>
             <v-col>
-              <v-btn color="green darken-1" text @click="selectPressed">
+              <v-btn
+                :disabled="
+                  !allPkgs[currPkgIdx].data.ongoing ||
+                    !allPkgs[currPkgIdx].status
+                "
+                color="deep-purple lighten-2"
+                @click="selectPressed(currPkgIdx)"
+                text
+              >
                 Select
               </v-btn>
             </v-col>
@@ -342,123 +422,6 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-row>
-
-    <!-- show own package -->
-    <v-row v-if="!!getUserData.package_id" justify="center">
-      <v-col class="col-lg-4">
-        <v-card>
-          <v-img height="250" src="./../../assets/images.jpg"></v-img>
-
-          <v-card-title>
-            {{ myPackage.name }} &nbsp;
-            <v-chip v-if="!myPackage.ongoing" color="red"> Disabled </v-chip>
-          </v-card-title>
-
-          <v-card-text>
-            <div class="my-4 text-subtitle-1">
-              Taka
-              <span v-if="!myPackage.offerId">
-                {{ myPackage.price }}
-              </span>
-              <template v-if="!!myPackage.offerId">
-                <s>{{ myPackage.price }}</s>
-                <span>
-                  &nbsp;
-                  {{
-                    calculateReducedPrice(myPackage.price, myPackage.offerId)
-                  }}
-                </span>
-                <v-chip color="deep-purple">
-                  <span style="color:white">
-                    {{ getOfferName(myPackage.offerId) }}
-                  </span>
-                </v-chip>
-              </template>
-            </div>
-            <v-chip-group
-              active-class="deep-purple accent-4 white--text"
-              column
-            >
-              <v-chip>{{ myPackage.bandwidth }} GBPS</v-chip>
-              <v-chip>{{ myPackage.duration }} months</v-chip>
-            </v-chip-group>
-            <div>
-              {{ myPackage.bandwidth }} GBPS speed relentless speed of unlimited
-              traffic with 24/7 service.
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col class="col-lg-1"> </v-col>
-
-      <v-col class="col-lg-6">
-        <v-card>
-          <v-simple-table dark>
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th class="text-left">Features</th>
-                  <th class="text-left">Availibility</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Package Name</td>
-                  <td>{{ myPackage.name }}</td>
-                </tr>
-                <tr>
-                  <td>Base Price</td>
-                  <td>Tk. {{ myPackage.price }} /ISP</td>
-                </tr>
-                <tr v-if="!!myPackage.offerId">
-                  <td>Reduced Price</td>
-                  <td>
-                    Tk.
-                    {{
-                      calculateReducedPrice(myPackage.price, myPackage.offerId)
-                    }}
-                    /ISP
-                  </td>
-                </tr>
-                <tr>
-                  <td>Bandwidth</td>
-                  <td>{{ myPackage.bandwidth }} GBPS</td>
-                </tr>
-                <tr>
-                  <td>Duration</td>
-                  <td>{{ myPackage.duration }} months</td>
-                </tr>
-                <tr>
-                  <td>Coverage Area</td>
-                  <td>{{ myPackage.areas }}</td>
-                </tr>
-                <tr>
-                  <td>Upload Speed</td>
-                  <td>{{ myPackage.up_speed }} GBPS</td>
-                </tr>
-                <tr>
-                  <td>Download Speed</td>
-                  <td>{{ myPackage.down_speed }} GBPS</td>
-                </tr>
-                <tr>
-                  <td>Data Limit</td>
-                  <td>Unlimited</td>
-                </tr>
-                <tr>
-                  <td>Estimated Down Time</td>
-                  <td>{{ myPackage.downTime }} hours</td>
-                </tr>
-                <tr>
-                  <td>Estimated Response Time</td>
-                  <td>{{ myPackage.responseTime }} milliseconds</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-card>
-      </v-col>
     </v-row>
 
     <!-- <v-row v-if="showPayment" justify="center">
@@ -491,7 +454,7 @@ export default {
       showSnackbar: false,
       pageInfo: "",
       myInfo: {},
-      myPackage: "",
+      myPackageList: [],
       allOffers: [],
       validOffers: [],
       allPkgs: [],
@@ -526,7 +489,7 @@ export default {
     this.fetchOwnData();
     this.fetchAllOffers();
     this.fetchPackages();
-    this.fetchOwnPackage();
+    this.fetchOwnPackages();
     this.showPayment = false;
   },
 
@@ -560,21 +523,18 @@ export default {
         });
     },
 
-    fetchOwnPackage() {
+    fetchOwnPackages() {
       // console.log("in");
       // console.log(this.getUserPkgID);
       axios
-        .post("/api/isp/fetchOwnPackage", {
-          package_id: this.getUserData.package_id,
+        .post("/api/isp/fetchOwnPackageArray", {
+          id: this.getUserData._id,
         })
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
-            if (res.data.length === 1) {
-              // console.log(res.data[0]);
-              this.myPackage = res.data[0];
-              // console.log(this.myPackage);
-            }
+            this.myPackageList = res.data;
+            // console.log(this.myPackageList);
           } else {
             this.error = true;
           }
@@ -586,18 +546,19 @@ export default {
 
     fetchPackages() {
       axios
-        .post("/api/package/fetchByQuery", {
-          packageCreator: "Nttn",
+        .post("/api/package/fetchByQueryWithStatus", {
+          type: 2,
+          id: this.getUserData._id,
         })
         .then((res) => {
           if (res.status === 200) {
-            this.allPkgs = res.data.data;
-            // console.log(this.myInfo.region);
+            // console.log(res.data);
+            this.allPkgs = res.data;
             for (let i in this.allPkgs) {
               // console.log(this.allPkgs[i].areas);
               if (
-                this.allPkgs[i].areas.includes("Nation-wide") ||
-                this.allPkgs[i].areas.includes(this.myInfo.region)
+                this.allPkgs[i].data.areas.includes("Nation-wide") ||
+                this.allPkgs[i].data.areas.includes(this.myInfo.region)
               ) {
                 // console.log("in");
                 this.pkgs.push(this.allPkgs[i]);
@@ -639,10 +600,23 @@ export default {
         });
     },
 
+    findIdx(myPkg) {
+      this.currPkgIdx = -1;
+      for (let i in this.allPkgs) {
+        if (this.allPkgs[i].data._id === myPkg._id) {
+          this.currPkgIdx = i;
+          break;
+        }
+      }
+      if (this.currPkgIdx !== -1) {
+        this.dialog2 = true;
+      }
+    },
+
     selectPressed(i) {
       // console.log(i);
-      this.setSelectedPkg(this.allPkgs[i]);
-      // console.log(this.getSelectedPkg);
+      this.setSelectedPkg(this.allPkgs[i].data);
+      console.log(this.getSelectedPkg);
       this.$router.push("/ISP/payments");
       // this.showPayment = true;
     },
@@ -671,7 +645,7 @@ export default {
     calculateReducedPrice(price, offerId) {
       let percentage = 0;
       if (!offerId) {
-        return;
+        return price;
       }
       for (let i in this.allOffers) {
         if (this.allOffers[i]._id === offerId) {

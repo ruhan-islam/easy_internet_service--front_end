@@ -61,7 +61,7 @@ export default {
     ...mapGetters(["getUserID", "getUserData", "getUserName"]),
   },
 
-  created() {
+  mounted() {
     if (!this.getUserData) {
       this.fetchOwnData();
     }

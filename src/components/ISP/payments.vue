@@ -6,11 +6,19 @@
       <!-- contents here  -->
       <v-row justify="center">
         <span>past payments dekhano lagbe</span>
+        <v-radio-group v-model="selectedPkgName">
+          <v-radio
+            v-for="(pkg, i) in myPackageList"
+            :key="i"
+            :label="pkg.data.name"
+            :value="pkg.data.name"
+          ></v-radio>
+        </v-radio-group>
         <v-dialog v-model="dialog" persistent max-width="40%">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              :disabled="!getUserData.package_id"
-              @click="pageInfo = 'paymentHighlights'"
+              :disabled="!selectedPkgName"
+              @click="selectPackage()"
               color="primary"
               v-bind="attrs"
               v-on="on"
@@ -90,14 +98,7 @@
                 </v-simple-table>
               </v-card-text>
               <v-card-actions>
-                <v-btn
-                  color="green darken-1"
-                  text
-                  @click="
-                    setSelectedPkg('');
-                    dialog = false;
-                  "
-                >
+                <v-btn color="green darken-1" text @click="closePressed">
                   close
                 </v-btn>
                 <v-btn
@@ -1207,6 +1208,8 @@ export default {
 
   data() {
     return {
+      selectedPkgName: "",
+      myPackageList: [],
       userData: {},
       pkgData: {},
       pkgID: "",
@@ -1359,14 +1362,14 @@ export default {
   mounted() {
     this.fetchAllOffers();
 
-    if (this.getUserData.package_id) {
-      this.fetchOwnPackage();
-    } else if (this.getSelectedPkg !== "") {
+    if (this.getSelectedPkg) {
       this.pageInfo = "paymentHighlights";
       this.dialog = true;
+    } else if (this.getUserData.packages.length) {
+      this.fetchOwnPackages();
     }
 
-    // console.log(this.userData);
+    console.log(this.getSelectedPkg);
     // console.log(this.getUserData.package_id);
   },
 
@@ -1392,19 +1395,18 @@ export default {
         });
     },
 
-    fetchOwnPackage() {
+    fetchOwnPackages() {
       // console.log("in");
       // console.log(this.getUserPkgID);
       axios
-        .post("/api/isp/fetchOwnPackage", {
-          package_id: this.getUserData.package_id,
+        .post("/api/isp/fetchOwnPackageArray", {
+          id: this.getUserData._id,
         })
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.status === 200) {
-            // console.log(res.data[0]);
-            this.setSelectedPkg(res.data[0]);
-            // console.log(this.getSelectedPkg);
+            this.myPackageList = res.data;
+            console.log(this.myPackageList);
           } else {
             this.error = true;
           }
@@ -1444,7 +1446,7 @@ export default {
       // console.log(price, offerId);
       let percentage = 0;
       if (!offerId) {
-        return;
+        return price;
       }
       for (let i in this.allOffers) {
         if (this.allOffers[i]._id === offerId) {
@@ -1453,6 +1455,24 @@ export default {
         }
       }
       return price - (price * percentage) / 100.0;
+    },
+
+    closePressed() {
+      this.setSelectedPkg("");
+      this.dialog = false;
+      this.fetchOwnPackages();
+    },
+
+    selectPackage() {
+      console.log(this.selectedPkgName);
+      for (let i in this.myPackageList) {
+        if (this.myPackageList[i].data.name === this.selectedPkgName) {
+          this.setSelectedPkg(this.myPackageList[i].data);
+          break;
+        }
+      }
+
+      this.pageInfo = "paymentHighlights";
     },
 
     payProcess(tag) {

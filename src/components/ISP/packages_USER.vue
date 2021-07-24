@@ -88,7 +88,7 @@
                   <v-expansion-panel-header>
                     <template v-slot:default="{ open }">
                       <v-row no-gutters>
-                        <v-col cols="4"> Bandwidth(GBPS) </v-col>
+                        <v-col cols="4"> Bandwidth(MBPS) </v-col>
                         <v-col cols="8" class="text--secondary">
                           <v-fade-transition leave-absolute>
                             <span v-if="open" key="0">
@@ -108,7 +108,7 @@
                       v-model="bandwidth"
                       :min="minBW"
                       :max="maxBW"
-                      label="Bandwidth (GBPS)"
+                      label="Bandwidth (MBPS)"
                       class="align-center"
                       thumb-label="always"
                     >
@@ -153,7 +153,7 @@
                   <v-expansion-panel-header>
                     <template v-slot:default="{ open }">
                       <v-row no-gutters>
-                        <v-col cols="4"> Download Speed(GBPS) </v-col>
+                        <v-col cols="4"> Download Speed(MBPS) </v-col>
                         <v-col cols="8" class="text--secondary">
                           <v-fade-transition leave-absolute>
                             <span v-if="open" key="0">
@@ -173,7 +173,7 @@
                       v-model="downSpeed"
                       :min="minBW"
                       :max="maxBW"
-                      label="Download speed (GBPS)"
+                      label="Download speed (MBPS)"
                       thumb-label="always"
                       :rules="speedRules"
                     >
@@ -185,7 +185,7 @@
                   <v-expansion-panel-header>
                     <template v-slot:default="{ open }">
                       <v-row no-gutters>
-                        <v-col cols="4"> Upload Speed(GBPS) </v-col>
+                        <v-col cols="4"> Upload Speed(MBPS) </v-col>
                         <v-col cols="8" class="text--secondary">
                           <v-fade-transition leave-absolute>
                             <span v-if="open" key="0">
@@ -205,7 +205,7 @@
                       v-model="upSpeed"
                       :min="minBW"
                       :max="maxBW"
-                      label="Upload speed (GBPS)"
+                      label="Upload speed (MBPS)"
                       thumb-label="always"
                       :rules="speedRules"
                     >
@@ -378,7 +378,7 @@
                 <v-expansion-panel-content>
                   <v-range-slider
                     v-model="filterBW"
-                    label="Bandwidth (GBPS)"
+                    label="Bandwidth (MBPS)"
                     min="0"
                     max="100"
                     thumb-label="always"
@@ -523,11 +523,11 @@
                   active-class="deep-purple accent-4 white--text"
                   column
                 >
-                  <v-chip>{{ pkg.bandwidth }} GBPS</v-chip>
+                  <v-chip>{{ pkg.bandwidth }} MBPS</v-chip>
                   <v-chip>{{ pkg.duration }} months</v-chip>
                 </v-chip-group>
                 <div>
-                  {{ pkg.bandwidth }} GBPS speed relentless speed of unlimited
+                  {{ pkg.bandwidth }} MBPS speed relentless speed of unlimited
                   traffic with 24/7 service.
                 </div>
               </v-card-text>
@@ -576,7 +576,7 @@
             <v-card-text>
               <!-- object: {{ allPkgs[currPkgIdx] }} <br />
               name: {{ allPkgs[currPkgIdx].name }} <br />
-              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} GBPS <br />-->
+              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} MBPS <br />-->
 
               <v-simple-table dark>
                 <template v-slot:default>
@@ -597,20 +597,20 @@
                       <td>Tk. {{ allPkgs[currPkgIdx].price }} /ISP</td>
                     </tr>
                     <tr>
-                      <td>Bandwidth (GBPS)</td>
-                      <td>{{ allPkgs[currPkgIdx].bandwidth }} GBPS</td>
+                      <td>Bandwidth (MBPS)</td>
+                      <td>{{ allPkgs[currPkgIdx].bandwidth }} MBPS</td>
                     </tr>
                     <tr>
                       <td>Duration (months)</td>
                       <td>{{ allPkgs[currPkgIdx].duration }} months</td>
                     </tr>
                     <tr>
-                      <td>Upload Speed (GBPS)</td>
-                      <td>{{ allPkgs[currPkgIdx].up_speed }} GBPS</td>
+                      <td>Upload Speed (MBPS)</td>
+                      <td>{{ allPkgs[currPkgIdx].up_speed }} MBPS</td>
                     </tr>
                     <tr>
-                      <td>Download Speed (GBPS)</td>
-                      <td>{{ allPkgs[currPkgIdx].down_speed }} GBPS</td>
+                      <td>Download Speed (MBPS)</td>
+                      <td>{{ allPkgs[currPkgIdx].down_speed }} MBPS</td>
                     </tr>
                     <tr>
                       <td>Data Limit</td>
@@ -652,7 +652,7 @@
             <v-card-text>
               <!-- object: {{ allPkgs[currPkgIdx] }} <br />
               name: {{ allPkgs[currPkgIdx].name }} <br />
-              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} GBPS <br />-->
+              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} MBPS <br />-->
               <!-- :label="`Radio ${n}`" -->
               <v-radio-group mandatory v-model="selectedOffer">
                 <v-radio
@@ -808,54 +808,61 @@ export default {
     },
   },
 
-  created() {
-    axios
-      .post("/api/offer/fetchByQuery", {
-        creator: this.getUserName,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          this.allOffers = res.data.data;
-          // console.log(this.allOffers);
-          this.validOffers = [];
-          for (let i in this.allOffers) {
-            if (
-              this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
-            ) {
-              this.validOffers.push(this.allOffers[i]);
-            }
-          }
-        } else {
-          this.error = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios
-      .post("/api/package/fetchByQuery", {
-        packageCreator: this.getUserName,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          this.allPkgs = res.data.data;
-          this.pkgs = this.allPkgs;
-          this.pkgNameList = [];
-          this.markVal = 0;
-          for (let i in this.pkgs) {
-            this.pkgNameList.push(this.allPkgs[i].name);
-          }
-        } else {
-          this.error = true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  mounted() {
+    this.fetchAllOffers();
+    this.fetchAllPackages();
   },
 
   methods: {
+    fetchAllPackages() {
+      axios
+        .post("/api/package/fetchByQuery", {
+          packageCreator: this.getUserName,
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.allPkgs = res.data.data;
+            this.pkgs = this.allPkgs;
+            this.pkgNameList = [];
+            this.markVal = 0;
+            for (let i in this.pkgs) {
+              this.pkgNameList.push(this.allPkgs[i].name);
+            }
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    fetchAllOffers() {
+      axios
+        .post("/api/offer/fetchByQuery", {
+          creator: this.getUserName,
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.allOffers = res.data.data;
+            // console.log(this.allOffers);
+            this.validOffers = [];
+            for (let i in this.allOffers) {
+              if (
+                this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
+              ) {
+                this.validOffers.push(this.allOffers[i]);
+              }
+            }
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     doSort(item) {
       // ["price 🔺", "price 🔻", "duraation 🔺","duraation 🔻",
       //           "bandwidth 🔺","bandwidth 🔻"],
@@ -978,7 +985,7 @@ export default {
     calculateReducedPrice(price, offerId) {
       let percentage = 0;
       if (!offerId) {
-        return;
+        return price;
       }
       for (let i in this.allOffers) {
         if (this.allOffers[i]._id === offerId) {

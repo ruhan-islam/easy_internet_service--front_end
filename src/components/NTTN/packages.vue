@@ -1032,7 +1032,7 @@ export default {
     calculateReducedPrice(price, offerId) {
       let percentage = 0;
       if (!offerId) {
-        return;
+        return price;
       }
       for (let i in this.allOffers) {
         if (this.allOffers[i]._id === offerId) {

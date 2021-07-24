@@ -1297,7 +1297,7 @@ export default {
     },
   },
 
-  created() {
+  mounted() {
     // this.fetchOwnPackage();
     this.fetchOwnData();
   },

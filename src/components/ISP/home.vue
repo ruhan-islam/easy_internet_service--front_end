@@ -23,7 +23,7 @@ export default {
     return {};
   },
 
-  created() {
+  mounted() {
     if (!this.getUserData) {
       this.fetchOwnData();
     }

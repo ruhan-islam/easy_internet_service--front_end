@@ -124,7 +124,7 @@ export default {
     };
   },
 
-  created() {
+  mounted() {
     if (!this.getUserData) {
       this.fetchOwnData();
     }
