@@ -1500,7 +1500,7 @@ export default {
     },
 
     paymentDone() {
-      console.log(this.pkgID);
+      // console.log(this.pkgID);
       this.showSnackbar = true;
       this.dialog = false;
       this.pageInfo = "";
@@ -1527,6 +1527,7 @@ export default {
           if (res.status === 201) {
             this.resetValue();
             this.setSelectedPkg("");
+            this.fetchOwnPackages();
             // console.log(res.data);
             // this.userData = res.data;
           } else {
