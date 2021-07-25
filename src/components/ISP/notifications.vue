@@ -2,9 +2,8 @@
   <div>
     <topbar></topbar>
 
-    <div class="container mt-5">
+    <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
-
       <template>
         <v-row justify="center">
           <v-expansion-panels v-model="panel" inset>

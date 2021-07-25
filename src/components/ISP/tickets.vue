@@ -2,8 +2,9 @@
   <div>
     <topbar></topbar>
 
-    <div class="container ma-12 mb-12">
+    <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
+      <v-row> </v-row>
     </div>
 
     <bottombar></bottombar>

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-5">
+  <div class="ma-12 mb-12 container-flow">
     <!-- contents here  -->
 
     <!-- show own packages -->

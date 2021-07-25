@@ -2,47 +2,49 @@
   <div>
     <topbar></topbar>
 
-    <!-- contents here  -->
-    <div class="container" justify-center>
-      <v-form ref="form" v-model="valid" lazy-validation>
-        <div style="width:80%">
-          <v-text-field
-            v-model="userName"
-            :rules="userNameRules"
-            label="Username"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="subject"
-            :rules="subjectRules"
-            label="Subject"
-            required
-          ></v-text-field>
-          <v-textarea
-            color="teal"
-            v-model="details"
-            :rules="detailsRules"
-            label="Details"
-            required
-          >
-          </v-textarea>
-
-          <v-card-actions class="justify-center">
-            <v-btn
-              :disabled="isSendDisabled"
-              color="success"
-              class="mr-4"
-              @click="sendPressed"
+    <div class="ma-12 mb-12 container-flow">
+      <!-- contents here  -->
+      <div class="container" justify-center>
+        <v-form ref="form" v-model="valid" lazy-validation>
+          <div style="width:80%">
+            <v-text-field
+              v-model="userName"
+              :rules="userNameRules"
+              label="Username"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="subject"
+              :rules="subjectRules"
+              label="Subject"
+              required
+            ></v-text-field>
+            <v-textarea
+              color="teal"
+              v-model="details"
+              :rules="detailsRules"
+              label="Details"
+              required
             >
-              Send
-            </v-btn>
-          </v-card-actions>
+            </v-textarea>
 
-          <v-snackbar :value="showSnackbar">
-            Notification Sent
-          </v-snackbar>
-        </div>
-      </v-form>
+            <v-card-actions class="justify-center">
+              <v-btn
+                :disabled="isSendDisabled"
+                color="success"
+                class="mr-4"
+                @click="sendPressed"
+              >
+                Send
+              </v-btn>
+            </v-card-actions>
+
+            <v-snackbar :value="showSnackbar">
+              Notification Sent
+            </v-snackbar>
+          </div>
+        </v-form>
+      </div>
     </div>
 
     <bottombar></bottombar>
@@ -135,7 +137,7 @@ export default {
       // console.log("send pressed");
 
       let newNotification = {
-        senderId: this.getUserName,
+        senderId: this.getUserData.name,
         receiverID: this.userName,
         senderType: 2,
         receiverType: 3,

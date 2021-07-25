@@ -2,7 +2,8 @@
   <div>
     <topbar></topbar>
 
-    <div style="background-color:#E8F0F2;padding:100px 200px">
+    <!-- <div class="ma-12 mb-12 container-flow"> -->
+    <div style="padding:0px 200px 50px 200px">
       <H1 style="padding-bottom:50px">Welcome to Amader Internet</H1>
       <div
         id="carouselExampleCaptions"
@@ -188,6 +189,7 @@
         </button>
       </div>
     </div>
+    <!-- </div> -->
 
     <bottombar></bottombar>
   </div>

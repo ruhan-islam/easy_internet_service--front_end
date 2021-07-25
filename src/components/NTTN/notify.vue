@@ -2,47 +2,49 @@
   <div>
     <topbar></topbar>
 
-    <!-- contents here  -->
-    <div class="ma-12 mb-12 container" justify-center>
-      <v-form ref="form" v-model="valid" lazy-validation>
-        <div style="width:80%">
-          <v-text-field
-            v-model="userName"
-            :rules="userNameRules"
-            label="Username"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="subject"
-            :rules="subjectRules"
-            label="Subject"
-            required
-          ></v-text-field>
-          <v-textarea
-            color="teal"
-            v-model="details"
-            :rules="detailsRules"
-            label="Details"
-            required
-          >
-          </v-textarea>
-
-          <v-card-actions class="justify-center">
-            <v-btn
-              :disabled="isSendDisabled"
-              color="success"
-              class="mr-4"
-              @click="sendPressed"
+    <div class="ma-12 mb-12 container-flow">
+      <!-- contents here  -->
+      <div class="container" justify-center>
+        <v-form ref="form" v-model="valid" lazy-validation>
+          <div style="width:80%">
+            <v-text-field
+              v-model="ispName"
+              :rules="ispNameRules"
+              label="ISP name"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="subject"
+              :rules="subjectRules"
+              label="Subject"
+              required
+            ></v-text-field>
+            <v-textarea
+              color="teal"
+              v-model="details"
+              :rules="detailsRules"
+              label="Details"
+              required
             >
-              Send
-            </v-btn>
-          </v-card-actions>
+            </v-textarea>
 
-          <v-snackbar :value="showSnackbar">
-            Notification Sent
-          </v-snackbar>
-        </div>
-      </v-form>
+            <v-card-actions class="justify-center">
+              <v-btn
+                :disabled="isSendDisabled"
+                color="success"
+                class="mr-4"
+                @click="sendPressed"
+              >
+                Send
+              </v-btn>
+            </v-card-actions>
+
+            <v-snackbar :value="showSnackbar">
+              Notification Sent
+            </v-snackbar>
+          </div>
+        </v-form>
+      </div>
     </div>
 
     <bottombar></bottombar>
@@ -65,13 +67,12 @@ export default {
     return {
       valid: false,
 
-      userList: [],
-      userNameList: [],
-      userName: "",
-      userNameRules: [
+      ispList: [],
+      ispNameList: [],
+      ispName: "",
+      ispNameRules: [
         (v) => !!v || "Name is required",
-        (v) =>
-          !(v && !this.userNameList.includes(v.trim())) || "user not found",
+        (v) => !(v && !this.ispNameList.includes(v.trim())) || "ISP not found",
       ],
 
       subject: "",
@@ -85,7 +86,7 @@ export default {
   },
 
   mounted() {
-    this.fetchUserNameList();
+    this.fetchIspNameList();
   },
 
   computed: {
@@ -98,7 +99,7 @@ export default {
     ]),
 
     isSendDisabled() {
-      return !(this.userName && this.subject && this.details && this.valid);
+      return !(this.ispName && this.subject && this.details && this.valid);
     },
   },
 
@@ -107,21 +108,19 @@ export default {
       // "setNtfCount",
     ]),
 
-    fetchUserNameList() {
+    fetchIspNameList() {
       axios
-        .post("/api/user/fetchUserOfIspByQuery", {
-          id: this.getUserData._id,
-        })
+        .post("/api/isp/fetchIspOfNttnByQuery")
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
             // console.log(res.data);
-            this.userList = res.data;
-            this.userNameList = [];
-            for (let i in this.userList) {
-              this.userNameList.push(this.userList[i].name);
+            this.ispList = res.data;
+            this.ispNameList = [];
+            for (let i in this.ispList) {
+              this.ispNameList.push(this.ispList[i].name);
             }
-            // console.log(this.userNameList);
+            // console.log(this.ispNameList);
           } else {
             this.error = true;
           }
@@ -135,16 +134,16 @@ export default {
       // console.log("send pressed");
 
       let newNotification = {
-        senderId: this.getUserName,
-        receiverID: this.userName,
-        senderType: 2,
-        receiverType: 3,
+        senderId: "Nttn",
+        receiverID: this.ispName,
+        senderType: 1,
+        receiverType: 2,
         subject: this.subject,
         details: this.details,
         category: "",
       };
 
-      // console.log(newNotification);
+      console.log(newNotification);
 
       axios
         .post("/api/notification/insert", newNotification)

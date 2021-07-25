@@ -2,29 +2,31 @@
   <div>
     <topbar></topbar>
 
-    <v-container>
-      <v-row justify="center">
-        <v-col></v-col>
-        <v-col>
-          <v-radio-group v-model="selectedOpt">
-            <v-radio
-              key="nttn"
-              label="packages from NTTN"
-              value="nttn"
-            ></v-radio>
-            <v-radio
-              key="user"
-              label="packages for users"
-              value="user"
-            ></v-radio>
-          </v-radio-group>
-        </v-col>
-        <v-col></v-col>
-      </v-row>
-    </v-container>
+    <div class="ma-12 mb-12 container-flow">
+      <v-container>
+        <v-row justify="center">
+          <v-col></v-col>
+          <v-col>
+            <v-radio-group v-model="selectedOpt">
+              <v-radio
+                key="nttn"
+                label="packages from NTTN"
+                value="nttn"
+              ></v-radio>
+              <v-radio
+                key="user"
+                label="packages for users"
+                value="user"
+              ></v-radio>
+            </v-radio-group>
+          </v-col>
+          <v-col></v-col>
+        </v-row>
+      </v-container>
 
-    <pkgNTTN v-if="selectedOpt === 'nttn'"></pkgNTTN>
-    <pkgUSER v-if="selectedOpt === 'user'"></pkgUSER>
+      <pkgNTTN v-if="selectedOpt === 'nttn'"></pkgNTTN>
+      <pkgUSER v-if="selectedOpt === 'user'"></pkgUSER>
+    </div>
 
     <bottombar></bottombar>
   </div>

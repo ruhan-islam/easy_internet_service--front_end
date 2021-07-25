@@ -2,7 +2,7 @@
   <div>
     <topbar></topbar>
 
-    <div class="container-flow">
+    <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
       <v-row> </v-row>
     </div>

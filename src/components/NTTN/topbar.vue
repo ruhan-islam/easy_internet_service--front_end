@@ -1,11 +1,18 @@
 <template>
-  <div>
-    <v-bottom-navigation color="teal" grow dark>
+  <div style="margin-bottom:8%">
+    <v-app-bar :fixed="true" grow dark>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrsHome }">
-          <v-btn v-bind="attrsHome" v-on="on" router-link to="/NTTN/home" exact>
-            <span> Home </span>
+          <v-btn
+            v-bind="attrsHome"
+            v-on="on"
+            router-link
+            to="/NTTN/home"
+            exact
+            elevation="0"
+          >
             <v-icon> mdi-home </v-icon>
+            <span> Home </span>
           </v-btn>
         </template>
         <span> Home </span>
@@ -19,6 +26,7 @@
             router-link
             to="/NTTN/packages"
             exact
+            elevation="0"
           >
             <span> Packages </span>
             <v-icon> mdi-package-variant </v-icon>
@@ -35,6 +43,7 @@
             router-link
             to="/NTTN/offers"
             exact
+            elevation="0"
           >
             <span> Offers </span>
             <v-icon> mdi-widgets </v-icon>
@@ -51,6 +60,7 @@
             router-link
             to="/NTTN/payments"
             exact
+            elevation="0"
           >
             <span> Payments </span>
             <v-icon> mdi-credit-card </v-icon>
@@ -67,12 +77,13 @@
             router-link
             to="/NTTN/notifications"
             exact
+            elevation="0"
           >
             <span> Notifications </span>
             <v-icon> mdi-bell </v-icon>
             <v-badge
-              offset-x="-5"
-              offset-y="15"
+              offset-x="10"
+              offset-y="0"
               v-if="getNtfCount !== 0"
               :content="getNtfCount"
             >
@@ -90,6 +101,7 @@
             router-link
             to="/NTTN/notify"
             exact
+            elevation="0"
           >
             <span> Notify </span>
             <v-icon> mdi-widgets </v-icon>
@@ -106,6 +118,7 @@
             router-link
             to="/NTTN/tickets"
             exact
+            elevation="0"
           >
             <span> Tickets </span>
             <v-icon> mdi-widgets </v-icon>
@@ -122,6 +135,7 @@
             router-link
             to="/NTTN/dashboard"
             exact
+            elevation="0"
           >
             <span> Dashboard </span>
             <v-icon> mdi-widgets </v-icon>
@@ -132,14 +146,14 @@
 
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrsLogout }">
-          <v-btn v-bind="attrsLogout" v-on="on" @click="logOut()">
+          <v-btn v-bind="attrsLogout" v-on="on" elevation="0" @click="logOut()">
             <span> Signout </span>
             <v-icon> mdi-logout </v-icon>
           </v-btn>
         </template>
         <span> Signout </span>
       </v-tooltip>
-    </v-bottom-navigation>
+    </v-app-bar>
   </div>
 </template>
 
@@ -228,3 +242,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.v-btn {
+  margin: 0px 8px;
+}
+</style>

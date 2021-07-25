@@ -2,7 +2,7 @@
   <div>
     <topbar></topbar>
 
-    <div class="container mt-5">
+    <div class="ma-12 mb-12 container-flow">
       <!-- create new package  -->
       <v-row justify="start">
         <v-dialog v-model="dialog" persistent max-width="80%">

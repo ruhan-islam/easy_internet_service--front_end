@@ -1,19 +1,17 @@
 <template>
   <div>
-    <div>
-      <topbar></topbar>
+    <topbar></topbar>
 
-      <div class="container mt-5">
-        <!-- contents here  -->
-        <v-row>
-          <v-col justify="center">
-            <h1>
-              ERROR 404! <br />
-              Page NOT Found!
-            </h1>
-          </v-col>
-        </v-row>
-      </div>
+    <div class="ma-12 mb-12 container-flow">
+      <!-- contents here  -->
+      <v-row>
+        <v-col justify="center">
+          <h1>
+            ERROR 404! <br />
+            Page NOT Found!
+          </h1>
+        </v-col>
+      </v-row>
     </div>
 
     <bottombar></bottombar>

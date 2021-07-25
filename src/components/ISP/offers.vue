@@ -2,181 +2,188 @@
   <div>
     <topbar></topbar>
 
-    <!-- contents here  -->
-    <v-row class="ma-12 mb-12" justify="center">
-      <v-dialog v-model="dialog" persistent max-width="80%">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn max-width="95%" color="primary" dark v-bind="attrs" v-on="on">
-            Create new Offer
-          </v-btn>
-        </template>
+    <div class="ma-12 mb-12 container-flow">
+      <!-- contents here  -->
+      <v-row class="ma-12 mb-12" justify="center">
+        <v-dialog v-model="dialog" persistent max-width="80%">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              max-width="95%"
+              color="primary"
+              dark
+              v-bind="attrs"
+              v-on="on"
+            >
+              Create new Offer
+            </v-btn>
+          </template>
 
-        <v-card style="padding: 30px">
-          <h2>New Offer</h2>
-          <v-form ref="form" v-model="valid" lazy-validation>
-            <v-expansion-panels>
-              <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <template v-slot:default="{ open }">
-                    <v-row no-gutters>
-                      <v-col cols="4"> Offer Name </v-col>
-                      <v-col cols="8" class="text--secondary">
-                        <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter the name of the offer
-                          </span>
-                          <span v-else key="1">
-                            {{ offerName }}
-                          </span>
-                        </v-fade-transition>
-                      </v-col>
-                    </v-row>
-                  </template>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-text-field
-                    placeholder="e.g. Super_cheap"
-                    v-model="offerName"
-                    :counter="nameLen"
-                    :rules="offerNameRules"
-                    label="Offer Name"
-                    required
-                  ></v-text-field>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
+          <v-card style="padding: 30px">
+            <h2>New Offer</h2>
+            <v-form ref="form" v-model="valid" lazy-validation>
+              <v-expansion-panels>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Offer Name </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter the name of the offer
+                            </span>
+                            <span v-else key="1">
+                              {{ offerName }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-text-field
+                      placeholder="e.g. Super_cheap"
+                      v-model="offerName"
+                      :counter="nameLen"
+                      :rules="offerNameRules"
+                      label="Offer Name"
+                      required
+                    ></v-text-field>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
 
-              <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <template v-slot:default="{ open }">
-                    <v-row no-gutters>
-                      <v-col cols="4"> Reduction(%) </v-col>
-                      <v-col cols="8" class="text--secondary">
-                        <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter the reduced percentage
-                          </span>
-                          <span v-else key="1">
-                            {{ reduction }}
-                          </span>
-                        </v-fade-transition>
-                      </v-col>
-                    </v-row>
-                  </template>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-slider
-                    v-model="reduction"
-                    :min="1"
-                    :max="100"
-                    label="Reduction (%)"
-                    thumb-label="always"
-                  >
-                  </v-slider>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-
-              <v-expansion-panel>
-                <v-expansion-panel-header v-slot="{ open }">
-                  <v-row no-gutters>
-                    <v-col cols="4"> Start and end dates </v-col>
-                    <v-col cols="8" class="text--secondary">
-                      <v-fade-transition leave-absolute>
-                        <span v-if="open"
-                          >When do you want to start the offer?</span
-                        >
-                        <v-row v-else no-gutters style="width: 100%">
-                          <v-col cols="6">
-                            Start date: {{ dates[0] || "Not set" }}
-                          </v-col>
-                          <v-col cols="6">
-                            End date: {{ dates[1] || "Not set" }}
-                          </v-col>
-                        </v-row>
-                      </v-fade-transition>
-                    </v-col>
-                  </v-row>
-                </v-expansion-panel-header>
-
-                <v-expansion-panel-content>
-                  <v-row>
-                    <v-menu
-                      v-model="menu"
-                      :close-on-content-click="false"
-                      :close-on-click="false"
-                      :nudge-right="40"
-                      transition="scale-transition"
-                      offset-y
-                      min-width="auto"
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Reduction(%) </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter the reduced percentage
+                            </span>
+                            <span v-else key="1">
+                              {{ reduction }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-slider
+                      v-model="reduction"
+                      :min="1"
+                      :max="100"
+                      label="Reduction (%)"
+                      thumb-label="always"
                     >
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-text-field
-                          v-model="dateRangeText"
-                          label="Date range"
-                          prepend-icon="mdi-calendar"
-                          readonly
-                          v-bind="attrs"
-                          v-on="on"
-                          :rules="dateRules"
-                        ></v-text-field>
-                      </template>
-                      <v-date-picker
-                        v-model="dates"
-                        :min="getToday"
-                        @input="menu = dates.length === 2 ? false : true"
-                        year-icon="mdi-calendar-blank"
-                        prev-icon="mdi-skip-previous"
-                        next-icon="mdi-skip-next"
-                        range
-                      ></v-date-picker>
-                    </v-menu>
-                  </v-row>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
+                    </v-slider>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
 
-              <v-card-actions>
-                <v-btn
-                  :disabled="isResetDisabled"
-                  color="error"
-                  class="mr-4"
-                  @click="resetPressed"
-                >
-                  Reset
-                </v-btn>
+                <v-expansion-panel>
+                  <v-expansion-panel-header v-slot="{ open }">
+                    <v-row no-gutters>
+                      <v-col cols="4"> Start and end dates </v-col>
+                      <v-col cols="8" class="text--secondary">
+                        <v-fade-transition leave-absolute>
+                          <span v-if="open"
+                            >When do you want to start the offer?</span
+                          >
+                          <v-row v-else no-gutters style="width: 100%">
+                            <v-col cols="6">
+                              Start date: {{ dates[0] || "Not set" }}
+                            </v-col>
+                            <v-col cols="6">
+                              End date: {{ dates[1] || "Not set" }}
+                            </v-col>
+                          </v-row>
+                        </v-fade-transition>
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-header>
 
-                <v-btn
-                  :disabled="isSubmitDisabled"
-                  color="success"
-                  class="mr-4"
-                  @click="submitPressed"
-                >
-                  Confirm
-                </v-btn>
-                <v-btn color="green darken-1" text @click="dialog = false">
-                  Cancel
-                </v-btn>
-              </v-card-actions>
-            </v-expansion-panels>
-          </v-form>
-        </v-card>
-      </v-dialog>
-    </v-row>
+                  <v-expansion-panel-content>
+                    <v-row>
+                      <v-menu
+                        v-model="menu"
+                        :close-on-content-click="false"
+                        :close-on-click="false"
+                        :nudge-right="40"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="auto"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="dateRangeText"
+                            label="Date range"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                            :rules="dateRules"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="dates"
+                          :min="getToday"
+                          @input="menu = dates.length === 2 ? false : true"
+                          year-icon="mdi-calendar-blank"
+                          prev-icon="mdi-skip-previous"
+                          next-icon="mdi-skip-next"
+                          range
+                        ></v-date-picker>
+                      </v-menu>
+                    </v-row>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
 
-    <v-row>
-      <div class="col-lg-4" v-for="(offer, i) in allOffers" :key="i">
-        <v-badge :content="0" :value="0" color="red" overlap icon="mdi-home">
-          <v-card class="mx-auto" max-width="344">
-            <v-img src="./../../assets/offer.jpg" height="200px"></v-img>
+                <v-card-actions>
+                  <v-btn
+                    :disabled="isResetDisabled"
+                    color="error"
+                    class="mr-4"
+                    @click="resetPressed"
+                  >
+                    Reset
+                  </v-btn>
 
-            <v-card-title>
-              {{ offer.name }} &nbsp;
-              <v-chip v-if="!offer.status" color="red"> Expired </v-chip>
-            </v-card-title>
+                  <v-btn
+                    :disabled="isSubmitDisabled"
+                    color="success"
+                    class="mr-4"
+                    @click="submitPressed"
+                  >
+                    Confirm
+                  </v-btn>
+                  <v-btn color="green darken-1" text @click="dialog = false">
+                    Cancel
+                  </v-btn>
+                </v-card-actions>
+              </v-expansion-panels>
+            </v-form>
+          </v-card>
+        </v-dialog>
+      </v-row>
 
-            <v-card-subtitle>
-              <h2 style="color:red">{{ offer.reduction }}% off</h2>
-            </v-card-subtitle>
+      <v-row>
+        <div class="col-lg-4" v-for="(offer, i) in allOffers" :key="i">
+          <v-badge :content="0" :value="0" color="red" overlap icon="mdi-home">
+            <v-card class="mx-auto" max-width="344">
+              <v-img src="./../../assets/offer.jpg" height="200px"></v-img>
 
-            <!-- <v-card-actions>
+              <v-card-title>
+                {{ offer.name }} &nbsp;
+                <v-chip v-if="!offer.status" color="red"> Expired </v-chip>
+              </v-card-title>
+
+              <v-card-subtitle>
+                <h2 style="color:red">{{ offer.reduction }}% off</h2>
+              </v-card-subtitle>
+
+              <!-- <v-card-actions>
                     <v-btn color="orange lighten-2" text> Details </v-btn>
 
                     <v-spacer></v-spacer>
@@ -188,36 +195,37 @@
                     </v-btn>
                   </v-card-actions> -->
 
-            <v-expand-transition>
-              <div>
-                <v-divider></v-divider>
+              <v-expand-transition>
+                <div>
+                  <v-divider></v-divider>
 
-                <v-card-text>
-                  <v-timeline align-top dense>
-                    <v-timeline-item color="green" small>
-                      <div>
-                        <div class="font-weight-normal">
-                          <strong>Start Time</strong> @
-                          {{ offer.startTime.slice(0, 10) }}
+                  <v-card-text>
+                    <v-timeline align-top dense>
+                      <v-timeline-item color="green" small>
+                        <div>
+                          <div class="font-weight-normal">
+                            <strong>Start Time</strong> @
+                            {{ offer.startTime.slice(0, 10) }}
+                          </div>
                         </div>
-                      </div>
-                    </v-timeline-item>
-                    <v-timeline-item color="red" small>
-                      <div>
-                        <div class="font-weight-normal">
-                          <strong>Expiry Time</strong> @
-                          {{ offer.expirationTime.slice(0, 10) }}
+                      </v-timeline-item>
+                      <v-timeline-item color="red" small>
+                        <div>
+                          <div class="font-weight-normal">
+                            <strong>Expiry Time</strong> @
+                            {{ offer.expirationTime.slice(0, 10) }}
+                          </div>
                         </div>
-                      </div>
-                    </v-timeline-item>
-                  </v-timeline>
-                </v-card-text>
-              </div>
-            </v-expand-transition>
-          </v-card>
-        </v-badge>
-      </div>
-    </v-row>
+                      </v-timeline-item>
+                    </v-timeline>
+                  </v-card-text>
+                </div>
+              </v-expand-transition>
+            </v-card>
+          </v-badge>
+        </div>
+      </v-row>
+    </div>
 
     <bottombar></bottombar>
   </div>

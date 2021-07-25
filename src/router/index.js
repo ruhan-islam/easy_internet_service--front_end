@@ -116,6 +116,20 @@ const routes = [
     component: () => import("../components/NTTN/offers"),
   },
   {
+    path: "/NTTN/notify",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/NTTN/notify"),
+  },
+  // {
+  //   path: "/NTTN/tickets",
+  //   meta: {
+	// 		requireLoggedIn: true
+	// 	},
+  //   component: () => import("../components/NTTN/tickets"),
+  // },
+  {
     path: "/NTTN/dashboard",
     meta: {
 			requireLoggedIn: true
