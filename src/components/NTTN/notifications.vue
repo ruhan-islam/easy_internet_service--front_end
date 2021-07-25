@@ -67,7 +67,7 @@ export default {
     };
   },
 
-  created() {
+  mounted() {
     this.isLoading = true;
     this.fetchNotifications();
   },

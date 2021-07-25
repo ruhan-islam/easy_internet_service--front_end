@@ -1321,7 +1321,7 @@ export default {
     },
   },
 
-  created() {
+  mounted() {
     this.fetchOwnData();
 
     if (this.isRedirected) {

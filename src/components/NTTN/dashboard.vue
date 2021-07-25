@@ -68,8 +68,6 @@ export default {
     };
   },
 
-  created() {},
-
   computed: {
     getToday() {
       let today = new Date();

@@ -168,15 +168,15 @@ export default {
     };
   },
 
-  created() {
-    // if (!this.getLoginState) {
-    //   this.$router.push("/");
-    // } else
+  mounted() {
     if (this.getUserType !== "NTTN") {
       this.$router.go(-1);
     }
-    this.fetchNotificationCount();
-    this.intervalID = setInterval(this.fetchNotificationCount, 2000);
+    this.setUserData({
+      name: "Nttn",
+    });
+    this.updateInfo();
+    this.intervalID = setInterval(this.updateInfo, 2000);
   },
 
   computed: {
@@ -190,14 +190,13 @@ export default {
 
   methods: {
     ...mapMutations([
-      "setUserName",
       "setUserType",
       "setLoginState",
       "setAuthToken",
       "setNtfCount",
     ]),
 
-    fetchNotificationCount() {
+    updateInfo() {
       axios
         .post("/api/notification/unseenNotificationCount", {
           receiverID: "Nttn",
@@ -228,7 +227,6 @@ export default {
             clearInterval(this.intervalID);
             this.setLoginState(false);
             this.setNtfCount(0);
-            this.setUserName("");
             this.setUserType("");
             this.setAuthToken("");
             this.$router.push("/");

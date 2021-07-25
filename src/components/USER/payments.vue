@@ -1388,8 +1388,6 @@ export default {
     },
   },
 
-  created() {},
-
   mounted() {
     this.fetchAllOffers();
     this.fetchOwnPayments();

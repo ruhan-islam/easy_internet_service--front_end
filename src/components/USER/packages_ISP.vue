@@ -366,12 +366,6 @@ export default {
     this.showPayment = false;
   },
 
-  updated() {
-    // this.fetchAllOffers();
-    // this.fetchPackages();
-    // this.fetchOwnPackage();
-  },
-
   methods: {
     ...mapMutations(["setSelectedPkg"]),
 
@@ -421,9 +415,9 @@ export default {
           id: this.getUserData._id,
         })
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.status === 200) {
-            console.log(res.data);
+            // console.log(res.data);
             this.allPkgs = res.data;
             this.pkgs = this.allPkgs;
           } else {
@@ -477,7 +471,7 @@ export default {
     selectPressed(i) {
       // console.log(i);
       this.setSelectedPkg(this.allPkgs[i].data);
-      console.log(this.getSelectedPkg);
+      // console.log(this.getSelectedPkg);
       this.$router.push("/ISP/payments");
       // this.showPayment = true;
     },

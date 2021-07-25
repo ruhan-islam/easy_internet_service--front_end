@@ -112,10 +112,7 @@ export default {
     };
   },
 
-  created() {
-    // if (!this.getLoginState) {
-    //   this.$router.push("/");
-    // } else
+  mounted() {
     if (this.getUserType !== "USER") {
       this.$router.go(-1);
     }
@@ -138,7 +135,6 @@ export default {
       "setLoginState",
       "setAuthToken",
       "setNtfCount",
-      "setUserName",
       "setUserType",
       "setUserData",
     ]),
@@ -192,7 +188,6 @@ export default {
             clearInterval(this.intervalID);
             this.setLoginState(false);
             this.setNtfCount(0);
-            this.setUserName("");
             this.setUserType("");
             this.setAuthToken("");
             this.$router.push("/");

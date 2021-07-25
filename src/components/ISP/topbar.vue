@@ -154,7 +154,7 @@ export default {
     };
   },
 
-  created() {
+  mounted() {
     if (this.getUserType !== "ISP") {
       this.$router.go(-1);
     }
@@ -174,7 +174,6 @@ export default {
 
   methods: {
     ...mapMutations([
-      "setUserName",
       "setUserType",
       "setLoginState",
       "setAuthToken",
@@ -231,7 +230,6 @@ export default {
             clearInterval(this.intervalID);
             this.setLoginState(false);
             this.setNtfCount(0);
-            this.setUserName("");
             this.setUserType("");
             this.setAuthToken("");
             this.$router.push("/");

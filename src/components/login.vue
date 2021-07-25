@@ -86,12 +86,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations([
-      "setLoginState",
-      "setAuthToken",
-      "setUserName",
-      "setUserType",
-    ]),
+    ...mapMutations(["setLoginState", "setAuthToken", "setUserType"]),
 
     validateLogin() {
       let api = "/api/" + this.type.toLowerCase() + "/login";
@@ -112,7 +107,6 @@ export default {
             this.setLoginState(true);
             this.setAuthToken(res.data.token);
             this.setUserType(this.type.toUpperCase());
-            this.setUserName(this.username);
             this.$router.push(dest);
             this.$router.go();
           } else {

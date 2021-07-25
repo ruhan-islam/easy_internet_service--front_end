@@ -51,6 +51,7 @@
             :value="pkg.data.name"
           ></v-radio>
         </v-radio-group>
+
         <v-dialog v-model="dialog" persistent max-width="40%">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -1430,8 +1431,6 @@ export default {
     },
   },
 
-  created() {},
-
   mounted() {
     this.fetchAllOffers();
     this.fetchOwnPayments();
@@ -1443,9 +1442,6 @@ export default {
     } else if (this.getUserData.packages.length) {
       this.fetchOwnPackages();
     }
-
-    console.log(this.getSelectedPkg);
-    // console.log(this.getUserData.package_id);
   },
 
   methods: {
@@ -1548,7 +1544,7 @@ export default {
           id: this.getUserData._id,
         })
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.status === 200) {
             // console.log(res.data);
             this.itemsUsers = res.data;
@@ -1589,7 +1585,7 @@ export default {
     },
 
     selectPackage() {
-      console.log(this.selectedPkgName);
+      // console.log(this.selectedPkgName);
       for (let i in this.myPackageList) {
         if (this.myPackageList[i].data.name === this.selectedPkgName) {
           this.setSelectedPkg(this.myPackageList[i].data);
