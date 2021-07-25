@@ -447,16 +447,17 @@ export default {
   methods: {
     sendNotification() {
       axios
-        .get("/api/isp/fetch")
+        .post("/api/isp/fetchIspOfNttnByQuery")
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
-            // console.log(res.data.data);
-            this.ispList = res.data.data;
+            // console.log(res.data);
+            this.ispList = res.data;
             this.ispNameList = [];
             for (let i in this.ispList) {
               this.ispNameList.push(this.ispList[i].name);
             }
+            // console.log(this.ispNameList);
           } else {
             this.error = true;
           }

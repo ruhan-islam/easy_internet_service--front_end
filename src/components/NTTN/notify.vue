@@ -3,7 +3,7 @@
     <topbar></topbar>
 
     <!-- contents here  -->
-    <div class="container" justify-center>
+    <div class="ma-12 mb-12 container" justify-center>
       <v-form ref="form" v-model="valid" lazy-validation>
         <div style="width:80%">
           <v-text-field

@@ -17,7 +17,7 @@
           </v-card-title>
 
           <v-card-text>
-            <div class="my-4 text-subtitle-1">
+            <!-- <div class="my-4 text-subtitle-1">
               Taka
               <span v-if="!myPackage.data.offerId">
                 {{ myPackage.data.price }}
@@ -39,7 +39,8 @@
                   </span>
                 </v-chip>
               </template>
-            </div>
+            </div> -->
+
             <v-chip-group
               active-class="deep-purple accent-4 white--text"
               column
@@ -47,9 +48,15 @@
               <v-chip>{{ myPackage.data.bandwidth }} GBPS</v-chip>
               <v-chip>{{ myPackage.data.duration }} months</v-chip>
             </v-chip-group>
+
             <div>
               {{ myPackage.data.bandwidth }} GBPS speed relentless speed of
               unlimited traffic with 24/7 service.
+            </div>
+
+            <div>
+              <strong>Expiration date:</strong>
+              {{ myPackage.expirationTime.slice(0, 10) }}
             </div>
           </v-card-text>
           <v-card-actions>
