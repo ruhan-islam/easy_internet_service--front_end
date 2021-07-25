@@ -3,7 +3,16 @@
     <topbar></topbar>
 
     <!-- <div class="ma-12 mb-12 container-flow"> -->
-    <div style="padding:0px 200px 50px 200px">
+    <v-progress-linear
+      v-if="isLoading"
+      style="margin:20% 0"
+      color="deep-purple accent-4"
+      indeterminate
+      rounded
+      height="6"
+    ></v-progress-linear>
+
+    <div v-if="!isLoading" style="padding:0px 200px 50px 200px">
       <H1 style="padding-bottom:50px">Welcome to Amader Internet</H1>
       <div
         id="carouselExampleCaptions"
@@ -202,8 +211,10 @@ import bottombar from "./bottombar.vue";
 
 export default {
   components: { topbar, bottombar },
+
   data() {
     return {
+      isLoading: true,
       allPkgs: [],
       pkgs: [],
       allOffers: [],
@@ -211,7 +222,56 @@ export default {
     };
   },
 
+  mounted() {
+    this.isLoading = true;
+    this.fetchOffers();
+    this.fetchPackages();
+  },
+
   methods: {
+    fetchOffers() {
+      axios
+        .post("/api/offer/fetchByQuery", {
+          creator: "Nttn",
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.allOffers = res.data.data;
+            // console.log(this.allOffers);
+            this.validOffers = [];
+            for (let i in this.allOffers) {
+              if (
+                this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
+              ) {
+                this.validOffers.push(this.allOffers[i]);
+              }
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    fetchPackages() {
+      axios
+        .post("/api/package/fetchByQuery", {
+          packageCreator: "Nttn",
+        })
+        .then((res) => {
+          this.allPkgs = res.data.data;
+          for (let i in this.allPkgs) {
+            if (this.allPkgs[i].ongoing) {
+              this.pkgs.push(this.allPkgs[i]);
+            }
+          }
+          this.isLoading = false;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     getToday() {
       let today = new Date();
       today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -225,46 +285,6 @@ export default {
     offerMore() {
       this.$router.push("/NTTN/dashboard");
     },
-  },
-
-  created() {
-    axios
-      .post("/api/offer/fetchByQuery", {
-        creator: "Nttn",
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          this.allOffers = res.data.data;
-          // console.log(this.allOffers);
-          this.validOffers = [];
-          for (let i in this.allOffers) {
-            if (
-              this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
-            ) {
-              this.validOffers.push(this.allOffers[i]);
-            }
-          }
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios
-      .post("/api/package/fetchByQuery", {
-        packageCreator: "Nttn",
-      })
-      .then((res) => {
-        this.allPkgs = res.data.data;
-        for (let i in this.allPkgs) {
-          if (this.allPkgs[i].ongoing) {
-            this.pkgs.push(this.allPkgs[i]);
-          }
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   },
 };
 </script>

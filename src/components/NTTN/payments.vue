@@ -15,6 +15,8 @@
           ></v-text-field>
         </v-card-title>
         <v-data-table
+          :loading="isLoading"
+          loading-text="Loading... Please wait"
           :headers="headers"
           :items="items"
           :search="search"
@@ -37,24 +39,25 @@ export default {
 
   data() {
     return {
+      isLoading: true,
       search: "",
       headers: [
-        { text: "ISP Name", value: "ispName" },
+        { text: "ISP Name", value: "senderName" },
         { text: "Package Name", value: "packageName" },
         { text: "Amount", value: "amount" },
         { text: "Payment Method", value: "method" },
-        { text: "Transaction ID", value: "trxID" },
-        { text: "Payment Time", value: "payTime" },
+        { text: "Transaction ID", value: "transaction_id" },
+        { text: "Payment Time", value: "payment_time" },
       ],
       items: [
-        {
-          ispName: "Frozen Yogurt",
-          packageName: 159,
-          amount: 6.0,
-          method: 24,
-          trxID: "1%",
-          payTime: "1%",
-        },
+        // {
+        //   ispName: "Frozen Yogurt",
+        //   packageName: 159,
+        //   amount: 6.0,
+        //   method: 24,
+        //   trxID: "1%",
+        //   payTime: "1%",
+        // },
       ],
     };
   },
@@ -65,12 +68,18 @@ export default {
 
   methods: {
     fetchAllIspPayments() {
+      this.isLoading = true;
       axios
         .post("/api/payment/fetchAllIspPayment")
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
-            console.log(res);
+            // console.log(res.data);
+            this.items = res.data;
+            for (let i in this.items) {
+              this.items[i].payment_time = new Date(this.items[i].payment_time);
+            }
+            this.isLoading = false;
           } else {
             this.error = true;
           }

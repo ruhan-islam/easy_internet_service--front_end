@@ -24,25 +24,6 @@
           ></v-data-table>
         </v-card>
 
-        <v-card>
-          <v-card-title>
-            <v-text-field
-              v-model="searchUsers"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-            ></v-text-field>
-          </v-card-title>
-          <v-data-table
-            :loading="isLoadingUsers"
-            loading-text="Loading... Please wait"
-            :headers="headersUsers"
-            :items="itemsUsers"
-            :search="searchUsers"
-          ></v-data-table>
-        </v-card>
-
         <v-radio-group v-model="selectedPkgName">
           <v-radio
             v-for="(pkg, i) in myPackageList"
@@ -1265,27 +1246,6 @@ export default {
         // },
       ],
 
-      isLoadingUsers: true,
-      searchUsers: "",
-      headersUsers: [
-        { text: "User Name", value: "senderName" },
-        { text: "Package Name", value: "packageName" },
-        { text: "Amount", value: "amount" },
-        { text: "Payment Method", value: "method" },
-        { text: "Transaction ID", value: "transaction_id" },
-        { text: "Payment Time", value: "payment_time" },
-      ],
-      itemsUsers: [
-        // {
-        //   ispName: "Frozen Yogurt",
-        //   packageName: 159,
-        //   amount: 6.0,
-        //   method: 24,
-        //   trxID: "1%",
-        //   payTime: "1%",
-        // },
-      ],
-
       selectedPkgName: "",
       myPackageList: [],
       userData: {},
@@ -1322,12 +1282,10 @@ export default {
       otpnumber: "",
 
       paymentPage: "",
-
       accntnumber: "",
       resendText: "",
       pin: "",
       showPIN: false,
-
       validBkashNo: false,
 
       amountRules: [
@@ -1458,7 +1416,7 @@ export default {
 
     fetchOwnData() {
       axios
-        .post("/api/isp/fetchOwnData", {
+        .post("/api/user/fetchOwnData", {
           id: this.getUserID,
         })
         .then((res) => {
@@ -1479,7 +1437,7 @@ export default {
       // console.log("in");
       // console.log(this.getUserPkgID);
       axios
-        .post("/api/isp/fetchOwnPackageArray", {
+        .post("/api/user/fetchOwnPackageArray", {
           id: this.getUserData._id,
         })
         .then((res) => {
@@ -1533,11 +1491,6 @@ export default {
           if (res.status === 200) {
             // console.log(res.data);
             this.itemsOwn = res.data;
-            for (let i in this.itemsOwn) {
-              this.itemsOwn[i].payment_time = new Date(
-                this.itemsOwn[i].payment_time
-              );
-            }
             this.isLoadingOwn = false;
           } else {
             this.error = true;
@@ -1559,12 +1512,47 @@ export default {
           if (res.status === 200) {
             // console.log(res.data);
             this.itemsUsers = res.data;
-            for (let i in this.itemsUsers) {
-              this.itemsUsers[i].payment_time = new Date(
-                this.itemsUsers[i].payment_time
-              );
-            }
             this.isLoadingUsers = false;
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    paymentDone() {
+      // console.log(this.pkgID);
+      this.showSnackbar = true;
+      this.dialog = false;
+      this.pageInfo = "";
+      setTimeout(() => {
+        this.showSnackbar = false;
+      }, 5000);
+
+      axios
+        .post("/api/payment/insert", {
+          user_type: 2, // for ISP
+          package_id: this.getSelectedPkg._id,
+          isp_id: this.getUserData._id,
+          gateway: this.cardTitle,
+          transaction_id: Math.random()
+            .toString(36)
+            .substring(10)
+            .toUpperCase(),
+          amount: this.amount,
+          method: this.cardTitle,
+          packageDuration: this.getSelectedPkg.duration,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 201) {
+            this.resetValue();
+            this.setSelectedPkg("");
+            this.fetchOwnPackages();
+            // console.log(res.data);
+            // this.userData = res.data;
           } else {
             this.error = true;
           }
@@ -1629,46 +1617,6 @@ export default {
       }
 
       this.pageInfo = this.paymentPage;
-    },
-
-    paymentDone() {
-      // console.log(this.pkgID);
-      this.showSnackbar = true;
-      this.dialog = false;
-      this.pageInfo = "";
-      setTimeout(() => {
-        this.showSnackbar = false;
-      }, 5000);
-
-      axios
-        .post("/api/payment/insert", {
-          user_type: 2, // for ISP
-          package_id: this.getSelectedPkg._id,
-          isp_id: this.getUserData._id,
-          gateway: this.cardTitle,
-          transaction_id: Math.random()
-            .toString(36)
-            .substring(10)
-            .toUpperCase(),
-          amount: this.amount,
-          method: this.cardTitle,
-          packageDuration: this.getSelectedPkg.duration,
-        })
-        .then((res) => {
-          // console.log(res);
-          if (res.status === 201) {
-            this.resetValue();
-            this.setSelectedPkg("");
-            this.fetchOwnPackages();
-            // console.log(res.data);
-            // this.userData = res.data;
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
     },
 
     resetValue() {

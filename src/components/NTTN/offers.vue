@@ -4,7 +4,15 @@
 
     <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
-      <div>
+      <v-progress-linear
+        v-if="isLoading"
+        style="margin:20% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+      <template v-if="!isLoading">
         <v-row class="ma-12 mb-12" justify="center">
           <v-dialog v-model="dialog" persistent max-width="80%">
             <template v-slot:activator="{ on, attrs }">
@@ -220,7 +228,7 @@
             </v-badge>
           </div>
         </v-row>
-      </div>
+      </template>
     </div>
 
     <bottombar></bottombar>
@@ -240,6 +248,7 @@ export default {
 
   data() {
     return {
+      isLoading: true,
       valid: false,
       show: false,
 
@@ -289,6 +298,7 @@ export default {
   },
 
   mounted() {
+    this.isLoading = true;
     this.fetchAllOfers();
   },
 
@@ -329,6 +339,7 @@ export default {
             for (let i in this.allOffers) {
               this.offerNameList.push(this.allOffers[i].name);
             }
+            this.isLoading = false;
           } else {
             this.error = true;
           }

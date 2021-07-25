@@ -4,16 +4,7 @@
 
     <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
-      <v-progress-linear
-        v-if="isLoading"
-        style="margin:20% 0"
-        color="deep-purple accent-4"
-        indeterminate
-        rounded
-        height="6"
-      ></v-progress-linear>
-
-      <template v-if="!isLoading">
+      <template>
         <v-row justify="center">
           <v-expansion-panels v-model="panel" inset>
             <v-expansion-panel
@@ -52,23 +43,27 @@
 
 <script>
 import axios from "axios";
-import { mapMutations } from "vuex";
+import { mapMutations, mapGetters } from "vuex";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
 
 export default {
   components: { topbar, bottombar },
-
   data() {
     return {
-      isLoading: true,
       panel: "",
       allNotifications: [],
     };
   },
 
-  created() {
-    this.isLoading = true;
+  computed: {
+    ...mapGetters(["getUserID", "getUserData", "getUserName"]),
+  },
+
+  mounted() {
+    if (!this.getUserData) {
+      this.fetchOwnData();
+    }
     this.fetchNotifications();
   },
 
@@ -77,13 +72,32 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["decNtfCount"]),
+    ...mapMutations(["setUserData", "decNtfCount"]),
+
+    fetchOwnData() {
+      axios
+        .post("/api/user/fetchOwnData", {
+          id: this.getUserID,
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            // console.log(res.data);
+            this.setUserData(res.data);
+            // console.log(this.userData);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
 
     fetchNotifications() {
       axios
         .post("/api/notification/fetchByQuery", {
-          receiverID: "Nttn",
-          receiverType: 1, // for NTTN
+          receiverID: this.getUserName,
+          receiverType: 3, // for ISP
         })
         .then((res) => {
           // console.log(res);
@@ -94,9 +108,6 @@ export default {
               this.allNotifications[i].notificationArrivalTime = new Date(
                 this.allNotifications[i].notificationArrivalTime
               );
-            }
-            if (this.isLoading) {
-              this.isLoading = false;
             }
           } else {
             this.error = true;

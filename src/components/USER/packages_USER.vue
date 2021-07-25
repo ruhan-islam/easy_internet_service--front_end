@@ -434,8 +434,8 @@
             <v-card-text>
               <div class="my-4 text-subtitle-1">
                 Taka
-                <span v-if="!pkg.offerId"> {{ pkg.price }} </span>
-                <template v-if="!!pkg.offerId">
+                <span v-if="!!pkg.offerId"> {{ pkg.price }} </span>
+                <template v-if="!pkg.offerId">
                   <s>{{ pkg.price }}</s>
                   <span>
                     &nbsp; {{ calculateReducedPrice(pkg.price, pkg.offerId) }}
@@ -473,8 +473,8 @@
                 color="deep-purple lighten-2"
                 text
               >
-                <span v-if="!pkg.offerId"> Add Offer </span>
-                <span v-if="!!pkg.offerId"> Remove Offer </span>
+                <span v-if="!!pkg.offerId"> Add Offer </span>
+                <span v-if="!pkg.offerId"> Remove Offer </span>
               </v-btn>
 
               <v-btn
@@ -775,6 +775,84 @@ export default {
         });
     },
 
+    doSort(item) {
+      // ["price 🔺", "price 🔻", "duraation 🔺","duraation 🔻",
+      //           "bandwidth 🔺","bandwidth 🔻"],
+      if (item == "Price 🔺") {
+        this.pkgs.sort(this.orderByPriceAscending);
+      } else if (item == "Bandwidth 🔺") {
+        this.pkgs.sort(this.orderByBandwidthAscending);
+      } else if (item == "Name 🔺") {
+        this.pkgs.sort(this.orderByNameAscending);
+      } else if (item == "Price 🔻") {
+        this.pkgs.sort(this.orderByPriceDescending);
+      } else if (item == "Bandwidth 🔻") {
+        this.pkgs.sort(this.orderByBandwidthDescending);
+      } else if (item == "Name 🔻") {
+        this.pkgs.sort(this.orderByNameDescending);
+      }
+    },
+
+    orderByNameAscending(a, b) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+        return -1;
+      }
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByPriceAscending(a, b) {
+      if (a.price < b.price) {
+        return -1;
+      }
+      if (a.price > b.price) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByBandwidthAscending(a, b) {
+      if (a.bandwidth < b.bandwidth) {
+        return -1;
+      }
+      if (a.bandwidth > b.bandwidth) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByNameDescending(a, b) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+        return -1;
+      }
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByPriceDescending(a, b) {
+      if (a.price > b.price) {
+        return -1;
+      }
+      if (a.price < b.price) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByBandwidthDescending(a, b) {
+      if (a.bandwidth > b.bandwidth) {
+        return -1;
+      }
+      if (a.bandwidth < b.bandwidth) {
+        return 1;
+      }
+      return 0;
+    },
+
     getToday() {
       let today = new Date();
       today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -822,47 +900,6 @@ export default {
             this.pkgs[this.currPkgIdx].offerId = this.selectedOffer;
             this.currPkgIdx = -1;
             this.selectedOffer = "";
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    newPkgConfirmPressed() {
-      this.dialog = false;
-      // console.log("submit pressed");
-      // console.log("submit pressed");
-      let newPkg = {
-        name: this.packageName,
-        package_type: 1, // for ISP
-        bandwidth: this.bandwidth,
-        up_speed: this.upSpeed,
-        down_speed: this.downSpeed,
-        duration: 1,
-        price: this.price,
-        ongoing: true,
-        isRealIp: true,
-        downTime: this.downTime,
-        responseTime: this.responseTime,
-        areas: [],
-        packageCreator: this.getUserName,
-      };
-
-      axios
-        .post("/api/package/insert", newPkg)
-        .then((res) => {
-          if (res.status === 201) {
-            // this.$refs.form.reset();
-            this.resetPressed();
-            this.allPkgs.push(newPkg);
-            this.pkgs = this.allPkgs;
-            this.pkgNameList.push(newPkg.name);
-            this.filterPrice = [0, 1000000];
-            this.filterBW = [0, 200];
-            this.showSuccessOverlay = true;
           } else {
             this.error = true;
           }
@@ -944,82 +981,42 @@ export default {
       else this.selectallTitle = "Select All";
     },
 
-    doSort(item) {
-      // ["price 🔺", "price 🔻", "duraation 🔺","duraation 🔻",
-      //           "bandwidth 🔺","bandwidth 🔻"],
-      if (item == "Price 🔺") {
-        this.pkgs.sort(this.orderByPriceAscending);
-      } else if (item == "Bandwidth 🔺") {
-        this.pkgs.sort(this.orderByBandwidthAscending);
-      } else if (item == "Name 🔺") {
-        this.pkgs.sort(this.orderByNameAscending);
-      } else if (item == "Price 🔻") {
-        this.pkgs.sort(this.orderByPriceDescending);
-      } else if (item == "Bandwidth 🔻") {
-        this.pkgs.sort(this.orderByBandwidthDescending);
-      } else if (item == "Name 🔻") {
-        this.pkgs.sort(this.orderByNameDescending);
-      }
-    },
-
-    orderByNameAscending(a, b) {
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
-        return -1;
-      }
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByPriceAscending(a, b) {
-      if (a.price < b.price) {
-        return -1;
-      }
-      if (a.price > b.price) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByBandwidthAscending(a, b) {
-      if (a.bandwidth < b.bandwidth) {
-        return -1;
-      }
-      if (a.bandwidth > b.bandwidth) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByNameDescending(a, b) {
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
-        return -1;
-      }
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByPriceDescending(a, b) {
-      if (a.price > b.price) {
-        return -1;
-      }
-      if (a.price < b.price) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByBandwidthDescending(a, b) {
-      if (a.bandwidth > b.bandwidth) {
-        return -1;
-      }
-      if (a.bandwidth < b.bandwidth) {
-        return 1;
-      }
-      return 0;
+    newPkgConfirmPressed() {
+      this.dialog = false;
+      // console.log("submit pressed");
+      let newPkg = {
+        name: this.packageName,
+        package_type: 0,
+        bandwidth: this.bandwidth,
+        up_speed: this.upSpeed,
+        down_speed: this.downSpeed,
+        duration: 1,
+        price: this.price,
+        ongoing: true,
+        isRealIp: true,
+        downTime: this.downTime,
+        responseTime: this.responseTime,
+        areas: [],
+      };
+      axios
+        .post("/api/package/insert", newPkg)
+        .then((res) => {
+          if (res.status === 201) {
+            // this.$refs.form.reset();
+            this.resetPressed();
+            this.allPkgs.push(newPkg);
+            this.pkgs = this.allPkgs;
+            this.pkgNameList.push(newPkg.name);
+            this.filterPrice = [0, 1000000];
+            this.filterBW = [0, 200];
+            this.showSuccessOverlay = true;
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     doFilter() {

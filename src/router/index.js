@@ -2,9 +2,6 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import store from '../store/index';
 
-
-
-
 Vue.use(VueRouter);
 
 const routes = [
@@ -135,6 +132,35 @@ const routes = [
 			requireLoggedIn: true
 		},
     component: () => import("../components/NTTN/dashboard"),
+  },
+  //
+  {
+    path: "/USER/home",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/USER/home"),
+  },
+  {
+    path: "/USER/notifications",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/USER/notifications"),
+  },
+  {
+    path: "/USER/packages",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/USER/packages"),
+  },
+  {
+    path: "/USER/dashboard",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/USER/dashboard"),
   },
   //
   {

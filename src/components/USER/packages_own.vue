@@ -2,257 +2,59 @@
   <div class="ma-12 mb-12 container-flow">
     <!-- contents here  -->
 
-    <!-- package filters  -->
-    <v-row justify="center">
-      <v-card style="padding:0px 20px">
-        <v-card-title>Search ISP Packages</v-card-title>
-        <v-expansion-panels>
-          <v-col>
-            Price Range:
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <template v-slot:default="{ open }">
-                  <v-row no-gutters>
-                    <v-col class="text--secondary">
-                      <v-fade-transition leave-absolute>
-                        <span v-if="open">Select the max and min price:</span>
-                        <v-row v-else no-gutters style="width: 100%">
-                          <v-col cols="6" style="color: green">
-                            Min Cost:
-                            {{ filterPrice[0] }}
-                          </v-col>
-                          <v-col cols="6" style="color: red">
-                            Max Cost: {{ filterPrice[1] }}
-                          </v-col>
-                        </v-row>
-                      </v-fade-transition>
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-range-slider
-                  v-model="filterPrice"
-                  label="Price (Taka)"
-                  min="0"
-                  max="1000000"
-                  step="1000"
-                >
-                </v-range-slider>
-                <label style="color: rgb(97, 91, 91)"
-                  >price(min): {{ filterPrice[0] }} <br />
-                  price(max): {{ filterPrice[1] }}</label
-                >
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-col>
-          <v-col>
-            Bandwidth Range:
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <template v-slot:default="{ open }">
-                  <v-row no-gutters>
-                    <v-col class="text--secondary">
-                      <v-fade-transition leave-absolute>
-                        <span v-if="open"
-                          >Select the max and min bandwidth:</span
-                        >
-                        <v-row v-else no-gutters style="width: 100%">
-                          <v-col cols="6" style="color: green">
-                            Min BW:
-                            {{ filterBW[0] }}
-                          </v-col>
-                          <v-col cols="6" style="color: red">
-                            Max BW: {{ filterBW[1] }}
-                          </v-col>
-                        </v-row>
-                      </v-fade-transition>
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-range-slider
-                  v-model="filterBW"
-                  label="Bandwidth (GBPS)"
-                  min="0"
-                  max="100"
-                  thumb-label="always"
-                >
-                </v-range-slider>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-col>
-
-          <v-col>
-            Duration Range(months):
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <template v-slot:default="{ open }">
-                  <v-row no-gutters>
-                    <v-col class="text--secondary">
-                      <v-fade-transition leave-absolute>
-                        <span v-if="open"
-                          >Select the max and min duration:</span
-                        >
-                        <v-row v-else no-gutters style="width: 100%">
-                          <v-col cols="6" style="color: green">
-                            Min Period:
-                            {{ filterDuration[0] }}
-                          </v-col>
-                          <v-col cols="6" style="color: red">
-                            Max Period: {{ filterDuration[1] }}
-                          </v-col>
-                        </v-row>
-                      </v-fade-transition>
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-range-slider
-                  v-model="filterDuration"
-                  label="Duration (Months)"
-                  min="0"
-                  max="24"
-                  thumb-label="always"
-                >
-                </v-range-slider>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-col>
-        </v-expansion-panels>
-        <v-card-actions>
-          <v-row align="center" justify="end">
-            <v-col cols="6"></v-col>
-            <v-col>
-              <v-btn
-                color="deep-purple lighten-2"
-                @click="doFilter"
-                dark
-                max-width="80%"
-                margin="10px"
-              >
-                Filter <v-icon>mdi-filter</v-icon>
-              </v-btn>
-            </v-col>
-
-            <v-col>
-              <v-btn
-                color="deep-purple lighten-2"
-                @click="clearFilter"
-                dark
-                margin="10px"
-              >
-                Clear Filter
-              </v-btn>
-            </v-col>
-
-            <v-col>
-              <v-menu offset-y>
-                <template v-slot:activator="{ attrs, on }">
-                  <v-btn
-                    color="deep-purple lighten-2"
-                    class="white--text ma-5"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    Sort <v-icon>mdi-sort</v-icon>
-                  </v-btn>
-                </template>
-
-                <v-list>
-                  <v-list-item v-for="item in sortedItems" :key="item" link>
-                    <v-list-item-title
-                      v-text="item"
-                      @click="doSort(item)"
-                    ></v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </v-col>
-          </v-row>
-        </v-card-actions>
-      </v-card>
-    </v-row>
-
-    <!-- show ISP packages -->
-    <v-row justify="center">
-      <div class="col-lg-5" v-for="(pkg, i) in allPkgs" :key="i">
+    <!-- show own packages -->
+    <v-row v-if="!!myPackageList.length">
+      <h2>My Packages</h2>
+      <div class="col-lg-5" v-for="(myPackage, i) in myPackageList" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
           <v-card-title>
-            {{ pkg.data.name }} &nbsp;
-            <v-chip v-if="!pkg.data.ongoing" color="red"> Disabled </v-chip>
+            {{ myPackage.data.name }} &nbsp;
+            <v-chip v-if="!myPackage.data.ongoing" color="red">
+              Disabled
+            </v-chip>
           </v-card-title>
 
           <v-card-text>
-            <div class="my-4 text-subtitle-1">
-              Taka
-              <span v-if="!pkg.data.offerId"> {{ pkg.data.price }} </span>
-              <template v-if="!!pkg.data.offerId">
-                <s>{{ pkg.data.price }}</s>
-                <span>
-                  &nbsp;
-                  {{ calculateReducedPrice(pkg.data.price, pkg.data.offerId) }}
-                </span>
-                <v-chip color="deep-purple">
-                  <span style="color:white">
-                    {{ getOfferName(pkg.data.offerId) }}
-                  </span>
-                </v-chip>
-              </template>
-            </div>
             <v-chip-group
               active-class="deep-purple accent-4 white--text"
               column
             >
-              <v-chip v-for="(area, i) in pkg.data.areas" :key="i"
-                >{{ area }}
-              </v-chip>
-            </v-chip-group>
-            <v-chip-group
-              active-class="deep-purple accent-4 white--text"
-              column
-            >
-              <v-chip>{{ pkg.data.bandwidth }} GBPS</v-chip>
-              <v-chip>{{ pkg.data.duration }} months</v-chip>
+              <v-chip>{{ myPackage.data.bandwidth }} GBPS</v-chip>
+              <v-chip>{{ myPackage.data.duration }} months</v-chip>
             </v-chip-group>
 
             <div>
-              {{ pkg.bandwidth }} GBPS speed relentless speed of unlimited
-              traffic with 24/7 service.
+              {{ myPackage.data.bandwidth }} GBPS speed relentless speed of
+              unlimited traffic with 24/7 service.
+            </div>
+
+            <div>
+              <strong>Expiration date:</strong>
+              {{ myPackage.expirationTime.slice(0, 10) }}
             </div>
           </v-card-text>
-
           <v-card-actions>
-            <v-col></v-col>
-            <v-col>
-              <v-btn
-                color="deep-purple lighten-2"
-                @click="detailsPressed(i)"
-                text
-              >
-                Details
-              </v-btn>
-            </v-col>
-            <v-col></v-col>
-            <v-col>
-              <v-btn
-                :disabled="!allPkgs[i].data.ongoing || !allPkgs[i].status"
-                color="deep-purple lighten-2"
-                @click="selectPressed(i)"
-                text
-              >
-                Select
-              </v-btn>
-            </v-col>
-            <v-col></v-col>
+            <v-row>
+              <v-col></v-col>
+              <v-col>
+                <v-btn
+                  color="deep-purple lighten-2"
+                  @click="findIdx(myPackage.data)"
+                  text
+                >
+                  Details
+                </v-btn>
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-card-actions>
         </v-card>
       </div>
     </v-row>
+
+    <!-- <span> {{ getUserData }} </span> -->
 
     <!-- details -->
     <v-row v-if="currPkgIdx !== -1" justify="center">
@@ -352,16 +154,6 @@
         </v-card>
       </v-dialog>
     </v-row>
-
-    <!-- <v-row v-if="showPayment" justify="center">
-      <v-dialog v-model="showPayment" max-width="70%">
-        <v-card>
-          <v-card-text>
-            <payments :isRedirected="true" :givenPkg="sele"></payments>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-    </v-row> -->
   </div>
 </template>
 

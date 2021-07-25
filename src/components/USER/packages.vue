@@ -133,13 +133,13 @@
               <v-icon left>
                 mdi-package-variant-closed
               </v-icon>
-              NTTN Packages
+              My ISP Packages
             </v-tab>
             <v-tab>
               <v-icon left>
                 mdi-package-variant
               </v-icon>
-              My Packages
+              My Package
             </v-tab>
 
             <!-- <v-tab :disabled="true"> -->
@@ -147,11 +147,11 @@
               <v-icon left>
                 mdi-package
               </v-icon>
-              User Packages
+              All ISP Packages
             </v-tab>
 
             <v-tab-item>
-              <pkgNTTN></pkgNTTN>
+              <pkgISP></pkgISP>
             </v-tab-item>
             <v-tab-item>
               <pkgOwn></pkgOwn>
@@ -174,12 +174,12 @@ import { mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
-import pkgNTTN from "./packages_NTTN.vue";
+import pkgISP from "./packages_ISP.vue";
 import pkgUSER from "./packages_USER.vue";
 import pkgOwn from "./packages_own.vue";
 
 export default {
-  components: { topbar, bottombar, pkgNTTN, pkgUSER, pkgOwn },
+  components: { topbar, bottombar, pkgISP, pkgUSER, pkgOwn },
 
   data() {
     return {

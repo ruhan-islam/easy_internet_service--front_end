@@ -352,16 +352,6 @@
         </v-card>
       </v-dialog>
     </v-row>
-
-    <!-- <v-row v-if="showPayment" justify="center">
-      <v-dialog v-model="showPayment" max-width="70%">
-        <v-card>
-          <v-card-text>
-            <payments :isRedirected="true" :givenPkg="sele"></payments>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-    </v-row> -->
   </div>
 </template>
 
@@ -474,26 +464,18 @@ export default {
     },
 
     fetchPackages() {
+      // console.log(this.getUserData._id);
       axios
         .post("/api/package/fetchByQueryWithStatus", {
-          type: 2,
+          type: 3,
           id: this.getUserData._id,
         })
         .then((res) => {
+          console.log(res);
           if (res.status === 200) {
-            // console.log(res.data);
+            console.log(res.data);
             this.allPkgs = res.data;
-            for (let i in this.allPkgs) {
-              // console.log(this.allPkgs[i].areas);
-              if (
-                this.allPkgs[i].data.areas.includes("Nation-wide") ||
-                this.allPkgs[i].data.areas.includes(this.myInfo.region)
-              ) {
-                // console.log("in");
-                this.pkgs.push(this.allPkgs[i]);
-              }
-            }
-            this.allPkgs = this.pkgs;
+            this.pkgs = this.allPkgs;
           } else {
             this.error = true;
           }
