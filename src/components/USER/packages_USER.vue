@@ -692,7 +692,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserName"]),
+    ...mapGetters(["getUserData"]),
 
     isSubmitDisabled() {
       return !(
@@ -729,7 +729,7 @@ export default {
     fetchAllPackages() {
       axios
         .post("/api/package/fetchByQuery", {
-          packageCreator: this.getUserName,
+          packageCreator: this.getUserData.name,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -752,7 +752,7 @@ export default {
     fetchAllOffers() {
       axios
         .post("/api/offer/fetchByQuery", {
-          creator: this.getUserName,
+          creator: this.getUserData.name,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -891,7 +891,7 @@ export default {
       axios
         .post("/api/package/addOffer", {
           name: this.pkgs[this.currPkgIdx].name,
-          packageCreator: this.getUserName,
+          packageCreator: this.getUserData.name,
           offerId: this.selectedOffer,
         })
         .then((res) => {
@@ -919,7 +919,7 @@ export default {
         axios
           .post("/api/package/addOffer", {
             name: this.pkgs[this.currPkgIdx].name,
-            packageCreator: this.getUserName,
+            packageCreator: this.getUserData.name,
             offerId: this.selectedOffer,
           })
           .then((res) => {
@@ -942,7 +942,7 @@ export default {
       axios
         .post("/api/package/updateStatus", {
           name: this.pkgs[i].name,
-          packageCreator: this.getUserName,
+          packageCreator: this.getUserData.name,
           ongoing: !this.pkgs[i].ongoing,
         })
         .then((res) => {

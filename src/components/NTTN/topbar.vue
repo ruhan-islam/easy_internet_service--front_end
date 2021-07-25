@@ -184,7 +184,6 @@ export default {
       "getLoginState",
       "getAuthToken",
       "getNtfCount",
-      "getUserName",
       "getUserType",
     ]),
   },

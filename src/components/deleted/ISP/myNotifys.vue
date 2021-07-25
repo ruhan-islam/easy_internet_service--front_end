@@ -81,8 +81,7 @@ export default {
     ...mapGetters([
       // "getAuthToken",
       // "getNtfCount",
-      // "getUserName",
-      // "getUserType",
+      "getUserData",
     ]),
 
     isSendDisabled() {
@@ -121,7 +120,7 @@ export default {
       // console.log("send pressed");
 
       let newNotification = {
-        senderId: this.getUserName,
+        senderId: this.getUserData.name,
         receiverID: this.userName,
         senderType: 2,
         receiverType: 3,

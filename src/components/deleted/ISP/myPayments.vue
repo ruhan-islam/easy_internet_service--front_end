@@ -1251,13 +1251,10 @@ export default {
 
   computed: {
     ...mapGetters([
-      "getUserID",
-      "getUserName",
-      "getUserPkgID",
+      "getUserData",
+      "getUserData",
       // "getAuthToken",
       // "getNtfCount",
-      // "getUserName",
-      // "getUserType",
     ]),
 
     isProceedDisabled() {
@@ -1308,11 +1305,9 @@ export default {
     ]),
 
     fetchOwnPackage() {
-      // console.log("in");
-      // console.log(this.getUserPkgID);
       axios
         .post("/api/isp/fetchOwnPackage", {
-          package_id: this.getUserPkgID,
+          package_id: this.getUserData.package_id,
         })
         .then((res) => {
           // console.log(res);
@@ -1332,7 +1327,7 @@ export default {
     fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
+          id: this.getUserData._id,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -1380,7 +1375,7 @@ export default {
       axios
         .post("/api/payment/insert", {
           user_type: 2,
-          package_id: this.getUserPkgID,
+          package_id: this.getUserData.package_id,
         })
         .then((res) => {
           if (res.status === 200) {

@@ -94,8 +94,6 @@ export default {
     ...mapGetters([
       // "getAuthToken",
       // "getNtfCount",
-      // "getUserName",
-      // "getUserType",
       "getUserData",
     ]),
 

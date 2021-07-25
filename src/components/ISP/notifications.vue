@@ -57,7 +57,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserID", "getUserData", "getUserName"]),
+    ...mapGetters(["getUserData"]),
   },
 
   mounted() {
@@ -77,7 +77,7 @@ export default {
     fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
+          id: this.getUserData._id,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -96,7 +96,7 @@ export default {
     fetchNotifications() {
       axios
         .post("/api/notification/fetchByQuery", {
-          receiverID: this.getUserName,
+          receiverID: this.getUserData.name,
           receiverType: 2, // for ISP
         })
         .then((res) => {

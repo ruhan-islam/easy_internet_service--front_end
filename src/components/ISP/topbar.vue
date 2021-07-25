@@ -167,9 +167,8 @@ export default {
       "getLoginState",
       "getAuthToken",
       "getNtfCount",
-      "getUserName",
       "getUserType",
-      "getUserID",
+      "getUserData",
     ]),
   },
 
@@ -186,7 +185,7 @@ export default {
     updateInfo() {
       axios
         .post("/api/notification/unseenNotificationCount", {
-          receiverID: this.getUserName,
+          receiverID: this.getUserData.name,
           receiverType: 2, // for ISP
         })
         .then((res) => {
@@ -204,7 +203,7 @@ export default {
 
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
+          id: this.getUserData._id,
         })
         .then((res) => {
           // console.log(res);

@@ -12,11 +12,8 @@ export default new Vuex.Store({
         loginState: false,
         authToken: '',
         userData: '',
-        userID: '',
-        userName: '',
         userType: '',
         userEmail: '',
-        userPkgID: '',
         // 
         notificationCount: 0,
         selectedPackage: '',
@@ -38,20 +35,11 @@ export default new Vuex.Store({
         getUserData: state => {
             return state.userData;
         },
-        getUserID: state => {
-            return state.userID;
-        },
-        getUserName: state => {
-            return state.userName;
-        },
         getUserType: state => {
             return state.userType;
         },
         getUserEmail: state => {
             return state.userEmail;
-        },
-        getUserPkgID: state => {
-            return state.userPkgID;
         },
         //
         getNtfCount: state => {
@@ -84,20 +72,11 @@ export default new Vuex.Store({
         setUserData: (state, userData) => {
             state.userData = userData;
         },
-        setUserID: (state, userID) => {
-            state.userID = userID;
-        },
-        setUserName: (state, userName) => {
-            state.userName = userName;
-        },
         setUserType: (state, userType) => {
             state.userType = userType;
         },
         setUserEmail: (state, userEmail) => {
             state.userEmail = userEmail;
-        },
-        setUserPkgID: (state, userPkgID) => {
-            state.userPkgID = userPkgID;
         },
         //
         setNtfCount: (state, notificationCount) => {

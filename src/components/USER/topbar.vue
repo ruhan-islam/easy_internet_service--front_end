@@ -119,8 +119,8 @@ export default {
     if (this.getUserType !== "USER") {
       this.$router.go(-1);
     }
-    this.myCallback();
-    this.intervalID = setInterval(this.myCallback, 5000);
+    this.updateInfo();
+    this.intervalID = setInterval(this.updateInfo, 2000);
   },
 
   computed: {
@@ -128,7 +128,7 @@ export default {
       "getLoginState",
       "getAuthToken",
       "getNtfCount",
-      "getUserName",
+      "getUserData",
       "getUserType",
     ]),
   },
@@ -140,12 +140,13 @@ export default {
       "setNtfCount",
       "setUserName",
       "setUserType",
+      "setUserData",
     ]),
 
-    myCallback() {
+    updateInfo() {
       axios
         .post("/api/notification/unseenNotificationCount", {
-          receiverID: this.getUserName,
+          receiverID: this.getUserData.name,
           receiverType: 3, // for USER
         })
         .then((res) => {
@@ -153,6 +154,24 @@ export default {
           if (res.status === 200) {
             // console.log(res.data.unseenCount);
             this.setNtfCount(res.data.unseenCount);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      axios
+        .post("/api/user/fetchOwnData", {
+          id: this.getUserData._id,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            // console.log(res.data);
+            this.setUserData(res.data);
+            // console.log(this.userData);
           } else {
             this.error = true;
           }

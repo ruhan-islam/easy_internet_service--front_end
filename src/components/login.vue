@@ -72,7 +72,6 @@ export default {
       "getLoginState",
       "getAuthToken",
       "getNtfCount",
-      "getUserName",
       "getUserType",
     ]),
   },
@@ -90,10 +89,8 @@ export default {
     ...mapMutations([
       "setLoginState",
       "setAuthToken",
-      "setUserID",
       "setUserName",
       "setUserType",
-      "setUserPkgID",
     ]),
 
     validateLogin() {
@@ -110,13 +107,10 @@ export default {
           if (res.status === 201) {
             if (this.username === "nttn") {
               this.username = "Nttn";
-            } else {
-              this.setUserPkgID(res.data.user.package_id);
             }
 
             this.setLoginState(true);
             this.setAuthToken(res.data.token);
-            this.setUserID(res.data.user._id);
             this.setUserType(this.type.toUpperCase());
             this.setUserName(this.username);
             this.$router.push(dest);

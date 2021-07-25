@@ -1387,15 +1387,10 @@ export default {
 
   computed: {
     ...mapGetters([
-      "getUserID",
       "getUserData",
-      "getUserName",
-      "getUserPkgID",
       "getSelectedPkg",
       // "getAuthToken",
       // "getNtfCount",
-      // "getUserName",
-      // "getUserType",
     ]),
 
     isProceedDisabled() {
@@ -1459,7 +1454,7 @@ export default {
     fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
+          id: this.getUserData._id,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -1476,8 +1471,6 @@ export default {
     },
 
     fetchOwnPackages() {
-      // console.log("in");
-      // console.log(this.getUserPkgID);
       axios
         .post("/api/isp/fetchOwnPackageArray", {
           id: this.getUserData._id,

@@ -637,8 +637,21 @@
                         <td>{{ allPkgs[currPkgIdx].name }}</td>
                       </tr>
                       <tr>
-                        <td>Price (Taka)</td>
+                        <td>Base Price (Taka)</td>
                         <td>Tk. {{ allPkgs[currPkgIdx].price }} /ISP</td>
+                      </tr>
+                      <tr v-if="!!allPkgs[currPkgIdx].data.offerId">
+                        <td>Reduced Price</td>
+                        <td>
+                          Tk.
+                          {{
+                            calculateReducedPrice(
+                              allPkgs[currPkgIdx].data.price,
+                              allPkgs[currPkgIdx].data.offerId
+                            )
+                          }}
+                          /ISP
+                        </td>
                       </tr>
                       <tr>
                         <td>Bandwidth (GBPS)</td>
@@ -934,108 +947,6 @@ export default {
         });
     },
 
-    doSort(item) {
-      // ["price 🔺", "price 🔻", "duraation 🔺","duraation 🔻",
-      //           "bandwidth 🔺","bandwidth 🔻"],
-      if (item == "Price 🔺") {
-        this.pkgs.sort(this.orderByPriceAscending);
-      } else if (item == "Duration 🔺") {
-        this.pkgs.sort(this.orderByDurationAscending);
-      } else if (item == "Bandwidth 🔺") {
-        this.pkgs.sort(this.orderByBandwidthAscending);
-      } else if (item == "Name 🔺") {
-        this.pkgs.sort(this.orderByNameAscending);
-      } else if (item == "Price 🔻") {
-        this.pkgs.sort(this.orderByPriceDescending);
-      } else if (item == "Duration 🔻") {
-        this.pkgs.sort(this.orderByDurationDescending);
-      } else if (item == "Bandwidth 🔻") {
-        this.pkgs.sort(this.orderByBandwidthDescending);
-      } else if (item == "Name 🔻") {
-        this.pkgs.sort(this.orderByNameDescending);
-      }
-    },
-
-    orderByNameAscending(a, b) {
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
-        return -1;
-      }
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByPriceAscending(a, b) {
-      if (a.price < b.price) {
-        return -1;
-      }
-      if (a.price > b.price) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByBandwidthAscending(a, b) {
-      if (a.bandwidth < b.bandwidth) {
-        return -1;
-      }
-      if (a.bandwidth > b.bandwidth) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByDurationAscending(a, b) {
-      if (a.duration < b.duration) {
-        return -1;
-      }
-      if (a.duration > b.duration) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByNameDescending(a, b) {
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
-        return -1;
-      }
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByPriceDescending(a, b) {
-      if (a.price > b.price) {
-        return -1;
-      }
-      if (a.price < b.price) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByBandwidthDescending(a, b) {
-      if (a.bandwidth > b.bandwidth) {
-        return -1;
-      }
-      if (a.bandwidth < b.bandwidth) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByDurationDescending(a, b) {
-      if (a.duration > b.duration) {
-        return -1;
-      }
-      if (a.duration < b.duration) {
-        return 1;
-      }
-      return 0;
-    },
-
     getToday() {
       let today = new Date();
       today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -1065,6 +976,45 @@ export default {
         }
       }
       return price - (price * percentage) / 100.0;
+    },
+
+    newPkgConfirmPressed() {
+      this.dialog = false;
+      // console.log("submit pressed");
+      let newPkg = {
+        name: this.packageName,
+        package_type: 0,
+        bandwidth: this.bandwidth,
+        up_speed: this.upSpeed,
+        down_speed: this.downSpeed,
+        duration: this.duration,
+        price: this.price,
+        ongoing: true,
+        isRealIp: true,
+        downTime: this.downTime,
+        responseTime: this.responseTime,
+        areas: this.areas,
+      };
+      axios
+        .post("/api/package/insert", newPkg)
+        .then((res) => {
+          if (res.status === 201) {
+            // this.$refs.form.reset();
+            this.resetPressed();
+            this.allPkgs.push(newPkg);
+            this.pkgs = this.allPkgs;
+            this.pkgNameList.push(newPkg.name);
+            this.filterPrice = [0, 1000000];
+            this.filterBW = [0, 200];
+            this.filterDuration = [0, 24];
+            this.showSuccessOverlay = true;
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     offerConfirmPressed() {
@@ -1165,43 +1115,106 @@ export default {
       else this.selectallTitle = "Select All";
     },
 
-    newPkgConfirmPressed() {
-      this.dialog = false;
-      // console.log("submit pressed");
-      let newPkg = {
-        name: this.packageName,
-        package_type: 0,
-        bandwidth: this.bandwidth,
-        up_speed: this.upSpeed,
-        down_speed: this.downSpeed,
-        duration: this.duration,
-        price: this.price,
-        ongoing: true,
-        isRealIp: true,
-        downTime: this.downTime,
-        responseTime: this.responseTime,
-        areas: this.areas,
-      };
-      axios
-        .post("/api/package/insert", newPkg)
-        .then((res) => {
-          if (res.status === 201) {
-            // this.$refs.form.reset();
-            this.resetPressed();
-            this.allPkgs.push(newPkg);
-            this.pkgs = this.allPkgs;
-            this.pkgNameList.push(newPkg.name);
-            this.filterPrice = [0, 1000000];
-            this.filterBW = [0, 200];
-            this.filterDuration = [0, 24];
-            this.showSuccessOverlay = true;
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    doSort(item) {
+      // ["price 🔺", "price 🔻", "duraation 🔺","duraation 🔻",
+      //           "bandwidth 🔺","bandwidth 🔻"],
+      if (item == "Price 🔺") {
+        this.pkgs.sort(this.orderByPriceAscending);
+      } else if (item == "Duration 🔺") {
+        this.pkgs.sort(this.orderByDurationAscending);
+      } else if (item == "Bandwidth 🔺") {
+        this.pkgs.sort(this.orderByBandwidthAscending);
+      } else if (item == "Name 🔺") {
+        this.pkgs.sort(this.orderByNameAscending);
+      } else if (item == "Price 🔻") {
+        this.pkgs.sort(this.orderByPriceDescending);
+      } else if (item == "Duration 🔻") {
+        this.pkgs.sort(this.orderByDurationDescending);
+      } else if (item == "Bandwidth 🔻") {
+        this.pkgs.sort(this.orderByBandwidthDescending);
+      } else if (item == "Name 🔻") {
+        this.pkgs.sort(this.orderByNameDescending);
+      }
+    },
+
+    orderByNameAscending(a, b) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+        return -1;
+      }
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByPriceAscending(a, b) {
+      if (a.price < b.price) {
+        return -1;
+      }
+      if (a.price > b.price) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByBandwidthAscending(a, b) {
+      if (a.bandwidth < b.bandwidth) {
+        return -1;
+      }
+      if (a.bandwidth > b.bandwidth) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByDurationAscending(a, b) {
+      if (a.duration < b.duration) {
+        return -1;
+      }
+      if (a.duration > b.duration) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByNameDescending(a, b) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+        return -1;
+      }
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByPriceDescending(a, b) {
+      if (a.price > b.price) {
+        return -1;
+      }
+      if (a.price < b.price) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByBandwidthDescending(a, b) {
+      if (a.bandwidth > b.bandwidth) {
+        return -1;
+      }
+      if (a.bandwidth < b.bandwidth) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByDurationDescending(a, b) {
+      if (a.duration > b.duration) {
+        return -1;
+      }
+      if (a.duration < b.duration) {
+        return 1;
+      }
+      return 0;
     },
 
     doFilter() {

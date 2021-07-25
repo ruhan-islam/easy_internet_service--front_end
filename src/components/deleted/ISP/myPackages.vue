@@ -468,7 +468,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserPkgID", "getUserID"]),
+    ...mapGetters(["getUserData", "getUserData"]),
   },
 
   mounted() {
@@ -487,11 +487,9 @@ export default {
 
   methods: {
     fetchOwnData() {
-      // console.log("in");
-      // console.log(this.getUserPkgID);
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
+          id: this.getUserData._id,
         })
         .then((res) => {
           // console.log(res);
@@ -508,11 +506,9 @@ export default {
     },
 
     fetchOwnPackage() {
-      // console.log("in");
-      // console.log(this.getUserPkgID);
       axios
         .post("/api/isp/fetchOwnPackage", {
-          package_id: this.getUserPkgID,
+          package_id: this.getUserData.package_id,
         })
         .then((res) => {
           // console.log(res);

@@ -277,8 +277,21 @@
                     <td>{{ allPkgs[currPkgIdx].data.name }}</td>
                   </tr>
                   <tr>
-                    <td>Price</td>
+                    <td>Base Price</td>
                     <td>Tk. {{ allPkgs[currPkgIdx].data.price }} /ISP</td>
+                  </tr>
+                  <tr v-if="!!allPkgs[currPkgIdx].data.offerId">
+                    <td>Reduced Price</td>
+                    <td>
+                      Tk.
+                      {{
+                        calculateReducedPrice(
+                          allPkgs[currPkgIdx].data.price,
+                          allPkgs[currPkgIdx].data.offerId
+                        )
+                      }}
+                      /ISP
+                    </td>
                   </tr>
                   <tr>
                     <td>Bandwidth</td>
@@ -406,12 +419,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters([
-      "getUserData",
-      "getUserPkgID",
-      "getUserID",
-      "getSelectedPkg",
-    ]),
+    ...mapGetters(["getUserData", "getSelectedPkg"]),
   },
 
   mounted() {
@@ -432,11 +440,9 @@ export default {
     ...mapMutations(["setSelectedPkg"]),
 
     fetchOwnData() {
-      // console.log("in");
-      // console.log(this.getUserPkgID);
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
+          id: this.getUserData._id,
         })
         .then((res) => {
           // console.log(res);
@@ -453,8 +459,6 @@ export default {
     },
 
     fetchOwnPackages() {
-      // console.log("in");
-      // console.log(this.getUserPkgID);
       axios
         .post("/api/isp/fetchOwnPackageArray", {
           id: this.getUserData._id,

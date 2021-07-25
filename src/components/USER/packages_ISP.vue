@@ -46,6 +46,7 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-col>
+
           <v-col>
             Bandwidth Range:
             <v-expansion-panel>
@@ -74,47 +75,9 @@
               <v-expansion-panel-content>
                 <v-range-slider
                   v-model="filterBW"
-                  label="Bandwidth (GBPS)"
+                  label="Bandwidth (MBPS)"
                   min="0"
                   max="100"
-                  thumb-label="always"
-                >
-                </v-range-slider>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-col>
-
-          <v-col>
-            Duration Range(months):
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <template v-slot:default="{ open }">
-                  <v-row no-gutters>
-                    <v-col class="text--secondary">
-                      <v-fade-transition leave-absolute>
-                        <span v-if="open"
-                          >Select the max and min duration:</span
-                        >
-                        <v-row v-else no-gutters style="width: 100%">
-                          <v-col cols="6" style="color: green">
-                            Min Period:
-                            {{ filterDuration[0] }}
-                          </v-col>
-                          <v-col cols="6" style="color: red">
-                            Max Period: {{ filterDuration[1] }}
-                          </v-col>
-                        </v-row>
-                      </v-fade-transition>
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-range-slider
-                  v-model="filterDuration"
-                  label="Duration (Months)"
-                  min="0"
-                  max="24"
                   thumb-label="always"
                 >
                 </v-range-slider>
@@ -208,20 +171,11 @@
               active-class="deep-purple accent-4 white--text"
               column
             >
-              <v-chip v-for="(area, i) in pkg.data.areas" :key="i"
-                >{{ area }}
-              </v-chip>
-            </v-chip-group>
-            <v-chip-group
-              active-class="deep-purple accent-4 white--text"
-              column
-            >
-              <v-chip>{{ pkg.data.bandwidth }} GBPS</v-chip>
-              <v-chip>{{ pkg.data.duration }} months</v-chip>
+              <v-chip>{{ pkg.data.bandwidth }} MBPS</v-chip>
             </v-chip-group>
 
             <div>
-              {{ pkg.bandwidth }} GBPS speed relentless speed of unlimited
+              {{ pkg.data.bandwidth }} MBPS speed relentless speed of unlimited
               traffic with 24/7 service.
             </div>
           </v-card-text>
@@ -277,28 +231,33 @@
                     <td>{{ allPkgs[currPkgIdx].data.name }}</td>
                   </tr>
                   <tr>
-                    <td>Price</td>
+                    <td>Base Price</td>
                     <td>Tk. {{ allPkgs[currPkgIdx].data.price }} /ISP</td>
+                  </tr>
+                  <tr v-if="!!allPkgs[currPkgIdx].data.offerId">
+                    <td>Reduced Price</td>
+                    <td>
+                      Tk.
+                      {{
+                        calculateReducedPrice(
+                          allPkgs[currPkgIdx].data.price,
+                          allPkgs[currPkgIdx].data.offerId
+                        )
+                      }}
+                      /ISP
+                    </td>
                   </tr>
                   <tr>
                     <td>Bandwidth</td>
-                    <td>{{ allPkgs[currPkgIdx].data.bandwidth }} GBPS</td>
-                  </tr>
-                  <tr>
-                    <td>Duration</td>
-                    <td>{{ allPkgs[currPkgIdx].data.duration }} months</td>
-                  </tr>
-                  <tr>
-                    <td>Coverage Area</td>
-                    <td>{{ allPkgs[currPkgIdx].data.areas }}</td>
+                    <td>{{ allPkgs[currPkgIdx].data.bandwidth }} MBPS</td>
                   </tr>
                   <tr>
                     <td>Upload Speed</td>
-                    <td>{{ allPkgs[currPkgIdx].data.up_speed }} GBPS</td>
+                    <td>{{ allPkgs[currPkgIdx].data.up_speed }} MBPS</td>
                   </tr>
                   <tr>
                     <td>Download Speed</td>
-                    <td>{{ allPkgs[currPkgIdx].data.down_speed }} GBPS</td>
+                    <td>{{ allPkgs[currPkgIdx].data.down_speed }} MBPS</td>
                   </tr>
                   <tr>
                     <td>Data Limit</td>
@@ -396,16 +355,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters([
-      "getUserData",
-      "getUserPkgID",
-      "getUserID",
-      "getSelectedPkg",
-    ]),
+    ...mapGetters(["getUserData", "getSelectedPkg"]),
   },
 
   mounted() {
-    this.fetchOwnData();
+    // this.fetchOwnData();
     this.fetchAllOffers();
     this.fetchPackages();
     this.fetchOwnPackages();
@@ -422,11 +376,9 @@ export default {
     ...mapMutations(["setSelectedPkg"]),
 
     fetchOwnData() {
-      // console.log("in");
-      // console.log(this.getUserPkgID);
       axios
-        .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
+        .post("/api/user/fetchOwnData", {
+          id: this.getUserData._id,
         })
         .then((res) => {
           // console.log(res);
@@ -443,10 +395,8 @@ export default {
     },
 
     fetchOwnPackages() {
-      // console.log("in");
-      // console.log(this.getUserPkgID);
       axios
-        .post("/api/isp/fetchOwnPackageArray", {
+        .post("/api/user/fetchOwnPackageArray", {
           id: this.getUserData._id,
         })
         .then((res) => {
@@ -488,7 +438,7 @@ export default {
     fetchAllOffers() {
       axios
         .post("/api/offer/fetchByQuery", {
-          creator: "Nttn",
+          creator: this.getUserData.name,
         })
         .then((res) => {
           if (res.status === 200) {
