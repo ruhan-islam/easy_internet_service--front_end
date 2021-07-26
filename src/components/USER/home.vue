@@ -27,6 +27,7 @@ export default {
     if (!this.getUserData) {
       this.fetchOwnData();
     }
+    console.log(this.getUserData);
   },
 
   computed: {

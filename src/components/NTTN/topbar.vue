@@ -185,12 +185,14 @@ export default {
       "getAuthToken",
       "getNtfCount",
       "getUserType",
+      "getUserData",
     ]),
   },
 
   methods: {
     ...mapMutations([
       "setUserType",
+      "setUserData",
       "setLoginState",
       "setAuthToken",
       "setNtfCount",
