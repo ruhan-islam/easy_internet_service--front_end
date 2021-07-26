@@ -139,6 +139,7 @@ export default {
         subject: this.subject,
         details: this.details,
         category: "",
+        notificationArrivalTime: new Date(),
       };
 
       console.log(newNotification);
