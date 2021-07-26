@@ -443,7 +443,7 @@ export default {
       // console.log(i);
       this.setSelectedPkg(this.allPkgs[i].data);
       // console.log(this.getSelectedPkg);
-      this.$router.push("/ISP/payments");
+      this.$router.push("/USER/payments");
       // this.showPayment = true;
     },
 

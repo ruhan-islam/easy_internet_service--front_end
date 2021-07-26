@@ -32,12 +32,12 @@
                 active-class="deep-purple accent-4 white--text"
                 column
               >
-                <v-chip>{{ myPackage.data.bandwidth }} GBPS</v-chip>
+                <v-chip>{{ myPackage.data.bandwidth }} MBPS</v-chip>
                 <v-chip>{{ myPackage.data.duration }} months</v-chip>
               </v-chip-group>
 
               <div>
-                {{ myPackage.data.bandwidth }} GBPS speed relentless speed of
+                {{ myPackage.data.bandwidth }} MBPS speed relentless speed of
                 unlimited traffic with 24/7 service.
               </div>
 
@@ -52,7 +52,10 @@
                 <v-col>
                   <v-btn
                     color="deep-purple lighten-2"
-                    @click="findIdx(myPackage.data)"
+                    @click="
+                      currPkgIdx = 0;
+                      dialog2 = true;
+                    "
                     text
                   >
                     Details
@@ -73,7 +76,7 @@
       <v-dialog v-model="dialog2" max-width="70%">
         <v-card>
           <v-card-title class="text-h5">
-            {{ allPkgs[currPkgIdx].data.name }}
+            {{ myPackageList[currPkgIdx].data.name }}
           </v-card-title>
 
           <v-card-text>
@@ -88,31 +91,31 @@
                 <tbody>
                   <tr>
                     <td>Package Name</td>
-                    <td>{{ allPkgs[currPkgIdx].data.name }}</td>
+                    <td>{{ myPackageList[currPkgIdx].data.name }}</td>
                   </tr>
                   <tr>
                     <td>Price</td>
-                    <td>Tk. {{ allPkgs[currPkgIdx].data.price }} /ISP</td>
+                    <td>Tk. {{ myPackageList[currPkgIdx].data.price }} /ISP</td>
                   </tr>
                   <tr>
                     <td>Bandwidth</td>
-                    <td>{{ allPkgs[currPkgIdx].data.bandwidth }} GBPS</td>
+                    <td>{{ myPackageList[currPkgIdx].data.bandwidth }} MBPS</td>
                   </tr>
                   <tr>
                     <td>Duration</td>
-                    <td>{{ allPkgs[currPkgIdx].data.duration }} months</td>
-                  </tr>
-                  <tr>
-                    <td>Coverage Area</td>
-                    <td>{{ allPkgs[currPkgIdx].data.areas }}</td>
+                    <td>
+                      {{ myPackageList[currPkgIdx].data.duration }} months
+                    </td>
                   </tr>
                   <tr>
                     <td>Upload Speed</td>
-                    <td>{{ allPkgs[currPkgIdx].data.up_speed }} GBPS</td>
+                    <td>{{ myPackageList[currPkgIdx].data.up_speed }} MBPS</td>
                   </tr>
                   <tr>
                     <td>Download Speed</td>
-                    <td>{{ allPkgs[currPkgIdx].data.down_speed }} GBPS</td>
+                    <td>
+                      {{ myPackageList[currPkgIdx].data.down_speed }} MBPS
+                    </td>
                   </tr>
                   <tr>
                     <td>Data Limit</td>
@@ -120,12 +123,13 @@
                   </tr>
                   <tr>
                     <td>Estimated Down Time</td>
-                    <td>{{ allPkgs[currPkgIdx].data.downTime }} hrs</td>
+                    <td>{{ myPackageList[currPkgIdx].data.downTime }} hrs</td>
                   </tr>
                   <tr>
                     <td>Estimated Response Time</td>
                     <td>
-                      {{ allPkgs[currPkgIdx].data.responseTime }} milliseconds
+                      {{ myPackageList[currPkgIdx].data.responseTime }}
+                      milliseconds
                     </td>
                   </tr>
                 </tbody>
@@ -151,8 +155,8 @@
             <v-col>
               <v-btn
                 :disabled="
-                  !allPkgs[currPkgIdx].data.ongoing ||
-                    !allPkgs[currPkgIdx].status
+                  !myPackageList[currPkgIdx].data.ongoing ||
+                    !myPackageList[currPkgIdx].status
                 "
                 color="deep-purple lighten-2"
                 @click="selectPressed(currPkgIdx)"
@@ -217,7 +221,7 @@ export default {
   mounted() {
     this.fetchAllOffers();
     this.fetchAllPackages();
-    this.fetchOwnPackages();
+    this.fetchOwnPackage();
     this.currPkgIdx = -1;
     this.showPayment = false;
   },
@@ -225,7 +229,7 @@ export default {
   methods: {
     ...mapMutations(["setSelectedPkg"]),
 
-    fetchOwnPackages() {
+    fetchOwnPackage() {
       this.isLoading = true;
       axios
         .post("/api/user/fetchOwnPackageArray", {
@@ -300,19 +304,6 @@ export default {
         .catch((err) => {
           console.log(err);
         });
-    },
-
-    findIdx(myPkg) {
-      this.currPkgIdx = -1;
-      for (let i in this.allPkgs) {
-        if (this.allPkgs[i].data._id === myPkg._id) {
-          this.currPkgIdx = i;
-          break;
-        }
-      }
-      if (this.currPkgIdx !== -1) {
-        this.dialog2 = true;
-      }
     },
 
     selectPressed(i) {

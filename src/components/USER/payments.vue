@@ -342,7 +342,8 @@
                               <td>Card Number:</td>
                               <td>
                                 <strong>
-                                  **** **** **** {{ cardnumber.slice(12, 16) }}
+                                  **** **** ****
+                                  {{ cardnumber.slice(12, 16) }}
                                 </strong>
                               </td>
                             </tr>
@@ -634,7 +635,7 @@
                           v-model="pin"
                           :rules="pinMRules"
                           required
-                          :type="showPIN ? 'text' : 'password'"
+                          type="password"
                           placeholder="PIN Number"
                         ></v-text-field>
                         <p style="color: #f21170;">asdasdd</p>
@@ -933,6 +934,7 @@
                       background-color: #ffffff;
                     "
                           v-model="pin"
+                          type="password"
                           :rules="pinMRules"
                           required
                           placeholder="PIN Number"
@@ -1216,7 +1218,7 @@
                     "
                           v-model="pin"
                           :rules="pinMRules"
-                          :type="showPIN ? 'text' : 'password'"
+                          type="password"
                           required
                           placeholder="PIN Number"
                         ></v-text-field>
@@ -1363,7 +1365,6 @@ export default {
       accntnumber: "",
       resendText: "",
       pin: "",
-      showPIN: false,
       validBkashNo: false,
 
       amountRules: [
@@ -1468,18 +1469,18 @@ export default {
   },
 
   mounted() {
-    console.log(this.getUserData);
-
     this.fetchAllOffers();
     this.fetchOwnPayments();
     this.fetchOwnPackages();
 
+    console.log(this.getSelectedPkg);
     if (this.getSelectedPkg) {
       this.pageInfo = "paymentHighlights";
       this.dialog = true;
     }
 
-    console.log(this.getSelectedPkg);
+    // console.log(this.getUserData);
+    // console.log(this.getSelectedPkg);
     // console.log(this.getUserData.package_id);
   },
 
@@ -1487,6 +1488,7 @@ export default {
     ...mapMutations(["setUserData", "setSelectedPkg"]),
 
     fetchOwnPackages() {
+      this.isLoadingPayNow = true;
       axios
         .post("/api/user/fetchOwnPackageArray", {
           id: this.getUserID,
@@ -1496,6 +1498,7 @@ export default {
           if (res.status === 200) {
             this.myPackageList = res.data;
             // console.log(this.myPackageList);
+            this.isLoadingPayNow = false;
           } else {
             this.error = true;
           }
@@ -1534,7 +1537,7 @@ export default {
     fetchOwnPayments() {
       this.isLoadingOwn = true;
       axios
-        .post("/api/payment/fetchIspOwnPayment", {
+        .post("/api/payment/fetchUserOwnPayment", {
           id: this.getUserID,
         })
         .then((res) => {
@@ -1542,6 +1545,14 @@ export default {
           if (res.status === 200) {
             // console.log(res.data);
             this.itemsOwn = res.data;
+            for (let i in this.itemsOwn) {
+              this.itemsOwn[i].payment_time = new Date(
+                this.itemsOwn[i].payment_time
+              );
+              this.itemsOwn[i].payment_time = this.itemsOwn[i].payment_time
+                .toString()
+                .slice(0, 24);
+            }
             this.isLoadingOwn = false;
           } else {
             this.error = true;
@@ -1563,9 +1574,9 @@ export default {
 
       axios
         .post("/api/payment/insert", {
-          user_type: 2, // for ISP
+          user_type: 3, // for USER
           package_id: this.getSelectedPkg._id,
-          isp_id: this.getUserID,
+          user_id: this.getUserID,
           gateway: this.cardTitle,
           transaction_id: Math.random()
             .toString(36)
@@ -1581,6 +1592,7 @@ export default {
             this.resetValue();
             this.setSelectedPkg("");
             this.fetchOwnPackages();
+            this.fetchOwnPayments();
             // console.log(res.data);
             // this.userData = res.data;
           } else {

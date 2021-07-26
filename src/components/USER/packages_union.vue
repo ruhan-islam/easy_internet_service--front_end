@@ -177,10 +177,12 @@
                 </v-chip>
               </template>
             </div>
+
             <v-chip-group
               active-class="deep-purple accent-4 white--text"
               column
             >
+              <v-chip>ISP: {{ pkg.packageCreator }} </v-chip>
               <v-chip>{{ pkg.bandwidth }} MBPS</v-chip>
             </v-chip-group>
 

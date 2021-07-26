@@ -641,7 +641,7 @@
                           v-model="pin"
                           :rules="pinMRules"
                           required
-                          :type="showPIN ? 'text' : 'password'"
+                          type="password"
                           placeholder="PIN Number"
                         ></v-text-field>
                         <p style="color: #f21170;">asdasdd</p>
@@ -940,6 +940,7 @@
                       background-color: #ffffff;
                     "
                           v-model="pin"
+                          type="password"
                           :rules="pinMRules"
                           required
                           placeholder="PIN Number"
@@ -1223,7 +1224,7 @@
                     "
                           v-model="pin"
                           :rules="pinMRules"
-                          :type="showPIN ? 'text' : 'password'"
+                          type="password"
                           required
                           placeholder="PIN Number"
                         ></v-text-field>
@@ -1413,7 +1414,6 @@ export default {
       accntnumber: "",
       resendText: "",
       pin: "",
-      showPIN: false,
 
       validBkashNo: false,
 
@@ -1535,25 +1535,6 @@ export default {
 
   methods: {
     ...mapMutations(["setUserData", "setSelectedPkg"]),
-
-    fetchOwnData() {
-      axios
-        .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            // console.log(res.data);
-            this.setUserData(res.data);
-            // console.log(this.userData);
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
 
     fetchOwnPackages() {
       this.isLoadingPayNow = true;
@@ -1746,6 +1727,7 @@ export default {
             this.resetValue();
             this.setSelectedPkg("");
             this.fetchOwnPackages();
+            this.fetchOwnPayments();
             // console.log(res.data);
             // this.userData = res.data;
           } else {
