@@ -286,6 +286,7 @@
       rounded
       height="6"
     ></v-progress-linear>
+
     <template v-if="!isLoading">
       <!-- package filters  -->
       <v-row class="ma-1" justify="center">

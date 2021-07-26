@@ -124,7 +124,7 @@
         </v-dialog>
       </v-container>
 
-      <!-- tabls -->
+      <!-- tabs -->
       <template>
         <v-card>
           <v-toolbar flat dark>

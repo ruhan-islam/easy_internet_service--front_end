@@ -57,6 +57,7 @@
             </v-expansion-panel>
           </v-col>
         </v-expansion-panels>
+
         <v-expansion-panels>
           <v-col>
             Bandwidth Range:
@@ -95,7 +96,6 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-col>
-
           <v-col>
             Duration Range(months):
             <v-expansion-panel>
@@ -134,6 +134,7 @@
             </v-expansion-panel>
           </v-col>
         </v-expansion-panels>
+
         <v-card-actions>
           <v-row align="center" justify="end">
             <v-col cols="6"></v-col>
@@ -251,12 +252,17 @@
 
             <v-col>
               <v-btn
-                :disabled="compareDisable"
+                :disabled="
+                  idxList.length >= maxCompareCount && !idxList.includes(i)
+                "
                 color="deep-purple lighten-2"
-                @click="comparePressed(pkg)"
+                @click="toggleComparePressed(i)"
                 text
               >
-                Compare
+                <span v-if="!idxList.includes(i)">
+                  Compare
+                </span>
+                <span v-if="idxList.includes(i)"> Remove </span>
               </v-btn>
             </v-col>
 
@@ -305,6 +311,7 @@
                     @click="
                       dialogCompare = false;
                       messages = 0;
+                      idxList = [];
                       compareList = [];
                     "
                   >
@@ -319,6 +326,7 @@
                       @click="
                         dialogCompare = false;
                         messages = 0;
+                        idxList = [];
                         compareList = [];
                       "
                     >
@@ -327,74 +335,96 @@
                   </v-toolbar-items>
                 </v-toolbar>
 
-                <v-divider></v-divider>
+                <!-- <v-divider></v-divider> -->
 
-                <v-card>
-                  <v-card-title>
-                    Packages
-                    <v-spacer></v-spacer>
-                    <v-text-field
-                      v-model="search"
-                      append-icon="mdi-magnify"
-                      label="Search"
-                      single-line
-                      hide-details
-                    ></v-text-field>
-                  </v-card-title>
+                <v-card
+                  style="
+                    margin: 20px 20px;
+                    padding: 20px 0px 20px 50px;
+                    background-color: #171010;
+                    color: white;
+                  "
+                  elevation="20"
+                >
+                  <h4 style="margin-bottom: 50px">Package Comparison</h4>
 
-                  <v-row>
+                  <v-row style="background-color: #595260; margin-right: 40px">
                     <v-col><h5>Features</h5></v-col>
                     <v-col v-for="(p, j) in compareList" :key="j">
-                      <h5>{{ p.data.name }}</h5>
+                      <h5 style="margin-left:25px">{{ p.data.name }}</h5>
                     </v-col>
                   </v-row>
-                  <v-row>
-                    <v-col>Price</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.price
-                    }}</v-col>
+                  <v-row style="margin-right: 40px">
+                    <v-col>Price(BDT)</v-col>
+                    <v-col
+                      v-for="(p, j) in compareList"
+                      :key="j"
+                      style="margin-left:100px"
+                      >{{ p.data.price }}</v-col
+                    >
                   </v-row>
-                  <v-row>
-                    <v-col>Bandwidth</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.bandwidth
-                    }}</v-col>
+                  <v-row style="background-color: #595260; margin-right: 40px">
+                    <v-col>Bandwidth(GBPS)</v-col>
+                    <v-col
+                      v-for="(p, j) in compareList"
+                      :key="j"
+                      style="margin-left:100px"
+                      >{{ p.data.bandwidth }}</v-col
+                    >
                   </v-row>
-                  <v-row>
-                    <v-col>Duration</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.duration
-                    }}</v-col>
+                  <v-row style="margin-right: 40px">
+                    <v-col>Duration(months)</v-col>
+                    <v-col
+                      v-for="(p, j) in compareList"
+                      :key="j"
+                      style="margin-left:100px"
+                      >{{ p.data.duration }}</v-col
+                    >
                   </v-row>
-                  <v-row>
+                  <v-row style="background-color: #595260; margin-right: 40px">
                     <v-col>Upload Speed(GBPS)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.up_speed
-                    }}</v-col>
+                    <v-col
+                      v-for="(p, j) in compareList"
+                      :key="j"
+                      style="margin-left:100px"
+                      >{{ p.data.up_speed }}</v-col
+                    >
                   </v-row>
-                  <v-row>
+                  <v-row style="margin-right: 40px">
                     <v-col>Download Speed(GBPS)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.down_speed
-                    }}</v-col>
+                    <v-col
+                      v-for="(p, j) in compareList"
+                      :key="j"
+                      style="margin-left:100px"
+                      >{{ p.data.down_speed }}</v-col
+                    >
                   </v-row>
-                  <v-row>
+                  <v-row style="background-color: #595260; margin-right: 40px">
                     <v-col>Upload Speed(GBPS)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.up_speed
-                    }}</v-col>
+                    <v-col
+                      v-for="(p, j) in compareList"
+                      :key="j"
+                      style="margin-left:100px"
+                      >{{ p.data.up_speed }}</v-col
+                    >
                   </v-row>
-                  <v-row>
+                  <v-row style="margin-right: 40px">
                     <v-col>Estimated Down Time(hrs)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.downTime
-                    }}</v-col>
+                    <v-col
+                      v-for="(p, j) in compareList"
+                      :key="j"
+                      style="margin-left:100px"
+                      >{{ p.data.downTime }}</v-col
+                    >
                   </v-row>
-                  <v-row>
+                  <v-row style="background-color: #595260; margin-right: 40px">
                     <v-col>Response Time(milliseconds)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.responseTime
-                    }}</v-col>
+                    <v-col
+                      v-for="(p, j) in compareList"
+                      :key="j"
+                      style="margin-left:100px"
+                      >{{ p.data.responseTime }}</v-col
+                    >
                   </v-row>
                 </v-card>
               </v-card>
@@ -555,15 +585,14 @@ export default {
 
   data() {
     return {
-      search: "",
+      maxCompareCount: 3,
 
-      //aksndjksfkanfs
       dialogCompare: false,
       dialogZero: false,
+      idxList: [],
       compareList: [],
       compareDisable: false,
       messages: 0,
-      //sakfdJILAJFLKJFHlSAKDg
 
       isLoading: true,
       valid: false,
@@ -667,6 +696,13 @@ export default {
         });
     },
 
+    computeCompareState(i) {
+      if (this.idxList.includes(i)) {
+        return false;
+      }
+      return true;
+    },
+
     findIdx(myPkg) {
       this.currPkgIdx = -1;
       for (let i in this.allPkgs) {
@@ -694,11 +730,24 @@ export default {
       // console.log(this.currPkgIdx);
     },
 
-    comparePressed(pkg) {
-      this.compareList.push(pkg);
-      this.messages++;
-      if (this.compareList.length >= 4) this.compareDisable = true;
-      else this.compareDisable = false;
+    toggleComparePressed(i) {
+      let idx = this.idxList.indexOf(i);
+
+      if (idx > -1) {
+        this.compareList.splice(idx, 1);
+        this.idxList.splice(idx, 1);
+        this.messages--;
+      } else {
+        this.idxList.push(i);
+        this.compareList.push(this.allPkgs[i]);
+        this.messages++;
+      }
+
+      // if (this.compareList.length >= 3) {
+      //   this.compareDisable = true;
+      // } else {
+      //   this.compareDisable = false;
+      // }
     },
 
     comparePkg() {
@@ -713,6 +762,7 @@ export default {
 
     clearCompare() {
       this.compareDisable = false;
+      this.idxList = [];
       this.compareList = [];
       this.messages = 0;
     },

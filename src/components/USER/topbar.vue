@@ -3,7 +3,14 @@
     <v-app-bar :fixed="true" dark>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/USER/home" exact>
+          <v-btn
+            v-bind="attrs"
+            v-on="on"
+            router-link
+            to="/USER/home"
+            exact
+            elevation="0"
+          >
             <span> Home </span>
             <v-icon> mdi-home </v-icon>
           </v-btn>
@@ -13,7 +20,14 @@
 
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/USER/packages" exact>
+          <v-btn
+            v-bind="attrs"
+            v-on="on"
+            router-link
+            to="/USER/packages"
+            exact
+            elevation="0"
+          >
             <span> Packages </span>
             <v-icon> mdi-package-variant </v-icon>
           </v-btn>
@@ -23,7 +37,14 @@
 
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" router-link to="/USER/payments" exact>
+          <v-btn
+            v-bind="attrs"
+            v-on="on"
+            router-link
+            to="/USER/payments"
+            exact
+            elevation="0"
+          >
             <span> Payments </span>
             <v-icon> mdi-credit-card </v-icon>
           </v-btn>
@@ -39,6 +60,7 @@
             router-link
             to="/USER/notifications"
             exact
+            elevation="0"
           >
             <span> Notifications </span>
             <v-icon> mdi-bell </v-icon>
@@ -79,6 +101,7 @@
             router-link
             to="/USER/dashboard"
             exact
+            elevation="0"
           >
             <span> Dashboard </span>
             <v-icon> mdi-widgets </v-icon>
@@ -89,7 +112,7 @@
 
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" @click="logOut()">
+          <v-btn v-bind="attrs" v-on="on" @click="logOut()" elevation="0">
             <span> Signout </span>
             <v-icon> mdi-logout </v-icon>
           </v-btn>

@@ -3,7 +3,14 @@
     <v-app-bar :fixed="true" grow dark>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrsHome }">
-          <v-btn v-bind="attrsHome" v-on="on" router-link to="/ISP/home" exact>
+          <v-btn
+            v-bind="attrsHome"
+            v-on="on"
+            router-link
+            to="/ISP/home"
+            exact
+            elevation="0"
+          >
             <span> Home </span>
             <v-icon> mdi-home </v-icon>
           </v-btn>
@@ -19,6 +26,7 @@
             router-link
             to="/ISP/packages"
             exact
+            elevation="0"
           >
             <span> Packages </span>
             <v-icon> mdi-package-variant </v-icon>
@@ -35,9 +43,10 @@
             router-link
             to="/ISP/offers"
             exact
+            elevation="0"
           >
             <span> Offers </span>
-            <v-icon> mdi-widgets </v-icon>
+            <v-icon> mdi-offer </v-icon>
           </v-btn>
         </template>
         <span> Offer </span>
@@ -51,6 +60,7 @@
             router-link
             to="/ISP/payments"
             exact
+            elevation="0"
           >
             <span> Payments </span>
             <v-icon> mdi-credit-card </v-icon>
@@ -67,6 +77,7 @@
             router-link
             to="/ISP/notifications"
             exact
+            elevation="0"
           >
             <span> Notifications </span>
             <v-icon> mdi-bell </v-icon>
@@ -90,9 +101,10 @@
             router-link
             to="/ISP/notify"
             exact
+            elevation="0"
           >
             <span> Notify </span>
-            <v-icon> mdi-widgets </v-icon>
+            <v-icon> mdi-antenna </v-icon>
           </v-btn>
         </template>
         <span> Notify </span>
@@ -106,9 +118,10 @@
             router-link
             to="/ISP/tickets"
             exact
+            elevation="0"
           >
             <span> Tickets </span>
-            <v-icon> mdi-widgets </v-icon>
+            <v-icon> mdi-ticket </v-icon>
           </v-btn>
         </template>
         <span> Tickets </span>
@@ -122,9 +135,10 @@
             router-link
             to="/ISP/dashboard"
             exact
+            elevation="0"
           >
             <span> Dashboard </span>
-            <v-icon> mdi-widgets </v-icon>
+            <v-icon> mdi-tablet-dashboard </v-icon>
           </v-btn>
         </template>
         <span> Dashboard </span>
@@ -132,7 +146,7 @@
 
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrsLogout }">
-          <v-btn v-bind="attrsLogout" v-on="on" @click="logOut()">
+          <v-btn v-bind="attrsLogout" v-on="on" @click="logOut()" elevation="0">
             <span> Signout </span>
             <v-icon> mdi-logout </v-icon>
           </v-btn>

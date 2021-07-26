@@ -15,10 +15,19 @@
       ></v-progress-linear>
 
       <template v-if="!isLoading">
+        <v-radio-group
+          @click="doFilterBySeenStatus(notificationType)"
+          v-model="notificationType"
+          row
+        >
+          <v-radio label="Seen" value="onlySeens"></v-radio>
+          <v-radio label="Unseen" value="onlyUnseens"></v-radio>
+          <v-radio label="All" value="all"></v-radio>
+        </v-radio-group>
         <v-row justify="center">
           <v-expansion-panels v-model="panel" inset>
             <v-expansion-panel
-              v-for="(notification, i) in allNotifications"
+              v-for="(notification, i) in selectedNotifications"
               :key="i"
             >
               <v-expansion-panel-header
@@ -62,8 +71,10 @@ export default {
   data() {
     return {
       isLoading: true,
+      notificationType: "",
       panel: "",
       allNotifications: [],
+      selectedNotifications: [],
     };
   },
 
@@ -122,6 +133,7 @@ export default {
                 this.allNotifications[i].notificationArrivalTime
               );
             }
+            this.selectedNotifications = this.allNotifications;
             if (this.isLoading) {
               this.isLoading = false;
             }
@@ -134,16 +146,20 @@ export default {
         });
     },
 
+    doFilterBySeenStatus(notificationType) {
+      console.log(notificationType);
+    },
+
     expandClicked(i) {
-      if (!this.allNotifications[i].seenStatus) {
+      if (!this.selectedNotifications[i].seenStatus) {
         axios
           .post("/api/notification/updateSeenStatus", {
-            id: this.allNotifications[i]._id,
+            id: this.selectedNotifications[i]._id,
           })
           .then((res) => {
             // console.log(res);
             if (res.status === 200) {
-              this.allNotifications[i].seenStatus = true;
+              this.selectedNotifications[i].seenStatus = true;
               this.decNtfCount(true);
             } else {
               this.error = true;
