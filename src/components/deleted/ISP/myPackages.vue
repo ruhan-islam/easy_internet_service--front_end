@@ -468,7 +468,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserData", "getUserData"]),
+    ...mapGetters(["getUserID", "getUserData"]),
   },
 
   mounted() {
@@ -489,7 +489,7 @@ export default {
     fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);

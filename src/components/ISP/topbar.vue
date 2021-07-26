@@ -168,6 +168,7 @@ export default {
       "getAuthToken",
       "getNtfCount",
       "getUserType",
+      "getUserID",
       "getUserData",
     ]),
   },
@@ -184,7 +185,7 @@ export default {
     updateInfo() {
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);

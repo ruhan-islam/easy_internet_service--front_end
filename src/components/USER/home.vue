@@ -31,7 +31,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserData"]),
+    ...mapGetters(["getUserID", "getUserData"]),
   },
 
   methods: {
@@ -40,7 +40,7 @@ export default {
     fetchOwnData() {
       axios
         .post("/api/user/fetchOwnData", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           if (res.status === 200) {

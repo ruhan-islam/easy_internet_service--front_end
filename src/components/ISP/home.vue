@@ -27,11 +27,12 @@ export default {
     if (!this.getUserData) {
       this.fetchOwnData();
     }
+    console.log("home mounted");
     console.log(this.getUserData);
   },
 
   computed: {
-    ...mapGetters(["getUserData"]),
+    ...mapGetters(["getUserID", "getUserData"]),
   },
 
   methods: {
@@ -40,7 +41,7 @@ export default {
     fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           if (res.status === 200) {

@@ -419,7 +419,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserData", "getSelectedPkg"]),
+    ...mapGetters(["getUserID", "getUserData", "getSelectedPkg"]),
   },
 
   mounted() {
@@ -437,7 +437,7 @@ export default {
       axios
         .post("/api/package/fetchByQueryWithStatus", {
           type: 2,
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           if (res.status === 200) {

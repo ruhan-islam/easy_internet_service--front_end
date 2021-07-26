@@ -124,6 +124,7 @@ export default {
       "getLoginState",
       "getAuthToken",
       "getNtfCount",
+      "getUserID",
       "getUserData",
       "getUserType",
     ]),
@@ -141,7 +142,7 @@ export default {
     updateInfo() {
       axios
         .post("/api/user/fetchOwnData", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);

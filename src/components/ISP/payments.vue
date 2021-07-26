@@ -4,7 +4,6 @@
 
     <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
-
       <v-card style="margin:0% 0% 20% 0%">
         <v-toolbar flat dark>
           <v-toolbar-title> Manage Payments </v-toolbar-title>
@@ -1304,10 +1303,6 @@
       </v-card>
     </div>
 
-    <!-- <v-snackbar :value="showSnackbar" style="margin: auto">
-      Payment Successful
-    </v-snackbar> -->
-
     <bottombar></bottombar>
   </div>
 </template>
@@ -1479,6 +1474,7 @@ export default {
 
   computed: {
     ...mapGetters([
+      "getUserID",
       "getUserData",
       "getSelectedPkg",
       // "getAuthToken",
@@ -1543,7 +1539,7 @@ export default {
     fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -1563,7 +1559,7 @@ export default {
       this.isLoadingPayNow = true;
       axios
         .post("/api/isp/fetchOwnPackageArray", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);
@@ -1610,7 +1606,7 @@ export default {
       this.isLoadingOwn = true;
       axios
         .post("/api/payment/fetchIspOwnPayment", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);
@@ -1639,7 +1635,7 @@ export default {
       this.isLoadingUsers = true;
       axios
         .post("/api/payment/fetchAllUserOfIspPayment", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);
@@ -1734,7 +1730,7 @@ export default {
         .post("/api/payment/insert", {
           user_type: 2, // for ISP
           package_id: this.getSelectedPkg._id,
-          isp_id: this.getUserData._id,
+          isp_id: this.getUserID,
           gateway: this.cardTitle,
           transaction_id: Math.random()
             .toString(36)

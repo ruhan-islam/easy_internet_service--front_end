@@ -90,6 +90,7 @@ export default {
       "setLoginState",
       "setAuthToken",
       "setUserType",
+      "setUserID",
       "setUserData",
     ]),
 
@@ -112,6 +113,7 @@ export default {
             this.setLoginState(true);
             this.setAuthToken(res.data.token);
             this.setUserType(this.type.toUpperCase());
+            this.setUserID(res.data.user._id);
             this.setUserData(res.data.user);
             this.$router.push(dest);
             this.$router.go();

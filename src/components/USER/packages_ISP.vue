@@ -364,7 +364,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserData", "getSelectedPkg"]),
+    ...mapGetters(["getUserID", "getUserData", "getSelectedPkg"]),
   },
 
   mounted() {
@@ -382,7 +382,7 @@ export default {
       axios
         .post("/api/package/fetchByQueryWithStatus", {
           type: 3,
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);

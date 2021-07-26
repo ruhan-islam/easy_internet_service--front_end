@@ -155,6 +155,13 @@ const routes = [
 		},
     component: () => import("../components/USER/packages"),
   },
+  {
+    path: "/NTTN/payments",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/NTTN/payments"),
+  },
   // {
   //   path: "/USER/tickets",
   //   meta: {

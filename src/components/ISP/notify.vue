@@ -94,6 +94,7 @@ export default {
     ...mapGetters([
       // "getAuthToken",
       // "getNtfCount",
+      "getUserID",
       "getUserData",
     ]),
 
@@ -110,7 +111,7 @@ export default {
     fetchUserNameList() {
       axios
         .post("/api/user/fetchUserOfIspByQuery", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);

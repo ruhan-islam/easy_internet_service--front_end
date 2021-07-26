@@ -4,186 +4,205 @@
 
     <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
-      <v-row justify="center">
-        <v-card>
-          <v-card-title>
-            <v-text-field
-              v-model="searchOwn"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-            ></v-text-field>
-          </v-card-title>
-          <v-data-table
-            :loading="isLoadingOwn"
-            loading-text="Loading... Please wait"
-            :headers="headersOwn"
-            :items="itemsOwn"
-            :search="searchOwn"
-          ></v-data-table>
-        </v-card>
+      <v-card style="margin:0% 0% 20% 0%">
+        <v-toolbar flat dark>
+          <v-toolbar-title> Manage Payments </v-toolbar-title>
+        </v-toolbar>
+        <v-tabs vertical>
+          <v-tab>
+            <v-icon left>
+              mdi-package-variant-closed
+            </v-icon>
+            Pay Now
+          </v-tab>
 
-        <v-radio-group v-model="selectedPkgName">
-          <v-radio
-            v-for="(pkg, i) in myPackageList"
-            :key="i"
-            :label="pkg.data.name"
-            :value="pkg.data.name"
-          ></v-radio>
-        </v-radio-group>
-        <v-dialog v-model="dialog" persistent max-width="40%">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              :disabled="!selectedPkgName"
-              @click="selectPackage()"
-              color="primary"
-              v-bind="attrs"
-              v-on="on"
-            >
-              Pay Bill
-            </v-btn>
-          </template>
+          <!-- <v-tab :disabled="true"> -->
+          <v-tab>
+            <v-icon left>
+              mdi-package-variant
+            </v-icon>
+            My Payment History
+          </v-tab>
 
-          <v-card v-if="pageInfo === 'paymentHighlights'">
-            <v-card-title class="text-h6" style="background-color: #eeeeee">
-              BILLING HIGHLIGHTS
-            </v-card-title>
-            <v-form ref="form01" v-model="valid" lazy-validation>
-              <v-card-text>
-                <v-simple-table light>
-                  <template v-slot:default>
-                    <tbody>
-                      <tr>
-                        <td>ISP Name:</td>
-                        <td>
-                          <strong> {{ getUserData.name }} </strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Package Name:</td>
-                        <td>
-                          <strong> {{ getSelectedPkg.name }} </strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Package Bill:</td>
-                        <td>
-                          <strong>
-                            {{
-                              calculateReducedPrice(
-                                getSelectedPkg.price,
-                                getSelectedPkg.offerId
-                              )
-                            }}
-                            Taka
-                          </strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Available Balance:</td>
-                        <td>
-                          <strong> {{ getUserData.balance }} Taka </strong>
-                        </td>
-                      </tr>
-                      <tr v-if="getUserData.expirationTime">
-                        <td>Bill Due Date:</td>
-                        <td>
-                          <strong>
-                            {{ getUserData.expirationTime.slice(0, 10) }}
-                          </strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Amount:</td>
-                        <td>
-                          <v-text-field
-                            v-model="amount"
-                            :rules="amountRules"
-                            label="Price (BDT)"
-                            :placeholder="
-                              calculateReducedPrice(
-                                getSelectedPkg.price,
-                                getSelectedPkg.offerId
-                              ) + ''
-                            "
-                            required
-                          ></v-text-field>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn color="green darken-1" text @click="closePressed">
-                  close
-                </v-btn>
-                <v-btn
-                  :disabled="isProceedDisabled"
-                  color="green darken-1"
-                  text
-                  @click="pageInfo = 'paymentOptions'"
-                >
-                  proceed
-                </v-btn>
-              </v-card-actions>
-            </v-form>
-          </v-card>
+          <!-- pay now -->
+          <v-tab-item>
+            <v-progress-linear
+              v-if="isLoadingPayNow"
+              style="margin:10% 0"
+              color="deep-purple accent-4"
+              indeterminate
+              rounded
+              height="6"
+            ></v-progress-linear>
 
-          <v-card v-show="pageInfo === 'paymentOptions'">
-            <v-card-title
-              class="text-h6"
-              style="background-color: #334257; color: white"
-            >
-              Pay BDT {{ amount }} with Debit / Credit Cards<br />
-              ( Local / International )
-            </v-card-title>
-            <v-form ref="form02" v-model="validOption" lazy-validation>
-              <v-card-text>
-                <div class="pa-4">
-                  <v-chip-group active-class="primary--text" column>
-                    <v-chip
-                      v-for="tag in cardtags"
-                      :key="tag"
-                      @click="payProcess(tag)"
+            <!-- pay now -->
+            <v-row v-if="!isLoadingPayNow" class="ma-12 mb-12" justify="center">
+              <v-radio-group v-model="selectedPkgName">
+                <v-radio
+                  v-for="(pkg, i) in myPackageList"
+                  :key="i"
+                  :label="pkg.data.name"
+                  :value="pkg.data.name"
+                ></v-radio>
+              </v-radio-group>
+
+              <v-dialog v-model="dialog" persistent max-width="40%">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :disabled="!selectedPkgName"
+                    @click="selectPackage()"
+                    color="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    Pay Bill
+                  </v-btn>
+                </template>
+
+                <v-card v-if="pageInfo === 'paymentHighlights'">
+                  <v-card-title
+                    class="text-h6"
+                    style="background-color: #eeeeee"
+                  >
+                    BILLING HIGHLIGHTS
+                  </v-card-title>
+                  <v-form ref="form01" v-model="valid" lazy-validation>
+                    <v-card-text>
+                      <v-simple-table light>
+                        <template v-slot:default>
+                          <tbody>
+                            <tr>
+                              <td>ISP Name:</td>
+                              <td>
+                                <strong> {{ getUserData.name }} </strong>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Package Name:</td>
+                              <td>
+                                <strong> {{ getSelectedPkg.name }} </strong>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Package Bill:</td>
+                              <td>
+                                <strong>
+                                  {{
+                                    calculateReducedPrice(
+                                      getSelectedPkg.price,
+                                      getSelectedPkg.offerId
+                                    )
+                                  }}
+                                  Taka
+                                </strong>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Available Balance:</td>
+                              <td>
+                                <strong>
+                                  {{ getUserData.balance }} Taka
+                                </strong>
+                              </td>
+                            </tr>
+                            <tr v-if="getUserData.expirationTime">
+                              <td>Bill Due Date:</td>
+                              <td>
+                                <strong>
+                                  {{ getUserData.expirationTime.slice(0, 10) }}
+                                </strong>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Amount:</td>
+                              <td>
+                                <v-text-field
+                                  v-model="amount"
+                                  :rules="amountRules"
+                                  label="Price (BDT)"
+                                  :placeholder="
+                                    calculateReducedPrice(
+                                      getSelectedPkg.price,
+                                      getSelectedPkg.offerId
+                                    ) + ''
+                                  "
+                                  required
+                                ></v-text-field>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-btn color="green darken-1" text @click="closePressed">
+                        close
+                      </v-btn>
+                      <v-btn
+                        :disabled="isProceedDisabled"
+                        color="green darken-1"
+                        text
+                        @click="pageInfo = 'paymentOptions'"
+                      >
+                        proceed
+                      </v-btn>
+                    </v-card-actions>
+                  </v-form>
+                </v-card>
+
+                <v-card v-show="pageInfo === 'paymentOptions'">
+                  <v-card-title
+                    class="text-h6"
+                    style="background-color: #334257; color: white"
+                  >
+                    Pay BDT {{ amount }} with Debit / Credit Cards<br />
+                    ( Local / International )
+                  </v-card-title>
+                  <v-form ref="form02" v-model="validOption" lazy-validation>
+                    <v-card-text>
+                      <div class="pa-4">
+                        <v-chip-group active-class="primary--text" column>
+                          <v-chip
+                            v-for="tag in cardtags"
+                            :key="tag"
+                            @click="payProcess(tag)"
+                          >
+                            {{ tag }}
+                          </v-chip>
+                        </v-chip-group>
+                      </div>
+                    </v-card-text>
+
+                    <v-card-title
+                      class="text-h6"
+                      style="background-color: #334257; color: white"
                     >
-                      {{ tag }}
-                    </v-chip>
-                  </v-chip-group>
-                </div>
-              </v-card-text>
+                      Pay BDT {{ amount }} with Mobile Banking
+                    </v-card-title>
+                    <v-card-text>
+                      <div class="pa-4">
+                        <v-chip-group active-class="primary--text" column>
+                          <v-chip
+                            v-for="tag in mobiletags"
+                            :key="tag"
+                            @click="payProcess(tag)"
+                          >
+                            {{ tag }}
+                          </v-chip>
+                        </v-chip-group>
+                      </div>
+                    </v-card-text>
 
-              <v-card-title
-                class="text-h6"
-                style="background-color: #334257; color: white"
-              >
-                Pay BDT {{ amount }} with Mobile Banking
-              </v-card-title>
-              <v-card-text>
-                <div class="pa-4">
-                  <v-chip-group active-class="primary--text" column>
-                    <v-chip
-                      v-for="tag in mobiletags"
-                      :key="tag"
-                      @click="payProcess(tag)"
-                    >
-                      {{ tag }}
-                    </v-chip>
-                  </v-chip-group>
-                </div>
-              </v-card-text>
-
-              <v-card-actions>
-                <!-- <v-spacer></v-spacer> -->
-                <v-btn
-                  color="green darken-1"
-                  text
-                  @click="pageInfo = 'paymentHighlights'"
-                >
-                  back
-                </v-btn>
-                <!-- <v-btn
+                    <v-card-actions>
+                      <!-- <v-spacer></v-spacer> -->
+                      <v-btn
+                        color="green darken-1"
+                        text
+                        @click="pageInfo = 'paymentHighlights'"
+                      >
+                        back
+                      </v-btn>
+                      <!-- <v-btn
                 :disabled="isPayDisabled"
                 color="green darken-1"
                 text
@@ -191,1013 +210,1070 @@
               >
                 proceed
               </v-btn> -->
-              </v-card-actions>
-            </v-form>
-          </v-card>
+                    </v-card-actions>
+                  </v-form>
+                </v-card>
 
-          <!-- visaStart -->
-          <v-card v-show="pageInfo === 'visaStart'">
-            <v-card-title class="text-h6" style="background-color: #eeeeee">
-              Enter Card Information
-            </v-card-title>
-            <v-form ref="form03" v-model="validVisa" lazy-validation>
-              <v-card-text>
-                <div class="row">
-                  <div class="col-lg-6">
-                    <v-text-field
-                      v-model="cardnumber"
-                      :rules="numberRules"
-                      label="CARD NUMBER"
-                      required
-                      placeholder="46XX XXXX XXXX XXXX"
-                    ></v-text-field>
-                  </div>
-
-                  <div class="col-lg-6">
-                    <v-text-field
-                      v-model="month"
-                      :rules="monthRules"
-                      label="MM/YY"
-                      required
-                      placeholder="12/23"
-                    ></v-text-field>
-                  </div>
-
-                  <div class="col-lg-6">
-                    <v-text-field
-                      v-model="holder"
-                      label="CARD HOLDER"
-                      required
-                    ></v-text-field>
-                  </div>
-
-                  <div class="col-lg-6">
-                    <v-text-field
-                      type="password"
-                      v-model="cvc"
-                      :rules="cvcRules"
-                      label="CVV2(CVC2)"
-                      required
-                      placeholder="XXX"
-                    ></v-text-field>
-                  </div>
-                </div>
-              </v-card-text>
-
-              <v-card-actions>
-                <!-- <v-spacer></v-spacer> -->
-                <v-btn
-                  :disabled="true"
-                  color="green darken-1"
-                  text
-                  @click="pageInfo = 'paymentOptions'"
-                >
-                  back
-                </v-btn>
-                <v-btn
-                  :disabled="isVisaProceedDisabled"
-                  color="green darken-1"
-                  text
-                  @click="pageInfo = 'visaOTP'"
-                >
-                  proceed
-                </v-btn>
-              </v-card-actions>
-
-              <v-card-text>
-                <div style="padding: 5%">
-                  <strong style="color: grey">Notes:</strong>
-                  <ul>
-                    <li>
-                      Your entered card information could not be corrupted or
-                      become known to the third party, as all transmitted data
-                      is encrypted by the TLS protocol.
-                    </li>
-                    <li>
-                      For VISA, MC and NEXXUS, look at the back side of your
-                      card to find 3-digit CVV2/ CVC2/ CVN2.
-                    </li>
-                    <li>
-                      The cardholder's name should be entered just as it's
-                      written on the card.
-                    </li>
-                  </ul>
-                </div>
-              </v-card-text>
-            </v-form>
-          </v-card>
-
-          <!-- visaOTP -->
-          <v-card v-show="pageInfo === 'visaOTP'">
-            <v-card-title class="text-h6" style="background-color: #eeeeee">
-              {{ cardTitle }}
-            </v-card-title>
-            <v-form ref="form04" v-model="validVisaOTP" lazy-validation>
-              <v-card-text>
-                <v-simple-table light>
-                  <template v-slot:default>
-                    <tbody>
-                      <tr>
-                        <td>Merchant:</td>
-                        <td><strong>Amader Internet</strong></td>
-                      </tr>
-                      <tr>
-                        <td>Amount:</td>
-                        <td>
-                          <strong>BDT {{ amount }}</strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Date:</td>
-                        <td>
-                          <strong>{{ getToday }}</strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Card Number:</td>
-                        <td>
-                          <strong>
-                            **** **** **** {{ cardnumber.slice(12, 16) }}
-                          </strong>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>OTP:</td>
-                        <td>
+                <!-- visaStart -->
+                <v-card v-show="pageInfo === 'visaStart'">
+                  <v-card-title
+                    class="text-h6"
+                    style="background-color: #eeeeee"
+                  >
+                    Enter Card Information
+                  </v-card-title>
+                  <v-form ref="form03" v-model="validVisa" lazy-validation>
+                    <v-card-text>
+                      <div class="row">
+                        <div class="col-lg-6">
                           <v-text-field
-                            v-model="otp"
-                            :rules="otpRules"
-                            label="one time password"
+                            v-model="cardnumber"
+                            :rules="numberRules"
+                            label="CARD NUMBER"
+                            required
+                            placeholder="46XX XXXX XXXX XXXX"
+                          ></v-text-field>
+                        </div>
+
+                        <div class="col-lg-6">
+                          <v-text-field
+                            v-model="month"
+                            :rules="monthRules"
+                            label="MM/YY"
+                            required
+                            placeholder="12/23"
+                          ></v-text-field>
+                        </div>
+
+                        <div class="col-lg-6">
+                          <v-text-field
+                            v-model="holder"
+                            label="CARD HOLDER"
                             required
                           ></v-text-field>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <v-btn
-                            :disabled="otpFlag"
-                            color="deep-purple lighten-2"
-                            text
-                            small
-                            @click="resendOTP"
+                        </div>
+
+                        <div class="col-lg-6">
+                          <v-text-field
+                            type="password"
+                            v-model="cvc"
+                            :rules="cvcRules"
+                            label="CVV2(CVC2)"
+                            required
+                            placeholder="XXX"
+                          ></v-text-field>
+                        </div>
+                      </div>
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <!-- <v-spacer></v-spacer> -->
+                      <v-btn
+                        :disabled="true"
+                        color="green darken-1"
+                        text
+                        @click="pageInfo = 'paymentOptions'"
+                      >
+                        back
+                      </v-btn>
+                      <v-btn
+                        :disabled="isVisaProceedDisabled"
+                        color="green darken-1"
+                        text
+                        @click="pageInfo = 'visaOTP'"
+                      >
+                        proceed
+                      </v-btn>
+                    </v-card-actions>
+
+                    <v-card-text>
+                      <div style="padding: 5%">
+                        <strong style="color: grey">Notes:</strong>
+                        <ul>
+                          <li>
+                            Your entered card information could not be corrupted
+                            or become known to the third party, as all
+                            transmitted data is encrypted by the TLS protocol.
+                          </li>
+                          <li>
+                            For VISA, MC and NEXXUS, look at the back side of
+                            your card to find 3-digit CVV2/ CVC2/ CVN2.
+                          </li>
+                          <li>
+                            The cardholder's name should be entered just as it's
+                            written on the card.
+                          </li>
+                        </ul>
+                      </div>
+                    </v-card-text>
+                  </v-form>
+                </v-card>
+
+                <!-- visaOTP -->
+                <v-card v-show="pageInfo === 'visaOTP'">
+                  <v-card-title
+                    class="text-h6"
+                    style="background-color: #eeeeee"
+                  >
+                    {{ cardTitle }}
+                  </v-card-title>
+                  <v-form ref="form04" v-model="validVisaOTP" lazy-validation>
+                    <v-card-text>
+                      <v-simple-table light>
+                        <template v-slot:default>
+                          <tbody>
+                            <tr>
+                              <td>Merchant:</td>
+                              <td><strong>Amader Internet</strong></td>
+                            </tr>
+                            <tr>
+                              <td>Amount:</td>
+                              <td>
+                                <strong>BDT {{ amount }}</strong>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Date:</td>
+                              <td>
+                                <strong>{{ getToday }}</strong>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Card Number:</td>
+                              <td>
+                                <strong>
+                                  **** **** **** {{ cardnumber.slice(12, 16) }}
+                                </strong>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>OTP:</td>
+                              <td>
+                                <v-text-field
+                                  v-model="otp"
+                                  :rules="otpRules"
+                                  label="one time password"
+                                  required
+                                ></v-text-field>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <v-btn
+                                  :disabled="otpFlag"
+                                  color="deep-purple lighten-2"
+                                  text
+                                  small
+                                  @click="resendOTP"
+                                >
+                                  {{ resendOTPData }}
+                                </v-btn>
+                              </td>
+                              <!-- <br /> -->
+                              <td>
+                                <span v-if="otpFlag">
+                                  OTP Resent. Try again in {{ otpseconds }}s
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+
+                          <!-- <p id="demo"></p> -->
+                        </template>
+                      </v-simple-table>
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <!-- <v-spacer></v-spacer> -->
+                      <v-btn
+                        color="green darken-1"
+                        text
+                        @click="pageInfo = 'visaStart'"
+                      >
+                        back
+                      </v-btn>
+                      <v-btn
+                        :disabled="isVisaOTPDisabled"
+                        color="green darken-1"
+                        text
+                        @click="paymentDone"
+                      >
+                        Confirm
+                      </v-btn>
+                    </v-card-actions>
+                  </v-form>
+                </v-card>
+
+                <!-- bkashStart -->
+                <v-card
+                  style="background-color: white"
+                  v-show="pageInfo === 'bkashStart'"
+                >
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 3% 7%">
+                      <img
+                        padding
+                        src="https://raw.githubusercontent.com/Shipu/bkash-example/master/bkash_payment_logo.png"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
+                    <hr
+                      style="border: 2px solid #ff0000; border-radius: 15px"
+                    />
+
+                    <v-row style="padding: 0% 5%">
+                      <v-col>
+                        <strong>Amader Internet</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>Taka {{ amount }}</strong>
+                      </v-col>
+                    </v-row>
+                    <v-form ref="form05" v-model="validBkashNo" lazy-validation>
+                      <div style="background-color: #f21170; margin: 0">
+                        <p
+                          style="
+                      color: white;
+                      text-align: center;
+                      font-size: 15px;
+                      padding: 10% 0%;
+                    "
+                        >
+                          Your bKash Account number
+                        </p>
+
+                        <v-text-field
+                          style="
+                      margin: 0% 15%;
+                      padding: 0px 15px;
+                      background-color: #ffffff;
+                    "
+                          v-model="accntnumber"
+                          :rules="accntNoRules"
+                          required
+                          placeholder="e.g 01XXX XXXXXX"
+                        ></v-text-field>
+
+                        <p
+                          style="
+                      color: white;
+                      text-align: center;
+                      font-size: 11px;
+                      padding: 10% 0%;
+                    "
+                        >
+                          By clicking on Confirm, you are agreeing to the
+                          <a href="https://www.bkash.com/terms-of-use-checkout"
+                            >terms & conditions</a
                           >
-                            {{ resendOTPData }}
-                          </v-btn>
-                        </td>
-                        <!-- <br /> -->
-                        <td>
-                          <span v-if="otpFlag">
-                            OTP Resent. Try again in {{ otpseconds }}s
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
+                        </p>
+                      </div>
 
-                    <!-- <p id="demo"></p> -->
-                  </template>
-                </v-simple-table>
-              </v-card-text>
+                      <v-row>
+                        <v-col>
+                          <v-btn
+                            :disabled="true"
+                            text
+                            width="100%"
+                            @click="pageInfo = 'paymentOptions'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="accntnumber === '' || !validBkashNo"
+                            text
+                            width="100%"
+                            @click="pageInfo = 'bkashOTP'"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <v-row mb-50>
+                        <v-btn mb-50 text plain width="100%" color="error"
+                          ><v-icon>mdi-phone</v-icon> 16247
+                        </v-btn>
+                      </v-row>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
 
-              <v-card-actions>
-                <!-- <v-spacer></v-spacer> -->
-                <v-btn
-                  color="green darken-1"
-                  text
-                  @click="pageInfo = 'visaStart'"
+                <!-- bkashOTP -->
+                <v-card
+                  style="background-color: white"
+                  v-show="pageInfo === 'bkashOTP'"
                 >
-                  back
-                </v-btn>
-                <v-btn
-                  :disabled="isVisaOTPDisabled"
-                  color="green darken-1"
-                  text
-                  @click="paymentDone"
-                >
-                  Confirm
-                </v-btn>
-              </v-card-actions>
-            </v-form>
-          </v-card>
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 3% 7%">
+                      <img
+                        padding
+                        src="https://raw.githubusercontent.com/Shipu/bkash-example/master/bkash_payment_logo.png"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
+                    <hr
+                      style="border: 2px solid #ff0000; border-radius: 15px"
+                    />
 
-          <!-- bkashStart -->
-          <v-card
-            style="background-color: white"
-            v-show="pageInfo === 'bkashStart'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 3% 7%">
-                <img
-                  padding
-                  src="https://raw.githubusercontent.com/Shipu/bkash-example/master/bkash_payment_logo.png"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
-              <hr style="border: 2px solid #ff0000; border-radius: 15px" />
-
-              <v-row style="padding: 0% 5%">
-                <v-col>
-                  <strong>Amader Internet</strong>
-                </v-col>
-                <v-col>
-                  <strong>Taka {{ amount }}</strong>
-                </v-col>
-              </v-row>
-              <v-form ref="form05" v-model="validBkashNo" lazy-validation>
-                <div style="background-color: #f21170; margin: 0">
-                  <p
-                    style="
+                    <v-form ref="form06" v-model="validOTPNo" lazy-validation>
+                      <div style="background-color: #f21170; margin: 0">
+                        <p
+                          style="
                       color: white;
                       text-align: center;
                       font-size: 15px;
                       padding: 10% 0%;
                     "
-                  >
-                    Your bKash Account number
-                  </p>
+                        >
+                          Enter verification code sent to
+                          {{ accntnumber.slice(0, 3) }} ** ***
+                          {{ accntnumber.slice(8, 11) }}
+                        </p>
 
-                  <v-text-field
-                    style="
+                        <v-text-field
+                          style="
                       margin: 0% 15%;
                       padding: 0px 15px;
                       background-color: #ffffff;
                     "
-                    v-model="accntnumber"
-                    :rules="accntNoRules"
-                    required
-                    placeholder="e.g 01XXX XXXXXX"
-                  ></v-text-field>
+                          v-model="otpnumber"
+                          :rules="otpMRules"
+                          required
+                          placeholder="Verification Code"
+                        ></v-text-field>
 
-                  <p
-                    style="
+                        <p
+                          style="
                       color: white;
                       text-align: center;
                       font-size: 11px;
                       padding: 10% 0%;
                     "
-                  >
-                    By clicking on Confirm, you are agreeing to the
-                    <a href="https://www.bkash.com/terms-of-use-checkout"
-                      >terms & conditions</a
-                    >
-                  </p>
-                </div>
+                        >
+                          Didn't receive code?
+                          <strong
+                            style="text-decoration:underline"
+                            @click="resendTextSet"
+                            >Resend code</strong
+                          >
+                          <br /><strong>{{ resendText }}</strong>
+                        </p>
+                      </div>
 
-                <v-row>
-                  <v-col>
-                    <v-btn
-                      :disabled="true"
-                      text
-                      width="100%"
-                      @click="pageInfo = 'paymentOptions'"
-                      >back</v-btn
-                    >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="accntnumber === '' || !validBkashNo"
-                      text
-                      width="100%"
-                      @click="pageInfo = 'bkashOTP'"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <v-row mb-50>
-                  <v-btn mb-50 text plain width="100%" color="error"
-                    ><v-icon>mdi-phone</v-icon> 16247
-                  </v-btn>
-                </v-row>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
+                      <v-row>
+                        <v-col>
+                          <v-btn
+                            text
+                            width="100%"
+                            @click="pageInfo = 'bkashStart'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="otpnumber === '' || !validOTPNo"
+                            text
+                            width="100%"
+                            @click="pageInfo = 'bkashPIN'"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <v-row mb-50>
+                        <v-btn mb-50 text plain width="100%" color="error"
+                          ><v-icon>mdi-phone</v-icon> 16247
+                        </v-btn>
+                      </v-row>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
 
-          <!-- bkashOTP -->
-          <v-card
-            style="background-color: white"
-            v-show="pageInfo === 'bkashOTP'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 3% 7%">
-                <img
-                  padding
-                  src="https://raw.githubusercontent.com/Shipu/bkash-example/master/bkash_payment_logo.png"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
-              <hr style="border: 2px solid #ff0000; border-radius: 15px" />
+                <!-- bkashPIN -->
+                <v-card
+                  style="background-color: white"
+                  v-show="pageInfo === 'bkashPIN'"
+                >
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 3% 7%">
+                      <img
+                        padding
+                        src="https://raw.githubusercontent.com/Shipu/bkash-example/master/bkash_payment_logo.png"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
+                    <hr
+                      style="border: 2px solid #ff0000; border-radius: 15px"
+                    />
 
-              <v-form ref="form06" v-model="validOTPNo" lazy-validation>
-                <div style="background-color: #f21170; margin: 0">
-                  <p
-                    style="
-                      color: white;
-                      text-align: center;
-                      font-size: 15px;
-                      padding: 10% 0%;
-                    "
-                  >
-                    Enter verification code sent to
-                    {{ accntnumber.slice(0, 3) }} ** ***
-                    {{ accntnumber.slice(8, 11) }}
-                  </p>
-
-                  <v-text-field
-                    style="
-                      margin: 0% 15%;
-                      padding: 0px 15px;
-                      background-color: #ffffff;
-                    "
-                    v-model="otpnumber"
-                    :rules="otpMRules"
-                    required
-                    placeholder="Verification Code"
-                  ></v-text-field>
-
-                  <p
-                    style="
-                      color: white;
-                      text-align: center;
-                      font-size: 11px;
-                      padding: 10% 0%;
-                    "
-                  >
-                    Didn't receive code?
-                    <strong
-                      style="text-decoration:underline"
-                      @click="resendTextSet"
-                      >Resend code</strong
-                    >
-                    <br /><strong>{{ resendText }}</strong>
-                  </p>
-                </div>
-
-                <v-row>
-                  <v-col>
-                    <v-btn text width="100%" @click="pageInfo = 'bkashStart'"
-                      >back</v-btn
-                    >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="otpnumber === '' || !validOTPNo"
-                      text
-                      width="100%"
-                      @click="pageInfo = 'bkashPIN'"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <v-row mb-50>
-                  <v-btn mb-50 text plain width="100%" color="error"
-                    ><v-icon>mdi-phone</v-icon> 16247
-                  </v-btn>
-                </v-row>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
-
-          <!-- bkashPIN -->
-          <v-card
-            style="background-color: white"
-            v-show="pageInfo === 'bkashPIN'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 3% 7%">
-                <img
-                  padding
-                  src="https://raw.githubusercontent.com/Shipu/bkash-example/master/bkash_payment_logo.png"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
-              <hr style="border: 2px solid #ff0000; border-radius: 15px" />
-
-              <v-form ref="form07" v-model="validPINNo" lazy-validation>
-                <div style="background-color: #f21170; margin: 0">
-                  <p
-                    style="
+                    <v-form ref="form07" v-model="validPINNo" lazy-validation>
+                      <div style="background-color: #f21170; margin: 0">
+                        <p
+                          style="
                       color: white;
                       text-align: center;
                       font-size: 15px;
                       padding: 10% 0% 5%;
                     "
-                  >
-                    Enter PIN of your bKash Account number
-                    {{ accntnumber.slice(0, 3) }} ** ***
-                    {{ accntnumber.slice(8, 11) }}
-                  </p>
+                        >
+                          Enter PIN of your bKash Account number
+                          {{ accntnumber.slice(0, 3) }} ** ***
+                          {{ accntnumber.slice(8, 11) }}
+                        </p>
 
-                  <v-text-field
-                    style="
+                        <v-text-field
+                          style="
                       margin: 0% 15% 5%;
                       padding: 0px 15px;
                       background-color: #ffffff;
                     "
-                    v-model="pin"
-                    :rules="pinMRules"
-                    required
-                    :type="showPIN ? 'text' : 'password'"
-                    placeholder="PIN Number"
-                  ></v-text-field>
-                  <p style="color: #f21170;">asdasdd</p>
-                </div>
+                          v-model="pin"
+                          :rules="pinMRules"
+                          required
+                          :type="showPIN ? 'text' : 'password'"
+                          placeholder="PIN Number"
+                        ></v-text-field>
+                        <p style="color: #f21170;">asdasdd</p>
+                      </div>
 
-                <v-row>
-                  <v-col>
-                    <v-btn text width="100%" @click="pageInfo = 'bkashOTP'"
-                      >back</v-btn
-                    >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="pin === '' || !validPINNo"
-                      text
-                      width="100%"
-                      @click="paymentDone"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <v-row mb-50>
-                  <v-btn mb-50 text plain width="100%" color="error"
-                    ><v-icon>mdi-phone</v-icon> 16247
-                  </v-btn>
-                </v-row>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
+                      <v-row>
+                        <v-col>
+                          <v-btn
+                            text
+                            width="100%"
+                            @click="pageInfo = 'bkashOTP'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="pin === '' || !validPINNo"
+                            text
+                            width="100%"
+                            @click="paymentDone"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <v-row mb-50>
+                        <v-btn mb-50 text plain width="100%" color="error"
+                          ><v-icon>mdi-phone</v-icon> 16247
+                        </v-btn>
+                      </v-row>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
 
-          <!-- nagadStart -->
-          <v-card
-            style="background-color: #8E1417"
-            v-show="pageInfo === 'nagadStart'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 7%">
-                <img
-                  padding
-                  src="../../assets/nagad.png"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
+                <!-- nagadStart -->
+                <v-card
+                  style="background-color: #8E1417"
+                  v-show="pageInfo === 'nagadStart'"
+                >
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 7%">
+                      <img
+                        padding
+                        src="../../assets/nagad.png"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
 
-              <v-row style="padding-left:15%; color:#CCCCC6">
-                <v-col cols="4">
-                  <strong>Total Amount:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT {{ amount }}</strong>
-                </v-col>
-              </v-row>
-              <v-row style="padding-left:15%; color:#CCCCC6">
-                <v-col cols="4">
-                  <strong>Charge:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT 0</strong>
-                </v-col>
-              </v-row>
-              <v-form ref="form08" v-model="validNagadNo" lazy-validation>
-                <div style=" margin: 0">
-                  <p
-                    style="
+                    <v-row style="padding-left:15%; color:#CCCCC6">
+                      <v-col cols="4">
+                        <strong>Total Amount:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT {{ amount }}</strong>
+                      </v-col>
+                    </v-row>
+                    <v-row style="padding-left:15%; color:#CCCCC6">
+                      <v-col cols="4">
+                        <strong>Charge:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT 0</strong>
+                      </v-col>
+                    </v-row>
+                    <v-form ref="form08" v-model="validNagadNo" lazy-validation>
+                      <div style=" margin: 0">
+                        <p
+                          style="
                       color: #CCCCC6;
                       text-align: center;
                       padding: 5% 0% 5%;
                     "
-                  >
-                    <strong>Your Nagad Account Number</strong>
-                  </p>
+                        >
+                          <strong>Your Nagad Account Number</strong>
+                        </p>
 
-                  <v-text-field
-                    style="
+                        <v-text-field
+                          style="
                       margin: 0% 15%;
                       padding: 0px 15px;
                       background-color: #ffffff;
                     "
-                    v-model="accntnumber"
-                    :rules="accntNoRules"
-                    required
-                    placeholder="e.g 01XXX XXXXXX"
-                  ></v-text-field>
+                          v-model="accntnumber"
+                          :rules="accntNoRules"
+                          required
+                          placeholder="e.g 01XXX XXXXXX"
+                        ></v-text-field>
 
-                  <v-row style="color: #CCCCC6;padding:5% 0% 0% 10%">
-                    <v-checkbox
-                      v-model="tcNagad"
-                      label="I agree to the terms and conditions"
+                        <v-row style="color: #CCCCC6;padding:5% 0% 0% 10%">
+                          <v-checkbox
+                            v-model="tcNagad"
+                            label="I agree to the terms and conditions"
+                          >
+                          </v-checkbox>
+                        </v-row>
+                      </div>
+
+                      <v-row style="padding:0% 5%">
+                        <v-col>
+                          <v-btn
+                            :disabled="true"
+                            width="50%"
+                            @click="pageInfo = 'paymentOptions'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="
+                              accntnumber === '' || !validNagadNo || !tcNagad
+                            "
+                            width="50%"
+                            @click="pageInfo = 'nagadOTP'"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <div style="text-align: center; padding: 7%">
+                        <img
+                          padding
+                          src="../../assets/nagad2.png"
+                          width="80%"
+                          alt="bkash payment"
+                        />
+                      </div>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
+
+                <!-- nagadOTP -->
+                <v-card
+                  style="background-color: #8E1417"
+                  v-show="pageInfo === 'nagadOTP'"
+                >
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 7%">
+                      <img
+                        padding
+                        src="../../assets/nagad.png"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
+
+                    <v-row style="padding-left:15%; color:#CCCCC6">
+                      <v-col cols="4">
+                        <strong>Total Amount:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT {{ amount }}</strong>
+                      </v-col>
+                    </v-row>
+                    <v-row style="padding-left:15%; color:#CCCCC6">
+                      <v-col cols="4">
+                        <strong>Charge:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT 0</strong>
+                      </v-col>
+                    </v-row>
+                    <v-form
+                      ref="form09"
+                      v-model="validNagadOTP"
+                      lazy-validation
                     >
-                    </v-checkbox>
-                  </v-row>
-                </div>
-
-                <v-row style="padding:0% 5%">
-                  <v-col>
-                    <v-btn
-                      :disabled="true"
-                      width="50%"
-                      @click="pageInfo = 'paymentOptions'"
-                      >back</v-btn
-                    >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="
-                        accntnumber === '' || !validNagadNo || !tcNagad
-                      "
-                      width="50%"
-                      @click="pageInfo = 'nagadOTP'"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <div style="text-align: center; padding: 7%">
-                  <img
-                    padding
-                    src="../../assets/nagad2.png"
-                    width="80%"
-                    alt="bkash payment"
-                  />
-                </div>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
-
-          <!-- nagadOTP -->
-          <v-card
-            style="background-color: #8E1417"
-            v-show="pageInfo === 'nagadOTP'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 7%">
-                <img
-                  padding
-                  src="../../assets/nagad.png"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
-
-              <v-row style="padding-left:15%; color:#CCCCC6">
-                <v-col cols="4">
-                  <strong>Total Amount:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT {{ amount }}</strong>
-                </v-col>
-              </v-row>
-              <v-row style="padding-left:15%; color:#CCCCC6">
-                <v-col cols="4">
-                  <strong>Charge:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT 0</strong>
-                </v-col>
-              </v-row>
-              <v-form ref="form09" v-model="validNagadOTP" lazy-validation>
-                <div style=" margin: 0">
-                  <p
-                    style="
+                      <div style=" margin: 0">
+                        <p
+                          style="
                       color: #CCCCC6;
                       text-align: center;
                       padding: 5% 0% 5%;
                     "
-                  >
-                    <strong
-                      >Enter verification code sent to
-                      {{ accntnumber.slice(0, 3) }} ** ***
-                      {{ accntnumber.slice(8, 11) }}</strong
-                    >
-                  </p>
+                        >
+                          <strong
+                            >Enter verification code sent to
+                            {{ accntnumber.slice(0, 3) }} ** ***
+                            {{ accntnumber.slice(8, 11) }}</strong
+                          >
+                        </p>
 
-                  <v-text-field
-                    style="
+                        <v-text-field
+                          style="
                       margin: 0% 15%;
                       padding: 0px 15px;
                       background-color: #ffffff;
                     "
-                    v-model="otpnumber"
-                    :rules="otpMRules"
-                    required
-                    placeholder="Verification Number"
-                  ></v-text-field>
-                </div>
+                          v-model="otpnumber"
+                          :rules="otpMRules"
+                          required
+                          placeholder="Verification Number"
+                        ></v-text-field>
+                      </div>
 
-                <p
-                  style="
+                      <p
+                        style="
                       color: #CCCCC6;
                       text-align: center;
                       font-size: 11px;
                       padding: 4% 0%;
                     "
+                      >
+                        Didn't receive code?
+                        <strong
+                          style="text-decoration:underline"
+                          @click="resendTextSet"
+                          >Resend code</strong
+                        >
+                        <br /><strong>{{ resendText }}</strong>
+                      </p>
+
+                      <v-row style="padding:0% 5%">
+                        <v-col>
+                          <v-btn width="50%" @click="pageInfo = 'nagadStart'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="otpnumber === '' || !validNagadOTP"
+                            width="50%"
+                            @click="pageInfo = 'nagadPIN'"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <div style="text-align: center; padding: 7%">
+                        <img
+                          padding
+                          src="../../assets/nagad2.png"
+                          width="80%"
+                          alt="bkash payment"
+                        />
+                      </div>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
+
+                <!-- nagadPIN -->
+                <v-card
+                  style="background-color: #8E1417"
+                  v-show="pageInfo === 'nagadPIN'"
                 >
-                  Didn't receive code?
-                  <strong
-                    style="text-decoration:underline"
-                    @click="resendTextSet"
-                    >Resend code</strong
-                  >
-                  <br /><strong>{{ resendText }}</strong>
-                </p>
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 7%">
+                      <img
+                        padding
+                        src="../../assets/nagad.png"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
 
-                <v-row style="padding:0% 5%">
-                  <v-col>
-                    <v-btn width="50%" @click="pageInfo = 'nagadStart'"
-                      >back</v-btn
+                    <v-row style="padding-left:15%; color:#CCCCC6">
+                      <v-col cols="4">
+                        <strong>Total Amount:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT {{ amount }}</strong>
+                      </v-col>
+                    </v-row>
+                    <v-row style="padding-left:15%; color:#CCCCC6">
+                      <v-col cols="4">
+                        <strong>Charge:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT 0</strong>
+                      </v-col>
+                    </v-row>
+                    <v-form
+                      ref="form10"
+                      v-model="validNagadPIN"
+                      lazy-validation
                     >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="otpnumber === '' || !validNagadOTP"
-                      width="50%"
-                      @click="pageInfo = 'nagadPIN'"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <div style="text-align: center; padding: 7%">
-                  <img
-                    padding
-                    src="../../assets/nagad2.png"
-                    width="80%"
-                    alt="bkash payment"
-                  />
-                </div>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
-
-          <!-- nagadPIN -->
-          <v-card
-            style="background-color: #8E1417"
-            v-show="pageInfo === 'nagadPIN'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 7%">
-                <img
-                  padding
-                  src="../../assets/nagad.png"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
-
-              <v-row style="padding-left:15%; color:#CCCCC6">
-                <v-col cols="4">
-                  <strong>Total Amount:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT {{ amount }}</strong>
-                </v-col>
-              </v-row>
-              <v-row style="padding-left:15%; color:#CCCCC6">
-                <v-col cols="4">
-                  <strong>Charge:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT 0</strong>
-                </v-col>
-              </v-row>
-              <v-form ref="form10" v-model="validNagadPIN" lazy-validation>
-                <div style=" margin: 0">
-                  <p
-                    style="
+                      <div style=" margin: 0">
+                        <p
+                          style="
                       color: #CCCCC6;
                       text-align: center;
                       padding: 5% 0% 5%;
                     "
-                  >
-                    <strong
-                      >Enter PIN of your Nagad Account number
-                      {{ accntnumber.slice(0, 3) }} ** ***
-                      {{ accntnumber.slice(8, 11) }}</strong
-                    >
-                  </p>
+                        >
+                          <strong
+                            >Enter PIN of your Nagad Account number
+                            {{ accntnumber.slice(0, 3) }} ** ***
+                            {{ accntnumber.slice(8, 11) }}</strong
+                          >
+                        </p>
 
-                  <v-text-field
-                    style="
+                        <v-text-field
+                          style="
                       margin: 0% 15%;
                       padding: 0px 15px;
                       background-color: #ffffff;
                     "
-                    v-model="pin"
-                    :rules="pinMRules"
-                    required
-                    placeholder="PIN Number"
-                  ></v-text-field>
-                </div>
+                          v-model="pin"
+                          :rules="pinMRules"
+                          required
+                          placeholder="PIN Number"
+                        ></v-text-field>
+                      </div>
 
-                <v-row style="padding:10% 5% 0%">
-                  <v-col>
-                    <v-btn width="50%" @click="pageInfo = 'nagadOTP'"
-                      >back</v-btn
-                    >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="pin === '' || !validNagadPIN"
-                      width="50%"
-                      @click="paymentDone"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <div style="text-align: center; padding: 7%">
-                  <img
-                    padding
-                    src="../../assets/nagad2.png"
-                    width="80%"
-                    alt="bkash payment"
-                  />
-                </div>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
+                      <v-row style="padding:10% 5% 0%">
+                        <v-col>
+                          <v-btn width="50%" @click="pageInfo = 'nagadOTP'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="pin === '' || !validNagadPIN"
+                            width="50%"
+                            @click="paymentDone"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <div style="text-align: center; padding: 7%">
+                        <img
+                          padding
+                          src="../../assets/nagad2.png"
+                          width="80%"
+                          alt="bkash payment"
+                        />
+                      </div>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
 
-          <!-- rocketStart -->
-          <v-card
-            style="background-color: #790280"
-            v-show="pageInfo === 'rocketStart'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 7%">
-                <img
-                  padding
-                  src="https://futurestartup.com/wp-content/uploads/2016/09/DBBL-Mobile-Banking-Becomes-Rocket.jpg"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
+                <!-- rocketStart -->
+                <v-card
+                  style="background-color: #790280"
+                  v-show="pageInfo === 'rocketStart'"
+                >
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 7%">
+                      <img
+                        padding
+                        src="https://futurestartup.com/wp-content/uploads/2016/09/DBBL-Mobile-Banking-Becomes-Rocket.jpg"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
 
-              <v-row style="padding-left:15%; color:#ffffff">
-                <v-col cols="4">
-                  <strong>Total Amount:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT {{ amount }}</strong>
-                </v-col>
-              </v-row>
-              <v-row style="padding-left:15%; color:#ffffff">
-                <v-col cols="4">
-                  <strong>Charge:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT 0</strong>
-                </v-col>
-              </v-row>
-              <v-form ref="form11" v-model="validNagadNo" lazy-validation>
-                <div style=" margin: 0">
-                  <p
-                    style="
+                    <v-row style="padding-left:15%; color:#ffffff">
+                      <v-col cols="4">
+                        <strong>Total Amount:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT {{ amount }}</strong>
+                      </v-col>
+                    </v-row>
+                    <v-row style="padding-left:15%; color:#ffffff">
+                      <v-col cols="4">
+                        <strong>Charge:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT 0</strong>
+                      </v-col>
+                    </v-row>
+                    <v-form ref="form11" v-model="validNagadNo" lazy-validation>
+                      <div style=" margin: 0">
+                        <p
+                          style="
                       color: #ffffff;
                       text-align: center;
                       padding: 5% 0% 5%;
                     "
-                  >
-                    <strong>Your Rocket Account Number</strong>
-                  </p>
+                        >
+                          <strong>Your Rocket Account Number</strong>
+                        </p>
 
-                  <v-text-field
-                    style="
+                        <v-text-field
+                          style="
                       margin: 0% 15%;
                       padding: 0px 15px;
                       background-color: #ffffff;
                     "
-                    v-model="accntnumber"
-                    :rules="accntNoRules"
-                    required
-                    placeholder="e.g 01XXX XXXXXX"
-                  ></v-text-field>
+                          v-model="accntnumber"
+                          :rules="accntNoRules"
+                          required
+                          placeholder="e.g 01XXX XXXXXX"
+                        ></v-text-field>
 
-                  <v-row style="color: #ffffff;padding:5% 0% 0% 10%">
-                    <v-checkbox
-                      v-model="tcRocket"
-                      label="I agree to the terms and conditions"
+                        <v-row style="color: #ffffff;padding:5% 0% 0% 10%">
+                          <v-checkbox
+                            v-model="tcRocket"
+                            label="I agree to the terms and conditions"
+                          >
+                          </v-checkbox>
+                        </v-row>
+                      </div>
+
+                      <v-row style="padding:0% 10%">
+                        <v-col>
+                          <v-btn
+                            :disabled="true"
+                            width="50%"
+                            @click="pageInfo = 'paymentOptions'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="
+                              accntnumber === '' || !validNagadNo || !tcRocket
+                            "
+                            width="50%"
+                            @click="pageInfo = 'rocketOTP'"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
+
+                <!-- rocketOTP -->
+                <v-card
+                  style="background-color: #790280"
+                  v-show="pageInfo === 'rocketOTP'"
+                >
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 7%">
+                      <img
+                        padding
+                        src="https://futurestartup.com/wp-content/uploads/2016/09/DBBL-Mobile-Banking-Becomes-Rocket.jpg"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
+
+                    <v-row style="padding-left:15%; color:#ffffff">
+                      <v-col cols="4">
+                        <strong>Total Amount:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT {{ amount }}</strong>
+                      </v-col>
+                    </v-row>
+                    <v-row style="padding-left:15%; color:#ffffff">
+                      <v-col cols="4">
+                        <strong>Charge:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT 0</strong>
+                      </v-col>
+                    </v-row>
+                    <v-form
+                      ref="form12"
+                      v-model="validNagadOTP"
+                      lazy-validation
                     >
-                    </v-checkbox>
-                  </v-row>
-                </div>
-
-                <v-row style="padding:0% 10%">
-                  <v-col>
-                    <v-btn
-                      :disabled="true"
-                      width="50%"
-                      @click="pageInfo = 'paymentOptions'"
-                      >back</v-btn
-                    >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="
-                        accntnumber === '' || !validNagadNo || !tcRocket
-                      "
-                      width="50%"
-                      @click="pageInfo = 'rocketOTP'"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
-
-          <!-- rocketOTP -->
-          <v-card
-            style="background-color: #790280"
-            v-show="pageInfo === 'rocketOTP'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 7%">
-                <img
-                  padding
-                  src="https://futurestartup.com/wp-content/uploads/2016/09/DBBL-Mobile-Banking-Becomes-Rocket.jpg"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
-
-              <v-row style="padding-left:15%; color:#ffffff">
-                <v-col cols="4">
-                  <strong>Total Amount:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT {{ amount }}</strong>
-                </v-col>
-              </v-row>
-              <v-row style="padding-left:15%; color:#ffffff">
-                <v-col cols="4">
-                  <strong>Charge:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT 0</strong>
-                </v-col>
-              </v-row>
-              <v-form ref="form12" v-model="validNagadOTP" lazy-validation>
-                <div style=" margin: 0">
-                  <p
-                    style="
+                      <div style=" margin: 0">
+                        <p
+                          style="
                       color: #ffffff;
                       text-align: center;
                       padding: 5% 0% 5%;
                     "
-                  >
-                    <strong
-                      >Enter verification code sent to
-                      {{ accntnumber.slice(0, 3) }} ** ***
-                      {{ accntnumber.slice(8, 11) }}</strong
-                    >
-                  </p>
+                        >
+                          <strong
+                            >Enter verification code sent to
+                            {{ accntnumber.slice(0, 3) }} ** ***
+                            {{ accntnumber.slice(8, 11) }}</strong
+                          >
+                        </p>
 
-                  <v-text-field
-                    style="
+                        <v-text-field
+                          style="
                       margin: 0% 15%;
                       padding: 0px 15px;
                       background-color: #ffffff;
                     "
-                    v-model="otpnumber"
-                    :rules="otpMRules"
-                    required
-                    placeholder="Verification Number"
-                  ></v-text-field>
-                </div>
+                          v-model="otpnumber"
+                          :rules="otpMRules"
+                          required
+                          placeholder="Verification Number"
+                        ></v-text-field>
+                      </div>
 
-                <p
-                  style="
+                      <p
+                        style="
                       color: #ffffff;
                       text-align: center;
                       font-size: 11px;
                       padding: 4% 0%;
                     "
+                      >
+                        Didn't receive code?
+                        <strong
+                          style="text-decoration:underline"
+                          @click="resendTextSet"
+                          >Resend code</strong
+                        >
+                        <br /><strong>{{ resendText }}</strong>
+                      </p>
+
+                      <v-row style="padding:0% 5%">
+                        <v-col>
+                          <v-btn width="50%" @click="pageInfo = 'rocketStart'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="otpnumber === '' || !validNagadOTP"
+                            width="50%"
+                            @click="pageInfo = 'rocketPIN'"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
+
+                <!-- rocketPIN -->
+                <v-card
+                  style="background-color: #790280"
+                  v-show="pageInfo === 'rocketPIN'"
                 >
-                  Didn't receive code?
-                  <strong
-                    style="text-decoration:underline"
-                    @click="resendTextSet"
-                    >Resend code</strong
-                  >
-                  <br /><strong>{{ resendText }}</strong>
-                </p>
+                  <v-img height="100%">
+                    <div style="text-align: center; padding: 7%">
+                      <img
+                        padding
+                        src="https://futurestartup.com/wp-content/uploads/2016/09/DBBL-Mobile-Banking-Becomes-Rocket.jpg"
+                        width="80%"
+                        alt="bkash payment"
+                      />
+                    </div>
 
-                <v-row style="padding:0% 5%">
-                  <v-col>
-                    <v-btn width="50%" @click="pageInfo = 'rocketStart'"
-                      >back</v-btn
+                    <v-row style="padding-left:15%; color:#ffffff">
+                      <v-col cols="4">
+                        <strong>Total Amount:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT {{ amount }}</strong>
+                      </v-col>
+                    </v-row>
+                    <v-row style="padding-left:15%; color:#ffffff">
+                      <v-col cols="4">
+                        <strong>Charge:</strong>
+                      </v-col>
+                      <v-col>
+                        <strong>BDT 0</strong>
+                      </v-col>
+                    </v-row>
+                    <v-form
+                      ref="form13"
+                      v-model="validNagadPIN"
+                      lazy-validation
                     >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="otpnumber === '' || !validNagadOTP"
-                      width="50%"
-                      @click="pageInfo = 'rocketPIN'"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
-
-          <!-- rocketPIN -->
-          <v-card
-            style="background-color: #790280"
-            v-show="pageInfo === 'rocketPIN'"
-          >
-            <v-img height="100%">
-              <div style="text-align: center; padding: 7%">
-                <img
-                  padding
-                  src="https://futurestartup.com/wp-content/uploads/2016/09/DBBL-Mobile-Banking-Becomes-Rocket.jpg"
-                  width="80%"
-                  alt="bkash payment"
-                />
-              </div>
-
-              <v-row style="padding-left:15%; color:#ffffff">
-                <v-col cols="4">
-                  <strong>Total Amount:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT {{ amount }}</strong>
-                </v-col>
-              </v-row>
-              <v-row style="padding-left:15%; color:#ffffff">
-                <v-col cols="4">
-                  <strong>Charge:</strong>
-                </v-col>
-                <v-col>
-                  <strong>BDT 0</strong>
-                </v-col>
-              </v-row>
-              <v-form ref="form13" v-model="validNagadPIN" lazy-validation>
-                <div style=" margin: 0">
-                  <p
-                    style="
+                      <div style=" margin: 0">
+                        <p
+                          style="
                       color: #ffffff;
                       text-align: center;
                       padding: 5% 0% 5%;
                     "
-                  >
-                    <strong
-                      >Enter PIN of your Rocket Account number
-                      {{ accntnumber.slice(0, 3) }} ** ***
-                      {{ accntnumber.slice(8, 11) }}</strong
-                    >
-                  </p>
+                        >
+                          <strong
+                            >Enter PIN of your Rocket Account number
+                            {{ accntnumber.slice(0, 3) }} ** ***
+                            {{ accntnumber.slice(8, 11) }}</strong
+                          >
+                        </p>
 
-                  <v-text-field
-                    style="
+                        <v-text-field
+                          style="
                       margin: 0% 15%;
                       padding: 0px 15px;
                       background-color: #ffffff;
                     "
-                    v-model="pin"
-                    :rules="pinMRules"
-                    required
-                    placeholder="PIN Number"
-                  ></v-text-field>
-                </div>
+                          v-model="pin"
+                          :rules="pinMRules"
+                          :type="showPIN ? 'text' : 'password'"
+                          required
+                          placeholder="PIN Number"
+                        ></v-text-field>
+                      </div>
 
-                <v-row style="padding:10% 5% 0%">
-                  <v-col>
-                    <v-btn width="50%" @click="pageInfo = 'rocketOTP'"
-                      >back</v-btn
-                    >
-                  </v-col>
-                  <v-col>
-                    <v-btn
-                      :disabled="pin === '' || !validNagadPIN"
-                      width="50%"
-                      @click="paymentDone"
-                      >Confirm</v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <v-row><p></p></v-row>
-              </v-form>
-            </v-img>
-          </v-card>
-        </v-dialog>
+                      <v-row style="padding:10% 5% 0%">
+                        <v-col>
+                          <v-btn width="50%" @click="pageInfo = 'rocketOTP'"
+                            >back</v-btn
+                          >
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="pin === '' || !validNagadPIN"
+                            width="50%"
+                            @click="paymentDone"
+                            >Confirm</v-btn
+                          >
+                        </v-col>
+                      </v-row>
+                      <v-row><p></p></v-row>
+                    </v-form>
+                  </v-img>
+                </v-card>
+              </v-dialog>
 
-        <v-snackbar :value="showSnackbar">
-          Payment Successful
-        </v-snackbar>
-      </v-row>
+              <v-snackbar :value="showSnackbar">
+                Payment Successful
+              </v-snackbar>
+            </v-row>
+          </v-tab-item>
+
+          <!-- my payments -->
+          <v-tab-item>
+            <!-- loading own payments -->
+            <v-card>
+              <v-card-title>
+                <v-text-field
+                  v-model="searchOwn"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-card-title>
+              <v-data-table
+                :loading="isLoadingOwn"
+                loading-text="Loading... Please wait"
+                :headers="headersOwn"
+                :items="itemsOwn"
+                :search="searchOwn"
+              ></v-data-table>
+            </v-card>
+          </v-tab-item>
+        </v-tabs>
+      </v-card>
     </div>
-
-    <!-- <v-snackbar :value="showSnackbar" style="margin: auto">
-      Payment Successful
-    </v-snackbar> -->
 
     <bottombar></bottombar>
   </div>
@@ -1226,6 +1302,8 @@ export default {
 
   data() {
     return {
+      isLoadingPayNow: true,
+
       isLoadingOwn: true,
       searchOwn: "",
       headersOwn: [
@@ -1345,6 +1423,7 @@ export default {
 
   computed: {
     ...mapGetters([
+      "getUserID",
       "getUserData",
       "getSelectedPkg",
       // "getAuthToken",
@@ -1389,15 +1468,15 @@ export default {
   },
 
   mounted() {
+    console.log(this.getUserData);
+
     this.fetchAllOffers();
     this.fetchOwnPayments();
-    this.fetchUserPayments();
+    this.fetchOwnPackages();
 
     if (this.getSelectedPkg) {
       this.pageInfo = "paymentHighlights";
       this.dialog = true;
-    } else if (this.getUserData.packages.length) {
-      this.fetchOwnPackages();
     }
 
     console.log(this.getSelectedPkg);
@@ -1407,29 +1486,10 @@ export default {
   methods: {
     ...mapMutations(["setUserData", "setSelectedPkg"]),
 
-    fetchOwnData() {
-      axios
-        .post("/api/user/fetchOwnData", {
-          id: this.getUserData._id,
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            // console.log(res.data);
-            this.setUserData(res.data);
-            // console.log(this.userData);
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
     fetchOwnPackages() {
       axios
         .post("/api/user/fetchOwnPackageArray", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);
@@ -1448,7 +1508,7 @@ export default {
     fetchAllOffers() {
       axios
         .post("/api/offer/fetchByQuery", {
-          creator: "Nttn",
+          creator: this.getUserData.ispId,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -1475,7 +1535,7 @@ export default {
       this.isLoadingOwn = true;
       axios
         .post("/api/payment/fetchIspOwnPayment", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           // console.log(res);
@@ -1483,27 +1543,6 @@ export default {
             // console.log(res.data);
             this.itemsOwn = res.data;
             this.isLoadingOwn = false;
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    fetchUserPayments() {
-      this.isLoadingUsers = true;
-      axios
-        .post("/api/payment/fetchAllUserOfIspPayment", {
-          id: this.getUserData._id,
-        })
-        .then((res) => {
-          console.log(res);
-          if (res.status === 200) {
-            // console.log(res.data);
-            this.itemsUsers = res.data;
-            this.isLoadingUsers = false;
           } else {
             this.error = true;
           }
@@ -1526,7 +1565,7 @@ export default {
         .post("/api/payment/insert", {
           user_type: 2, // for ISP
           package_id: this.getSelectedPkg._id,
-          isp_id: this.getUserData._id,
+          isp_id: this.getUserID,
           gateway: this.cardTitle,
           transaction_id: Math.random()
             .toString(36)

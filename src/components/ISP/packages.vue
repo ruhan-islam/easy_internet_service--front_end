@@ -209,7 +209,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserData"]),
+    ...mapGetters(["getUserID", "getUserData"]),
 
     isSubmitDisabled() {
       // return !(
@@ -245,7 +245,7 @@ export default {
     fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
-          id: this.getUserData._id,
+          id: this.getUserID,
         })
         .then((res) => {
           if (res.status === 200) {
