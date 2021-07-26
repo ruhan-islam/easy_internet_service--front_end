@@ -56,6 +56,8 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-col>
+        </v-expansion-panels>
+        <v-expansion-panels>
           <v-col>
             Bandwidth Range:
             <v-expansion-panel>
