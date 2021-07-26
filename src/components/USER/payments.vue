@@ -1544,7 +1544,7 @@ export default {
           // console.log(res);
           if (res.status === 200) {
             // console.log(res.data);
-            this.itemsOwn = res.data;
+            this.itemsOwn = res.data.reverse();
             for (let i in this.itemsOwn) {
               this.itemsOwn[i].payment_time = new Date(
                 this.itemsOwn[i].payment_time

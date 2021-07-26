@@ -75,9 +75,12 @@ export default {
           // console.log(res);
           if (res.status === 200) {
             // console.log(res.data);
-            this.items = res.data;
+            this.items = res.data.reverse();
             for (let i in this.items) {
               this.items[i].payment_time = new Date(this.items[i].payment_time);
+              this.items[i].payment_time = this.items[i].payment_time
+                .toString()
+                .slice(0, 24);
             }
             this.isLoading = false;
           } else {
