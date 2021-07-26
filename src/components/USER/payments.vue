@@ -1578,10 +1578,9 @@ export default {
           package_id: this.getSelectedPkg._id,
           user_id: this.getUserID,
           gateway: this.cardTitle,
-          transaction_id: Math.random()
-            .toString(36)
-            .substring(10)
-            .toUpperCase(),
+          transaction_id: [...Array(10)]
+            .map(() => ((Math.random() * 36) | 0).toString(36).toUpperCase())
+            .join(""),
           amount: this.amount,
           method: this.cardTitle,
           packageDuration: this.getSelectedPkg.duration,
