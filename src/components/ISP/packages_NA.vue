@@ -2,18 +2,8 @@
   <div class="ma-12 mb-12 container-flow">
     <!-- contents here  -->
 
-    <!-- loading -->
-    <v-progress-linear
-      v-if="isLoading"
-      style="margin:10% 0"
-      color="deep-purple accent-4"
-      indeterminate
-      rounded
-      height="6"
-    ></v-progress-linear>
-
     <!-- package filters  -->
-    <v-row v-if="!isLoading" justify="center">
+    <v-row justify="center">
       <v-card style="padding:0px 20px">
         <v-card-title>Search ISP Packages</v-card-title>
         <v-expansion-panels>
@@ -187,7 +177,7 @@
     </v-row>
 
     <!-- show ISP packages -->
-    <v-row v-if="!isLoading" justify="center">
+    <v-row justify="center">
       <div class="col-lg-5" v-for="(pkg, i) in allPkgs" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
@@ -268,165 +258,158 @@
                 Select
               </v-btn>
             </v-col>
-            <v-col></v-col>
           </v-card-actions>
         </v-card>
       </div>
 
-      <div>
-        <v-row>
-          <v-col cols="8"></v-col>
-          <v-col>
-            <v-btn color="error" @click="clearCompare" dark>
-              Clear
+      <v-row>
+        <v-col cols="8"></v-col>
+        <v-col>
+          <v-btn color="error" @click="clearCompare" dark>
+            Clear
+          </v-btn>
+        </v-col>
+
+        <v-col>
+          <v-badge :content="messages" :value="messages" color="red" overlap>
+            <v-btn color="deep-purple lighten-2" @click="comparePkg" dark>
+              Compare
             </v-btn>
-          </v-col>
+          </v-badge>
 
-          <v-col>
-            <v-badge :content="messages" :value="messages" color="red" overlap>
-              <v-btn color="deep-purple lighten-2" @click="comparePkg" dark>
-                Compare
-              </v-btn>
-            </v-badge>
-
-            <v-dialog
-              v-model="dialogCompare"
-              fullscreen
-              hide-overlay
-              transition="dialog-bottom-transition"
-            >
-              <v-card>
-                <v-toolbar dark color="primary">
+          <v-dialog
+            v-model="dialogCompare"
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
+          >
+            <v-card>
+              <v-toolbar dark color="primary">
+                <v-btn
+                  icon
+                  dark
+                  @click="
+                    dialogCompare = false;
+                    messages = 0;
+                    compareList = [];
+                  "
+                >
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-toolbar-title>Package Comparison</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-toolbar-items>
                   <v-btn
-                    icon
                     dark
+                    text
                     @click="
                       dialogCompare = false;
                       messages = 0;
                       compareList = [];
                     "
                   >
-                    <v-icon>mdi-close</v-icon>
+                    Done
                   </v-btn>
-                  <v-toolbar-title>Package Comparison</v-toolbar-title>
-                  <v-spacer></v-spacer>
-                  <v-toolbar-items>
-                    <v-btn
-                      dark
-                      text
-                      @click="
-                        dialogCompare = false;
-                        messages = 0;
-                        compareList = [];
-                      "
-                    >
-                      Done
-                    </v-btn>
-                  </v-toolbar-items>
-                </v-toolbar>
+                </v-toolbar-items>
+              </v-toolbar>
 
-                <v-divider></v-divider>
-
-                <v-card>
-                  <v-card-title>
-                    Packages
-                    <v-spacer></v-spacer>
-                    <v-text-field
-                      v-model="search"
-                      append-icon="mdi-magnify"
-                      label="Search"
-                      single-line
-                      hide-details
-                    ></v-text-field>
-                  </v-card-title>
-
-                  <v-row>
-                    <v-col><h5>Features</h5></v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">
-                      <h5>{{ p.data.name }}</h5>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>Price</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.price
-                    }}</v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>Bandwidth</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.bandwidth
-                    }}</v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>Duration</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.duration
-                    }}</v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>Upload Speed(GBPS)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.up_speed
-                    }}</v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>Download Speed(GBPS)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.down_speed
-                    }}</v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>Upload Speed(GBPS)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.up_speed
-                    }}</v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>Estimated Down Time(hrs)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.downTime
-                    }}</v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>Response Time(milliseconds)</v-col>
-                    <v-col v-for="(p, j) in compareList" :key="j">{{
-                      p.data.responseTime
-                    }}</v-col>
-                  </v-row>
-                </v-card>
-              </v-card>
-            </v-dialog>
-
-            <v-dialog
-              v-model="dialogZero"
-              persistent
-              max-width="290"
-              transition="dialog-bottom-transition"
-            >
+              <v-divider></v-divider>
+              <!-- dnkankakdmkm                mmmmmmmkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk -->
               <v-card>
-                <v-card-title class="text-h5">
-                  Not Sufficient Package
-                </v-card-title>
-                <v-card-text
-                  >Sufficient amount of package was not selected. Please select
-                  at least two packages to compare.</v-card-text
-                >
-                <v-card-actions>
+                <v-card-title>
+                  Packages
                   <v-spacer></v-spacer>
-                  <v-btn
-                    color="green darken-1"
-                    text
-                    @click="dialogZero = false"
-                  >
-                    Close
-                  </v-btn>
-                </v-card-actions>
+                  <v-text-field
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-card-title>
+
+                <v-row>
+                  <v-col><h5>Features</h5></v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">
+                    <h5>{{ p.data.name }}</h5>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>Price</v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">{{
+                    p.data.price
+                  }}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col>Bandwidth</v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">{{
+                    p.data.bandwidth
+                  }}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col>Duration</v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">{{
+                    p.data.duration
+                  }}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col>Upload Speed(GBPS)</v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">{{
+                    p.data.up_speed
+                  }}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col>Download Speed(GBPS)</v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">{{
+                    p.data.down_speed
+                  }}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col>Upload Speed(GBPS)</v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">{{
+                    p.data.up_speed
+                  }}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col>Estimated Down Time(hrs)</v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">{{
+                    p.data.downTime
+                  }}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col>Response Time(milliseconds)</v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">{{
+                    p.data.responseTime
+                  }}</v-col>
+                </v-row>
               </v-card>
-            </v-dialog>
-          </v-col>
-        </v-row>
-      </div>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog
+            v-model="dialogZero"
+            persistent
+            max-width="290"
+            transition="dialog-bottom-transition"
+          >
+            <v-card>
+              <v-card-title class="text-h5">
+                Not Sufficient Package
+              </v-card-title>
+              <v-card-text
+                >Sufficient amount of package was not selected. Please select at
+                least two packages to compare.</v-card-text
+              >
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" text @click="dialogZero = false">
+                  Close
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-col>
+      </v-row>
     </v-row>
 
     <!-- details -->
@@ -452,21 +435,8 @@
                     <td>{{ allPkgs[currPkgIdx].data.name }}</td>
                   </tr>
                   <tr>
-                    <td>Base Price</td>
+                    <td>Price</td>
                     <td>Tk. {{ allPkgs[currPkgIdx].data.price }} /ISP</td>
-                  </tr>
-                  <tr v-if="!!allPkgs[currPkgIdx].data.offerId">
-                    <td>Reduced Price</td>
-                    <td>
-                      Tk.
-                      {{
-                        calculateReducedPrice(
-                          allPkgs[currPkgIdx].data.price,
-                          allPkgs[currPkgIdx].data.offerId
-                        )
-                      }}
-                      /ISP
-                    </td>
                   </tr>
                   <tr>
                     <td>Bandwidth</td>
@@ -558,12 +528,8 @@ export default {
       //aksndjksfkanfs
       dialogCompare: false,
       dialogZero: false,
-      compareList: [],
-      compareDisable: false,
-      messages: 0,
       //sakfdJILAJFLKJFHlSAKDg
 
-      isLoading: true,
       valid: false,
       dialog2: false,
       showPayment: false,
@@ -571,6 +537,7 @@ export default {
 
       showSnackbar: false,
       pageInfo: "",
+      myInfo: {},
       myPackageList: [],
       allOffers: [],
       validOffers: [],
@@ -590,29 +557,86 @@ export default {
         "Bandwidth 🔺",
         "Bandwidth 🔻",
       ],
+
+      compareList: [],
+      compareDisable: false,
+      messages: 0,
     };
   },
 
   computed: {
-    ...mapGetters(["getUserID", "getUserData", "getSelectedPkg"]),
+    ...mapGetters([
+      "getUserData",
+      "getUserPkgID",
+      "getUserID",
+      "getSelectedPkg",
+    ]),
   },
 
   mounted() {
+    this.fetchOwnData();
     this.fetchAllOffers();
-    this.fetchAllPackages();
+    this.fetchPackages();
+    this.fetchOwnPackages();
     this.showPayment = false;
+  },
+
+  updated() {
+    // this.fetchAllOffers();
+    // this.fetchPackages();
+    // this.fetchOwnPackage();
   },
 
   methods: {
     ...mapMutations(["setSelectedPkg"]),
 
-    fetchAllPackages() {
-      this.isLoading = true;
+    fetchOwnData() {
+      // console.log("in");
+      // console.log(this.getUserPkgID);
+      axios
+        .post("/api/isp/fetchOwnData", {
+          id: this.getUserID,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            this.myInfo = res.data;
+            // console.log(this.myInfo);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
 
+    fetchOwnPackages() {
+      // console.log("in");
+      // console.log(this.getUserPkgID);
+      axios
+        .post("/api/isp/fetchOwnPackageArray", {
+          id: this.getUserData._id,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            this.myPackageList = res.data;
+            // console.log(this.myPackageList);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    fetchPackages() {
       axios
         .post("/api/package/fetchByQueryWithStatus", {
           type: 2,
-          id: this.getUserID,
+          id: this.getUserData._id,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -622,14 +646,13 @@ export default {
               // console.log(this.allPkgs[i].areas);
               if (
                 this.allPkgs[i].data.areas.includes("Nation-wide") ||
-                this.allPkgs[i].data.areas.includes(this.getUserData.region)
+                this.allPkgs[i].data.areas.includes(this.myInfo.region)
               ) {
                 // console.log("in");
                 this.pkgs.push(this.allPkgs[i]);
               }
             }
             this.allPkgs = this.pkgs;
-            this.isLoading = false;
           } else {
             this.error = true;
           }

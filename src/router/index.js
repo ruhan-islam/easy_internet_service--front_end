@@ -156,11 +156,11 @@ const routes = [
     component: () => import("../components/USER/packages"),
   },
   {
-    path: "/NTTN/payments",
+    path: "/USER/payments",
     meta: {
 			requireLoggedIn: true
 		},
-    component: () => import("../components/NTTN/payments"),
+    component: () => import("../components/USER/payments"),
   },
   // {
   //   path: "/USER/tickets",

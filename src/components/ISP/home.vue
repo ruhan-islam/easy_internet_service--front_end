@@ -27,8 +27,8 @@ export default {
     if (!this.getUserData) {
       this.fetchOwnData();
     }
-    console.log("home mounted");
-    console.log(this.getUserData);
+    // console.log("home mounted");
+    // console.log(this.getUserData);
   },
 
   computed: {
