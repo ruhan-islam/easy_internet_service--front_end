@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-bottom-navigation color="teal" grow dark>
+  <div style="margin-bottom:8%">
+    <v-app-bar :fixed="true" grow dark>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrsHome }">
           <v-btn v-bind="attrsHome" v-on="on" router-link to="/ISP/home" exact>
@@ -71,8 +71,8 @@
             <span> Notifications </span>
             <v-icon> mdi-bell </v-icon>
             <v-badge
-              offset-x="-5"
-              offset-y="15"
+              offset-x="10"
+              offset-y="0"
               v-if="getNtfCount !== 0"
               :content="getNtfCount"
             >
@@ -139,7 +139,7 @@
         </template>
         <span> Signout </span>
       </v-tooltip>
-    </v-bottom-navigation>
+    </v-app-bar>
   </div>
 </template>
 
@@ -242,3 +242,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.v-btn {
+  margin: 0px 0.6%;
+}
+</style>

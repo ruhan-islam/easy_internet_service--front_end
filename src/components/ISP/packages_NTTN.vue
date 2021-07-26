@@ -2,8 +2,18 @@
   <div class="ma-12 mb-12 container-flow">
     <!-- contents here  -->
 
+    <!-- loading -->
+    <v-progress-linear
+      v-if="isLoading"
+      style="margin:10% 0"
+      color="deep-purple accent-4"
+      indeterminate
+      rounded
+      height="6"
+    ></v-progress-linear>
+
     <!-- package filters  -->
-    <v-row justify="center">
+    <v-row v-if="!isLoading" justify="center">
       <v-card style="padding:0px 20px">
         <v-card-title>Search ISP Packages</v-card-title>
         <v-expansion-panels>
@@ -177,7 +187,7 @@
     </v-row>
 
     <!-- show ISP packages -->
-    <v-row justify="center">
+    <v-row v-if="!isLoading" justify="center">
       <div class="col-lg-5" v-for="(pkg, i) in allPkgs" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
@@ -365,16 +375,6 @@
         </v-card>
       </v-dialog>
     </v-row>
-
-    <!-- <v-row v-if="showPayment" justify="center">
-      <v-dialog v-model="showPayment" max-width="70%">
-        <v-card>
-          <v-card-text>
-            <payments :isRedirected="true" :givenPkg="sele"></payments>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-    </v-row> -->
   </div>
 </template>
 
@@ -388,6 +388,7 @@ export default {
 
   data() {
     return {
+      isLoading: true,
       valid: false,
       dialog2: false,
       showPayment: false,
@@ -395,7 +396,6 @@ export default {
 
       showSnackbar: false,
       pageInfo: "",
-      myInfo: {},
       myPackageList: [],
       allOffers: [],
       validOffers: [],
@@ -423,61 +423,17 @@ export default {
   },
 
   mounted() {
-    this.fetchOwnData();
     this.fetchAllOffers();
-    this.fetchPackages();
-    this.fetchOwnPackages();
+    this.fetchAllPackages();
     this.showPayment = false;
-  },
-
-  updated() {
-    // this.fetchAllOffers();
-    // this.fetchPackages();
-    // this.fetchOwnPackage();
   },
 
   methods: {
     ...mapMutations(["setSelectedPkg"]),
 
-    fetchOwnData() {
-      axios
-        .post("/api/isp/fetchOwnData", {
-          id: this.getUserData._id,
-        })
-        .then((res) => {
-          // console.log(res);
-          if (res.status === 200) {
-            this.myInfo = res.data;
-            // console.log(this.myInfo);
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
+    fetchAllPackages() {
+      this.isLoading = true;
 
-    fetchOwnPackages() {
-      axios
-        .post("/api/isp/fetchOwnPackageArray", {
-          id: this.getUserData._id,
-        })
-        .then((res) => {
-          // console.log(res);
-          if (res.status === 200) {
-            this.myPackageList = res.data;
-            // console.log(this.myPackageList);
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    fetchPackages() {
       axios
         .post("/api/package/fetchByQueryWithStatus", {
           type: 2,
@@ -491,13 +447,14 @@ export default {
               // console.log(this.allPkgs[i].areas);
               if (
                 this.allPkgs[i].data.areas.includes("Nation-wide") ||
-                this.allPkgs[i].data.areas.includes(this.myInfo.region)
+                this.allPkgs[i].data.areas.includes(this.getUserData.region)
               ) {
                 // console.log("in");
                 this.pkgs.push(this.allPkgs[i]);
               }
             }
             this.allPkgs = this.pkgs;
+            this.isLoading = false;
           } else {
             this.error = true;
           }

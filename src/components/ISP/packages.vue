@@ -3,6 +3,7 @@
     <topbar></topbar>
 
     <div class="ma-12 mb-12 container-flow">
+      <!-- loading -->
       <v-container>
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
@@ -123,6 +124,7 @@
         </v-dialog>
       </v-container>
 
+      <!-- tabls -->
       <template>
         <v-card>
           <v-toolbar flat dark>
@@ -135,6 +137,7 @@
               </v-icon>
               NTTN Packages
             </v-tab>
+
             <v-tab>
               <v-icon left>
                 mdi-package-variant

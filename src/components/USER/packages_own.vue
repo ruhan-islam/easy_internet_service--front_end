@@ -2,56 +2,68 @@
   <div class="ma-12 mb-12 container-flow">
     <!-- contents here  -->
 
+    <!-- loading -->
+    <v-progress-linear
+      v-if="isLoading"
+      style="margin:10% 0"
+      color="deep-purple accent-4"
+      indeterminate
+      rounded
+      height="6"
+    ></v-progress-linear>
+
     <!-- show own packages -->
-    <v-row v-if="!!myPackageList.length">
-      <h2>My Packages</h2>
-      <div class="col-lg-5" v-for="(myPackage, i) in myPackageList" :key="i">
-        <v-card>
-          <v-img height="250" src="./../../assets/images.jpg"></v-img>
+    <v-row v-if="!isLoading">
+      <h2 v-if="!myPackageList.length">No Package Yet</h2>
+      <template v-if="!!myPackageList.length">
+        <div class="col-lg-5" v-for="(myPackage, i) in myPackageList" :key="i">
+          <v-card>
+            <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
-          <v-card-title>
-            {{ myPackage.data.name }} &nbsp;
-            <v-chip v-if="!myPackage.data.ongoing" color="red">
-              Disabled
-            </v-chip>
-          </v-card-title>
+            <v-card-title>
+              {{ myPackage.data.name }} &nbsp;
+              <v-chip v-if="!myPackage.data.ongoing" color="red">
+                Disabled
+              </v-chip>
+            </v-card-title>
 
-          <v-card-text>
-            <v-chip-group
-              active-class="deep-purple accent-4 white--text"
-              column
-            >
-              <v-chip>{{ myPackage.data.bandwidth }} GBPS</v-chip>
-              <v-chip>{{ myPackage.data.duration }} months</v-chip>
-            </v-chip-group>
+            <v-card-text>
+              <v-chip-group
+                active-class="deep-purple accent-4 white--text"
+                column
+              >
+                <v-chip>{{ myPackage.data.bandwidth }} GBPS</v-chip>
+                <v-chip>{{ myPackage.data.duration }} months</v-chip>
+              </v-chip-group>
 
-            <div>
-              {{ myPackage.data.bandwidth }} GBPS speed relentless speed of
-              unlimited traffic with 24/7 service.
-            </div>
+              <div>
+                {{ myPackage.data.bandwidth }} GBPS speed relentless speed of
+                unlimited traffic with 24/7 service.
+              </div>
 
-            <div>
-              <strong>Expiration date:</strong>
-              {{ myPackage.expirationTime.slice(0, 10) }}
-            </div>
-          </v-card-text>
-          <v-card-actions>
-            <v-row>
-              <v-col></v-col>
-              <v-col>
-                <v-btn
-                  color="deep-purple lighten-2"
-                  @click="findIdx(myPackage.data)"
-                  text
-                >
-                  Details
-                </v-btn>
-              </v-col>
-              <v-col></v-col>
-            </v-row>
-          </v-card-actions>
-        </v-card>
-      </div>
+              <div>
+                <strong>Expiration date:</strong>
+                {{ myPackage.expirationTime.slice(0, 10) }}
+              </div>
+            </v-card-text>
+            <v-card-actions>
+              <v-row>
+                <v-col></v-col>
+                <v-col>
+                  <v-btn
+                    color="deep-purple lighten-2"
+                    @click="findIdx(myPackage.data)"
+                    text
+                  >
+                    Details
+                  </v-btn>
+                </v-col>
+                <v-col></v-col>
+              </v-row>
+            </v-card-actions>
+          </v-card>
+        </div>
+      </template>
     </v-row>
 
     <!-- <span> {{ getUserData }} </span> -->
@@ -167,6 +179,8 @@ export default {
 
   data() {
     return {
+      currPkgIdx: -1,
+      isLoading: true,
       valid: false,
       dialog2: false,
       showPayment: false,
@@ -180,7 +194,6 @@ export default {
       validOffers: [],
       allPkgs: [],
       pkgs: [],
-      currPkgIdx: -1,
       filterPrice: [0, 1000000],
       filterBW: [1, 200],
       filterDuration: [1, 24],
@@ -202,44 +215,20 @@ export default {
   },
 
   mounted() {
-    this.fetchOwnData();
     this.fetchAllOffers();
-    this.fetchPackages();
+    this.fetchAllPackages();
     this.fetchOwnPackages();
+    this.currPkgIdx = -1;
     this.showPayment = false;
-  },
-
-  updated() {
-    // this.fetchAllOffers();
-    // this.fetchPackages();
-    // this.fetchOwnPackage();
   },
 
   methods: {
     ...mapMutations(["setSelectedPkg"]),
 
-    fetchOwnData() {
-      axios
-        .post("/api/isp/fetchOwnData", {
-          id: this.getUserData._id,
-        })
-        .then((res) => {
-          // console.log(res);
-          if (res.status === 200) {
-            this.myInfo = res.data;
-            // console.log(this.myInfo);
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
     fetchOwnPackages() {
+      this.isLoading = true;
       axios
-        .post("/api/isp/fetchOwnPackageArray", {
+        .post("/api/user/fetchOwnPackageArray", {
           id: this.getUserData._id,
         })
         .then((res) => {
@@ -247,6 +236,7 @@ export default {
           if (res.status === 200) {
             this.myPackageList = res.data;
             // console.log(this.myPackageList);
+            this.isLoading = false;
           } else {
             this.error = true;
           }
@@ -256,10 +246,10 @@ export default {
         });
     },
 
-    fetchPackages() {
+    fetchAllPackages() {
       axios
         .post("/api/package/fetchByQueryWithStatus", {
-          type: 2,
+          type: 3,
           id: this.getUserData._id,
         })
         .then((res) => {
@@ -270,7 +260,7 @@ export default {
               // console.log(this.allPkgs[i].areas);
               if (
                 this.allPkgs[i].data.areas.includes("Nation-wide") ||
-                this.allPkgs[i].data.areas.includes(this.myInfo.region)
+                this.allPkgs[i].data.areas.includes(this.getUserData.region)
               ) {
                 // console.log("in");
                 this.pkgs.push(this.allPkgs[i]);
@@ -289,7 +279,7 @@ export default {
     fetchAllOffers() {
       axios
         .post("/api/offer/fetchByQuery", {
-          creator: "Nttn",
+          creator: this.getUserData.ispId,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -372,155 +362,6 @@ export default {
       let today = new Date();
       today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
       return today.toISOString().slice(0, 10);
-    },
-
-    doSort(item) {
-      if (item == "Price 🔺") {
-        this.pkgs.sort(this.orderByPriceAscending);
-      } else if (item == "Duration 🔺") {
-        this.pkgs.sort(this.orderByDurationAscending);
-      } else if (item == "Bandwidth 🔺") {
-        this.pkgs.sort(this.orderByBandwidthAscending);
-      } else if (item == "Name 🔺") {
-        this.pkgs.sort(this.orderByNameAscending);
-      } else if (item == "Price 🔻") {
-        this.pkgs.sort(this.orderByPriceDescending);
-      } else if (item == "Duration 🔻") {
-        this.pkgs.sort(this.orderByDurationDescending);
-      } else if (item == "Bandwidth 🔻") {
-        this.pkgs.sort(this.orderByBandwidthDescending);
-      } else if (item == "Name 🔻") {
-        this.pkgs.sort(this.orderByNameDescending);
-      }
-    },
-
-    orderByNameAscending(a, b) {
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
-        return -1;
-      }
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByPriceAscending(a, b) {
-      if (a.price < b.price) {
-        return -1;
-      }
-      if (a.price > b.price) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByBandwidthAscending(a, b) {
-      if (a.bandwidth < b.bandwidth) {
-        return -1;
-      }
-      if (a.bandwidth > b.bandwidth) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByDurationAscending(a, b) {
-      if (a.duration < b.duration) {
-        return -1;
-      }
-      if (a.duration > b.duration) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByNameDescending(a, b) {
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
-        return -1;
-      }
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByPriceDescending(a, b) {
-      if (a.price > b.price) {
-        return -1;
-      }
-      if (a.price < b.price) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByBandwidthDescending(a, b) {
-      if (a.bandwidth > b.bandwidth) {
-        return -1;
-      }
-      if (a.bandwidth < b.bandwidth) {
-        return 1;
-      }
-      return 0;
-    },
-
-    orderByDurationDescending(a, b) {
-      if (a.duration > b.duration) {
-        return -1;
-      }
-      if (a.duration < b.duration) {
-        return 1;
-      }
-      return 0;
-    },
-
-    doFilter() {
-      let minPrice =
-        this.filterPrice[0] < this.filterPrice[1]
-          ? this.filterPrice[0]
-          : this.filterPrice[1];
-      let maxPrice =
-        this.filterPrice[0] > this.filterPrice[1]
-          ? this.filterPrice[0]
-          : this.filterPrice[1];
-      let minBandwidth =
-        this.filterBW[0] < this.filterBW[1]
-          ? this.filterBW[0]
-          : this.filterBW[1];
-      let maxBandwidth =
-        this.filterBW[0] > this.filterBW[1]
-          ? this.filterBW[0]
-          : this.filterBW[1];
-      let minDuration =
-        this.filterDuration[0] < this.filterDuration[1]
-          ? this.filterDuration[0]
-          : this.filterDuration[1];
-      let maxDuration =
-        this.filterDuration[0] > this.filterDuration[1]
-          ? this.filterDuration[0]
-          : this.filterDuration[1];
-      this.pkgs = [];
-      // console.log(minPrice, maxPrice);
-      for (let pkg in this.allPkgs) {
-        if (
-          this.allPkgs[pkg].price >= minPrice &&
-          this.allPkgs[pkg].price <= maxPrice &&
-          this.allPkgs[pkg].bandwidth >= minBandwidth &&
-          this.allPkgs[pkg].bandwidth <= maxBandwidth &&
-          this.allPkgs[pkg].duration >= minDuration &&
-          this.allPkgs[pkg].duration <= maxDuration
-        ) {
-          this.pkgs.push(this.allPkgs[pkg]);
-        }
-      }
-      this.markVal = 0;
-    },
-
-    clearFilter() {
-      this.filterPrice = [0, 1000000];
-      this.filterBW = [1, 200];
-      this.filterDuration = [1, 24];
-      this.pkgs = this.allPkgs;
     },
   },
 };

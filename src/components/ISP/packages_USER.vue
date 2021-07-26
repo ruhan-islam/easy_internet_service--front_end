@@ -1,618 +1,631 @@
 <template>
   <div class="ma-12 mb-12 container-flow">
-    <!-- create new package  -->
-    <v-row justify="start">
-      <v-dialog v-model="dialog" persistent max-width="80%">
-        <template v-slot:activator="{ on, attrs }">
-          <v-col cols="1">
-            <v-btn
-              color="deep-purple lighten-2"
-              dark
-              v-bind="attrs"
-              v-on="on"
-              max-width="100%"
-              fab
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col>
-            <h5 style="margin-top:15px">Create New Package</h5>
-          </v-col>
-        </template>
+    <template>
+      <!-- create new package  -->
+      <v-row justify="start">
+        <v-dialog v-model="dialog" persistent max-width="80%">
+          <template v-slot:activator="{ on, attrs }">
+            <v-col cols="1">
+              <v-btn
+                color="deep-purple lighten-2"
+                dark
+                v-bind="attrs"
+                v-on="on"
+                max-width="100%"
+                fab
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col>
+              <h5 style="margin-top:15px">Create New Package</h5>
+            </v-col>
+          </template>
 
-        <v-card style="padding: 30px">
-          <h2>New Package</h2>
-          <v-form ref="form" v-model="valid" lazy-validation>
-            <v-expansion-panels>
+          <v-card style="padding: 30px">
+            <h2>New Package</h2>
+            <v-form ref="form" v-model="valid" lazy-validation>
+              <v-expansion-panels>
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Package Name </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter a name for new package
+                            </span>
+                            <span v-else key="1">
+                              {{ packageName }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-text-field
+                      placeholder="e.g. Ultra_premium"
+                      v-model="packageName"
+                      :counter="nameLen"
+                      :rules="nameRules"
+                      label="Package Name"
+                      required
+                    ></v-text-field>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Price(BDT) </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter price of the package
+                            </span>
+                            <span v-else key="1">
+                              {{ price }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-text-field
+                      v-model="price"
+                      :rules="priceRules"
+                      label="Price (BDT)"
+                      required
+                    ></v-text-field>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Bandwidth(MBPS) </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter bandwidth of the package
+                            </span>
+                            <span v-else key="1">
+                              {{ bandwidth }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+
+                  <v-expansion-panel-content>
+                    <v-slider
+                      v-model="bandwidth"
+                      :min="minBW"
+                      :max="maxBW"
+                      label="Bandwidth (MBPS)"
+                      class="align-center"
+                      thumb-label="always"
+                    >
+                    </v-slider>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Download Speed(MBPS) </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter download speed of the package
+                            </span>
+                            <span v-else key="1">
+                              {{ downSpeed }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+
+                  <v-expansion-panel-content>
+                    <v-slider
+                      v-model="downSpeed"
+                      :min="minBW"
+                      :max="maxBW"
+                      label="Download speed (MBPS)"
+                      thumb-label="always"
+                      :rules="speedRules"
+                    >
+                    </v-slider>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Upload Speed(MBPS) </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter upload speed of the package
+                            </span>
+                            <span v-else key="1">
+                              {{ upSpeed }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+
+                  <v-expansion-panel-content>
+                    <v-slider
+                      v-model="upSpeed"
+                      :min="minBW"
+                      :max="maxBW"
+                      label="Upload speed (MBPS)"
+                      thumb-label="always"
+                      :rules="speedRules"
+                    >
+                    </v-slider>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4">Estimated Down Time(hours) </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter estimated down time of the package
+                            </span>
+                            <span v-else key="1">
+                              {{ downTime }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+
+                  <v-expansion-panel-content>
+                    <v-slider
+                      v-model="downTime"
+                      :min="minDT"
+                      :step="stepDT"
+                      :max="maxDT"
+                      label="Down-time (hour)"
+                      thumb-label="always"
+                    >
+                    </v-slider>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
+                        <v-col cols="4"> Response Time(milliseconds) </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter response time of the package
+                            </span>
+                            <span v-else key="1">
+                              {{ responseTime }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+
+                  <v-expansion-panel-content>
+                    <v-slider
+                      v-model="responseTime"
+                      :min="minRT"
+                      :step="stepRT"
+                      :max="maxRT"
+                      label="Response Time (milliseconds)"
+                      thumb-label="always"
+                    >
+                    </v-slider>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-card-actions>
+                  <v-btn
+                    :disabled="isResetDisabled"
+                    color="error"
+                    class="mr-4"
+                    @click="resetPressed"
+                  >
+                    Reset
+                  </v-btn>
+
+                  <v-btn
+                    :disabled="isSubmitDisabled"
+                    color="success"
+                    class="mr-4"
+                    @click="newPkgConfirmPressed"
+                  >
+                    Confirm
+                  </v-btn>
+                  <v-btn color="green darken-1" text @click="dialog = false">
+                    Cancel
+                  </v-btn>
+                </v-card-actions>
+              </v-expansion-panels>
+            </v-form>
+          </v-card>
+        </v-dialog>
+      </v-row>
+
+      <v-snackbar :value="showSuccessOverlay">
+        Package Successfully Added!
+      </v-snackbar>
+    </template>
+
+    <!-- loading -->
+    <v-progress-linear
+      v-if="isLoading"
+      style="margin:10% 0"
+      color="deep-purple accent-4"
+      indeterminate
+      rounded
+      height="6"
+    ></v-progress-linear>
+    <template v-if="!isLoading">
+      <!-- package filters  -->
+      <v-row class="ma-1" justify="center">
+        <v-card style="padding:0px 20px">
+          <v-card-title>Search User Packages</v-card-title>
+          <v-expansion-panels>
+            <v-col>
+              Price Range:
               <v-expansion-panel>
                 <v-expansion-panel-header>
                   <template v-slot:default="{ open }">
                     <v-row no-gutters>
-                      <v-col cols="4"> Package Name </v-col>
-                      <v-col cols="8" class="text--secondary">
+                      <v-col class="text--secondary">
                         <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter a name for new package
-                          </span>
-                          <span v-else key="1">
-                            {{ packageName }}
-                          </span>
+                          <span v-if="open">Select the max and min price:</span>
+                          <v-row v-else no-gutters style="width: 100%">
+                            <v-col cols="6" style="color: green">
+                              Min Cost:
+                              {{ filterPrice[0] }}
+                            </v-col>
+                            <v-col cols="6" style="color: red">
+                              Max Cost: {{ filterPrice[1] }}
+                            </v-col>
+                          </v-row>
                         </v-fade-transition>
                       </v-col>
                     </v-row>
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <v-text-field
-                    placeholder="e.g. Ultra_premium"
-                    v-model="packageName"
-                    :counter="nameLen"
-                    :rules="nameRules"
-                    label="Package Name"
-                    required
-                  ></v-text-field>
+                  <v-range-slider
+                    v-model="filterPrice"
+                    label="Price (Taka)"
+                    min="0"
+                    max="1000000"
+                    step="1000"
+                  >
+                  </v-range-slider>
+                  <label style="color: rgb(97, 91, 91)"
+                    >price(min): {{ filterPrice[0] }} <br />
+                    price(max): {{ filterPrice[1] }}</label
+                  >
                 </v-expansion-panel-content>
               </v-expansion-panel>
+            </v-col>
 
+            <v-col>
+              Bandwidth Range:
               <v-expansion-panel>
                 <v-expansion-panel-header>
                   <template v-slot:default="{ open }">
                     <v-row no-gutters>
-                      <v-col cols="4"> Price(BDT) </v-col>
-                      <v-col cols="8" class="text--secondary">
+                      <v-col class="text--secondary">
                         <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter price of the package
-                          </span>
-                          <span v-else key="1">
-                            {{ price }}
-                          </span>
+                          <span v-if="open"
+                            >Select the max and min bandwidth:</span
+                          >
+                          <v-row v-else no-gutters style="width: 100%">
+                            <v-col cols="6" style="color: green">
+                              Min BW:
+                              {{ filterBW[0] }}
+                            </v-col>
+                            <v-col cols="6" style="color: red">
+                              Max BW: {{ filterBW[1] }}
+                            </v-col>
+                          </v-row>
                         </v-fade-transition>
                       </v-col>
                     </v-row>
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <v-text-field
-                    v-model="price"
-                    :rules="priceRules"
-                    label="Price (BDT)"
-                    required
-                  ></v-text-field>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-
-              <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <template v-slot:default="{ open }">
-                    <v-row no-gutters>
-                      <v-col cols="4"> Bandwidth(MBPS) </v-col>
-                      <v-col cols="8" class="text--secondary">
-                        <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter bandwidth of the package
-                          </span>
-                          <span v-else key="1">
-                            {{ bandwidth }}
-                          </span>
-                        </v-fade-transition>
-                      </v-col>
-                    </v-row>
-                  </template>
-                </v-expansion-panel-header>
-
-                <v-expansion-panel-content>
-                  <v-slider
-                    v-model="bandwidth"
-                    :min="minBW"
-                    :max="maxBW"
+                  <v-range-slider
+                    v-model="filterBW"
                     label="Bandwidth (MBPS)"
-                    class="align-center"
+                    min="0"
+                    max="100"
                     thumb-label="always"
                   >
-                  </v-slider>
+                  </v-range-slider>
                 </v-expansion-panel-content>
               </v-expansion-panel>
+            </v-col>
+          </v-expansion-panels>
 
-              <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <template v-slot:default="{ open }">
-                    <v-row no-gutters>
-                      <v-col cols="4"> Download Speed(MBPS) </v-col>
-                      <v-col cols="8" class="text--secondary">
-                        <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter download speed of the package
-                          </span>
-                          <span v-else key="1">
-                            {{ downSpeed }}
-                          </span>
-                        </v-fade-transition>
-                      </v-col>
-                    </v-row>
+          <v-card-actions>
+            <v-row align="center" justify="end">
+              <v-col cols="6"></v-col>
+              <v-col>
+                <v-btn
+                  color="deep-purple lighten-2"
+                  @click="doFilter"
+                  dark
+                  max-width="80%"
+                  margin="10px"
+                >
+                  Filter <v-icon>mdi-filter</v-icon>
+                </v-btn>
+              </v-col>
+
+              <v-col>
+                <v-btn
+                  color="deep-purple lighten-2"
+                  @click="clearFilter"
+                  dark
+                  margin="10px"
+                >
+                  Clear Filter
+                </v-btn>
+              </v-col>
+
+              <v-col>
+                <v-menu offset-y>
+                  <template v-slot:activator="{ attrs, on }">
+                    <v-btn
+                      color="deep-purple lighten-2"
+                      class="white--text ma-5"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      Sort <v-icon>mdi-sort</v-icon>
+                    </v-btn>
                   </template>
-                </v-expansion-panel-header>
 
-                <v-expansion-panel-content>
-                  <v-slider
-                    v-model="downSpeed"
-                    :min="minBW"
-                    :max="maxBW"
-                    label="Download speed (MBPS)"
-                    thumb-label="always"
-                    :rules="speedRules"
-                  >
-                  </v-slider>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
+                  <v-list>
+                    <v-list-item v-for="item in sortedItems" :key="item" link>
+                      <v-list-item-title
+                        v-text="item"
+                        @click="doSort(item)"
+                      ></v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </v-col>
+            </v-row>
+          </v-card-actions>
+        </v-card>
+      </v-row>
 
-              <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <template v-slot:default="{ open }">
-                    <v-row no-gutters>
-                      <v-col cols="4"> Upload Speed(MBPS) </v-col>
-                      <v-col cols="8" class="text--secondary">
-                        <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter upload speed of the package
-                          </span>
-                          <span v-else key="1">
-                            {{ upSpeed }}
-                          </span>
-                        </v-fade-transition>
-                      </v-col>
-                    </v-row>
+      <v-row justify="center">
+        <v-btn color="deep-purple lighten-2" text> USER Packages </v-btn>
+      </v-row>
+
+      <!-- showing user packages -->
+      <v-row>
+        <div class="col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
+          <v-badge
+            :content="0"
+            :value="markVal"
+            color="green"
+            overlap
+            icon="mdi-check"
+          >
+            <v-card>
+              <v-img height="250" src="./../../assets/images.jpg"></v-img>
+
+              <v-card-title>
+                {{ pkg.name }} &nbsp;
+                <v-chip v-if="!pkg.ongoing" color="red"> Disabled </v-chip>
+              </v-card-title>
+
+              <v-card-text>
+                <div class="my-4 text-subtitle-1">
+                  Taka
+                  <span v-if="!pkg.offerId"> {{ pkg.price }} </span>
+                  <template v-if="!!pkg.offerId">
+                    <s>{{ pkg.price }}</s>
+                    <span>
+                      &nbsp; {{ calculateReducedPrice(pkg.price, pkg.offerId) }}
+                    </span>
+                    <v-chip color="deep-purple">
+                      <span style="color:white">
+                        {{ getOfferName(pkg.offerId) }}
+                      </span>
+                    </v-chip>
                   </template>
-                </v-expansion-panel-header>
-
-                <v-expansion-panel-content>
-                  <v-slider
-                    v-model="upSpeed"
-                    :min="minBW"
-                    :max="maxBW"
-                    label="Upload speed (MBPS)"
-                    thumb-label="always"
-                    :rules="speedRules"
-                  >
-                  </v-slider>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-
-              <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <template v-slot:default="{ open }">
-                    <v-row no-gutters>
-                      <v-col cols="4">Estimated Down Time(hours) </v-col>
-                      <v-col cols="8" class="text--secondary">
-                        <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter estimated down time of the package
-                          </span>
-                          <span v-else key="1">
-                            {{ downTime }}
-                          </span>
-                        </v-fade-transition>
-                      </v-col>
-                    </v-row>
-                  </template>
-                </v-expansion-panel-header>
-
-                <v-expansion-panel-content>
-                  <v-slider
-                    v-model="downTime"
-                    :min="minDT"
-                    :step="stepDT"
-                    :max="maxDT"
-                    label="Down-time (hour)"
-                    thumb-label="always"
-                  >
-                  </v-slider>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-
-              <v-expansion-panel>
-                <v-expansion-panel-header>
-                  <template v-slot:default="{ open }">
-                    <v-row no-gutters>
-                      <v-col cols="4"> Response Time(milliseconds) </v-col>
-                      <v-col cols="8" class="text--secondary">
-                        <v-fade-transition leave-absolute>
-                          <span v-if="open" key="0">
-                            Enter response time of the package
-                          </span>
-                          <span v-else key="1">
-                            {{ responseTime }}
-                          </span>
-                        </v-fade-transition>
-                      </v-col>
-                    </v-row>
-                  </template>
-                </v-expansion-panel-header>
-
-                <v-expansion-panel-content>
-                  <v-slider
-                    v-model="responseTime"
-                    :min="minRT"
-                    :step="stepRT"
-                    :max="maxRT"
-                    label="Response Time (milliseconds)"
-                    thumb-label="always"
-                  >
-                  </v-slider>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
+                </div>
+                <v-chip-group
+                  active-class="deep-purple accent-4 white--text"
+                  column
+                >
+                  <v-chip>{{ pkg.bandwidth }} MBPS</v-chip>
+                </v-chip-group>
+                <div>
+                  {{ pkg.bandwidth }} MBPS speed relentless speed of unlimited
+                  traffic with 24/7 service.
+                </div>
+              </v-card-text>
 
               <v-card-actions>
                 <v-btn
-                  :disabled="isResetDisabled"
-                  color="error"
-                  class="mr-4"
-                  @click="resetPressed"
+                  color="deep-purple lighten-2"
+                  @click="detailsPressed(i)"
+                  text
                 >
-                  Reset
+                  Details
                 </v-btn>
 
                 <v-btn
-                  :disabled="isSubmitDisabled"
-                  color="success"
-                  class="mr-4"
-                  @click="newPkgConfirmPressed"
+                  @click="toggleOfferPressed(i)"
+                  color="deep-purple lighten-2"
+                  text
                 >
-                  Confirm
+                  <span v-if="!pkg.offerId"> Add Offer </span>
+                  <span v-if="!!pkg.offerId"> Remove Offer </span>
                 </v-btn>
-                <v-btn color="green darken-1" text @click="dialog = false">
-                  Cancel
+
+                <v-btn
+                  @click="toggleStatusPressed(i)"
+                  color="deep-purple lighten-2"
+                  text
+                >
+                  <span v-if="pkg.ongoing"> Disable </span>
+                  <span v-if="!pkg.ongoing"> Enable </span>
                 </v-btn>
               </v-card-actions>
-            </v-expansion-panels>
-          </v-form>
-        </v-card>
-      </v-dialog>
-    </v-row>
+            </v-card>
+          </v-badge>
+        </div>
+      </v-row>
 
-    <!-- package filters  -->
-    <v-row class="ma-1" justify="center">
-      <v-card style="padding:0px 20px">
-        <v-card-title>Search ISP Packages</v-card-title>
-        <v-expansion-panels>
-          <v-col>
-            Price Range:
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <template v-slot:default="{ open }">
-                  <v-row no-gutters>
-                    <v-col class="text--secondary">
-                      <v-fade-transition leave-absolute>
-                        <span v-if="open">Select the max and min price:</span>
-                        <v-row v-else no-gutters style="width: 100%">
-                          <v-col cols="6" style="color: green">
-                            Min Cost:
-                            {{ filterPrice[0] }}
-                          </v-col>
-                          <v-col cols="6" style="color: red">
-                            Max Cost: {{ filterPrice[1] }}
-                          </v-col>
-                        </v-row>
-                      </v-fade-transition>
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-range-slider
-                  v-model="filterPrice"
-                  label="Price (Taka)"
-                  min="0"
-                  max="1000000"
-                  step="1000"
-                >
-                </v-range-slider>
-                <label style="color: rgb(97, 91, 91)"
-                  >price(min): {{ filterPrice[0] }} <br />
-                  price(max): {{ filterPrice[1] }}</label
-                >
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-col>
-
-          <v-col>
-            Bandwidth Range:
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <template v-slot:default="{ open }">
-                  <v-row no-gutters>
-                    <v-col class="text--secondary">
-                      <v-fade-transition leave-absolute>
-                        <span v-if="open"
-                          >Select the max and min bandwidth:</span
-                        >
-                        <v-row v-else no-gutters style="width: 100%">
-                          <v-col cols="6" style="color: green">
-                            Min BW:
-                            {{ filterBW[0] }}
-                          </v-col>
-                          <v-col cols="6" style="color: red">
-                            Max BW: {{ filterBW[1] }}
-                          </v-col>
-                        </v-row>
-                      </v-fade-transition>
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-range-slider
-                  v-model="filterBW"
-                  label="Bandwidth (MBPS)"
-                  min="0"
-                  max="100"
-                  thumb-label="always"
-                >
-                </v-range-slider>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-col>
-        </v-expansion-panels>
-
-        <v-card-actions>
-          <v-row align="center" justify="end">
-            <v-col cols="6"></v-col>
-            <v-col>
-              <v-btn
-                color="deep-purple lighten-2"
-                @click="doFilter"
-                dark
-                max-width="80%"
-                margin="10px"
-              >
-                Filter <v-icon>mdi-filter</v-icon>
-              </v-btn>
-            </v-col>
-
-            <v-col>
-              <v-btn
-                color="deep-purple lighten-2"
-                @click="clearFilter"
-                dark
-                margin="10px"
-              >
-                Clear Filter
-              </v-btn>
-            </v-col>
-
-            <v-col>
-              <v-menu offset-y>
-                <template v-slot:activator="{ attrs, on }">
-                  <v-btn
-                    color="deep-purple lighten-2"
-                    class="white--text ma-5"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    Sort <v-icon>mdi-sort</v-icon>
-                  </v-btn>
-                </template>
-
-                <v-list>
-                  <v-list-item v-for="item in sortedItems" :key="item" link>
-                    <v-list-item-title
-                      v-text="item"
-                      @click="doSort(item)"
-                    ></v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </v-col>
-          </v-row>
-        </v-card-actions>
-      </v-card>
-    </v-row>
-
-    <v-row justify="center">
-      <v-btn color="deep-purple lighten-2" text> USER Packages </v-btn>
-    </v-row>
-
-    <!-- showing packages -->
-    <v-row>
-      <div class="col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
-        <v-badge
-          :content="0"
-          :value="markVal"
-          color="green"
-          overlap
-          icon="mdi-check"
-        >
+      <!-- details & offer -->
+      <v-row v-if="currPkgIdx != -1" justify="center">
+        <!-- package details -->
+        <v-dialog v-model="dialog2" max-width="40%" dark>
           <v-card>
-            <v-img height="250" src="./../../assets/images.jpg"></v-img>
-
-            <v-card-title>
-              {{ pkg.name }} &nbsp;
-              <v-chip v-if="!pkg.ongoing" color="red"> Disabled </v-chip>
+            <v-card-title class="text-h5">
+              {{ allPkgs[currPkgIdx].name }}
             </v-card-title>
 
             <v-card-text>
-              <div class="my-4 text-subtitle-1">
-                Taka
-                <span v-if="!pkg.offerId"> {{ pkg.price }} </span>
-                <template v-if="!!pkg.offerId">
-                  <s>{{ pkg.price }}</s>
-                  <span>
-                    &nbsp; {{ calculateReducedPrice(pkg.price, pkg.offerId) }}
-                  </span>
-                  <v-chip color="deep-purple">
-                    <span style="color:white">
-                      {{ getOfferName(pkg.offerId) }}
-                    </span>
-                  </v-chip>
+              <!-- object: {{ allPkgs[currPkgIdx] }} <br />
+              name: {{ allPkgs[currPkgIdx].name }} <br />
+              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} MBPS <br />-->
+
+              <v-simple-table dark>
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th class="text-left">Features</th>
+                      <th class="text-left">Availibility</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- <tr v-for="item in pkgDetails" :key="item.name"> -->
+                    <tr>
+                      <td>Package Name</td>
+                      <td>{{ allPkgs[currPkgIdx].name }}</td>
+                    </tr>
+                    <tr>
+                      <td>Price (Taka)</td>
+                      <td>Tk. {{ allPkgs[currPkgIdx].price }} /ISP</td>
+                    </tr>
+                    <tr>
+                      <td>Bandwidth (MBPS)</td>
+                      <td>{{ allPkgs[currPkgIdx].bandwidth }} MBPS</td>
+                    </tr>
+                    <tr>
+                      <td>Upload Speed (MBPS)</td>
+                      <td>{{ allPkgs[currPkgIdx].up_speed }} MBPS</td>
+                    </tr>
+                    <tr>
+                      <td>Download Speed (MBPS)</td>
+                      <td>{{ allPkgs[currPkgIdx].down_speed }} MBPS</td>
+                    </tr>
+                    <tr>
+                      <td>Data Limit</td>
+                      <td>Unlimited</td>
+                    </tr>
+                    <tr>
+                      <td>Estimated Down Time (hours)</td>
+                      <td>{{ allPkgs[currPkgIdx].downTime }} hrs</td>
+                    </tr>
+                    <tr>
+                      <td>Estimated Response Time (milliseconds)</td>
+                      <td>{{ allPkgs[currPkgIdx].responseTime }} ms</td>
+                    </tr>
+                  </tbody>
                 </template>
-              </div>
-              <v-chip-group
-                active-class="deep-purple accent-4 white--text"
-                column
-              >
-                <v-chip>{{ pkg.bandwidth }} MBPS</v-chip>
-              </v-chip-group>
-              <div>
-                {{ pkg.bandwidth }} MBPS speed relentless speed of unlimited
-                traffic with 24/7 service.
-              </div>
+              </v-simple-table>
             </v-card-text>
 
             <v-card-actions>
               <v-btn
-                color="deep-purple lighten-2"
-                @click="detailsPressed(i)"
+                color="green darken-1"
                 text
+                @click="
+                  dialog2 = false;
+                  currPkgIdx = -1;
+                "
               >
-                Details
-              </v-btn>
-
-              <v-btn
-                @click="toggleOfferPressed(i)"
-                color="deep-purple lighten-2"
-                text
-              >
-                <span v-if="!pkg.offerId"> Add Offer </span>
-                <span v-if="!!pkg.offerId"> Remove Offer </span>
-              </v-btn>
-
-              <v-btn
-                @click="toggleStatusPressed(i)"
-                color="deep-purple lighten-2"
-                text
-              >
-                <span v-if="pkg.ongoing"> Disable </span>
-                <span v-if="!pkg.ongoing"> Enable </span>
+                Close
               </v-btn>
             </v-card-actions>
           </v-card>
-        </v-badge>
-      </div>
-    </v-row>
+        </v-dialog>
 
-    <!-- details & offer -->
-    <v-row v-if="currPkgIdx != -1" justify="center">
-      <!-- package details -->
-      <v-dialog v-model="dialog2" max-width="40%" dark>
-        <v-card>
-          <v-card-title class="text-h5">
-            {{ allPkgs[currPkgIdx].name }}
-          </v-card-title>
+        <!-- offer -->
+        <v-dialog v-model="dialog3" max-width="50%" dark>
+          <v-card>
+            <v-card-title class="text-h5"> Offer List </v-card-title>
 
-          <v-card-text>
-            <!-- object: {{ allPkgs[currPkgIdx] }} <br />
-              name: {{ allPkgs[currPkgIdx].name }} <br />
-              bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} MBPS <br />-->
+            <v-card-text>
+              <v-radio-group mandatory v-model="selectedOffer">
+                <v-radio
+                  v-for="(offer, i) in validOffers"
+                  :key="i"
+                  :label="
+                    `${offer.name} -- Reduction: ${
+                      offer.reduction
+                    }% -- Duration (From ${offer.startTime.slice(
+                      0,
+                      10
+                    )} To ${offer.expirationTime.slice(0, 10)} )`
+                  "
+                  :value="offer._id"
+                >
+                </v-radio>
+              </v-radio-group>
+            </v-card-text>
 
-            <v-simple-table dark>
-              <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th class="text-left">Features</th>
-                    <th class="text-left">Availibility</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- <tr v-for="item in pkgDetails" :key="item.name"> -->
-                  <tr>
-                    <td>Package Name</td>
-                    <td>{{ allPkgs[currPkgIdx].name }}</td>
-                  </tr>
-                  <tr>
-                    <td>Price (Taka)</td>
-                    <td>Tk. {{ allPkgs[currPkgIdx].price }} /ISP</td>
-                  </tr>
-                  <tr>
-                    <td>Bandwidth (MBPS)</td>
-                    <td>{{ allPkgs[currPkgIdx].bandwidth }} MBPS</td>
-                  </tr>
-                  <tr>
-                    <td>Upload Speed (MBPS)</td>
-                    <td>{{ allPkgs[currPkgIdx].up_speed }} MBPS</td>
-                  </tr>
-                  <tr>
-                    <td>Download Speed (MBPS)</td>
-                    <td>{{ allPkgs[currPkgIdx].down_speed }} MBPS</td>
-                  </tr>
-                  <tr>
-                    <td>Data Limit</td>
-                    <td>Unlimited</td>
-                  </tr>
-                  <tr>
-                    <td>Estimated Down Time (hours)</td>
-                    <td>{{ allPkgs[currPkgIdx].downTime }} hrs</td>
-                  </tr>
-                  <tr>
-                    <td>Estimated Response Time (milliseconds)</td>
-                    <td>{{ allPkgs[currPkgIdx].responseTime }} ms</td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="
-                dialog2 = false;
-                currPkgIdx = -1;
-              "
-            >
-              Close
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <!-- offer -->
-      <v-dialog v-model="dialog3" max-width="50%" dark>
-        <v-card>
-          <v-card-title class="text-h5"> Offer List </v-card-title>
-
-          <v-card-text>
-            <v-radio-group mandatory v-model="selectedOffer">
-              <v-radio
-                v-for="(offer, i) in validOffers"
-                :key="i"
-                :label="
-                  `${offer.name} -- Reduction: ${
-                    offer.reduction
-                  }% -- Duration (From ${offer.startTime.slice(
-                    0,
-                    10
-                  )} To ${offer.expirationTime.slice(0, 10)} )`
+            <v-card-actions>
+              <v-btn color="green darken-1" text @click="offerConfirmPressed">
+                Confirm
+              </v-btn>
+              <v-btn
+                color="green darken-1"
+                text
+                @click="
+                  dialog3 = false;
+                  currPkgIdx = -1;
                 "
-                :value="offer._id"
               >
-              </v-radio>
-            </v-radio-group>
-          </v-card-text>
-
-          <v-card-actions>
-            <v-btn color="green darken-1" text @click="offerConfirmPressed">
-              Confirm
-            </v-btn>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="
-                dialog3 = false;
-                currPkgIdx = -1;
-              "
-            >
-              Cancel
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row>
-
-    <v-snackbar :value="showSuccessOverlay">
-      Package Successfully Added!
-    </v-snackbar>
+                Cancel
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-row>
+    </template>
   </div>
 </template>
 
@@ -627,6 +640,7 @@ export default {
 
   data() {
     return {
+      isLoading: true,
       sortedItems: [
         "Name 🔺",
         "Name 🔻",
@@ -723,10 +737,12 @@ export default {
   mounted() {
     this.fetchAllOffers();
     this.fetchAllPackages();
+    this.isLoading = true;
   },
 
   methods: {
     fetchAllPackages() {
+      this.isLoading = true;
       axios
         .post("/api/package/fetchByQuery", {
           packageCreator: this.getUserData.name,
@@ -740,6 +756,7 @@ export default {
             for (let i in this.pkgs) {
               this.pkgNameList.push(this.allPkgs[i].name);
             }
+            this.isLoading = false;
           } else {
             this.error = true;
           }

@@ -156,23 +156,23 @@
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
           <v-card-title>
-            {{ pkg.data.name }} &nbsp;
-            <v-chip v-if="!pkg.data.ongoing" color="red"> Disabled </v-chip>
+            {{ pkg.name }} &nbsp;
+            <v-chip v-if="!pkg.ongoing" color="red"> Disabled </v-chip>
           </v-card-title>
 
           <v-card-text>
             <div class="my-4 text-subtitle-1">
               Taka
-              <span v-if="!pkg.data.offerId"> {{ pkg.data.price }} </span>
-              <template v-if="!!pkg.data.offerId">
-                <s>{{ pkg.data.price }}</s>
+              <span v-if="!pkg.offerId"> {{ pkg.price }} </span>
+              <template v-if="!!pkg.offerId">
+                <s>{{ pkg.price }}</s>
                 <span>
                   &nbsp;
-                  {{ calculateReducedPrice(pkg.data.price, pkg.data.offerId) }}
+                  {{ calculateReducedPrice(pkg.price, pkg.offerId) }}
                 </span>
                 <v-chip color="deep-purple">
                   <span style="color:white">
-                    {{ getOfferName(pkg.data.offerId) }}
+                    {{ getOfferName(pkg.offerId) }}
                   </span>
                 </v-chip>
               </template>
@@ -181,11 +181,11 @@
               active-class="deep-purple accent-4 white--text"
               column
             >
-              <v-chip>{{ pkg.data.bandwidth }} MBPS</v-chip>
+              <v-chip>{{ pkg.bandwidth }} MBPS</v-chip>
             </v-chip-group>
 
             <div>
-              {{ pkg.data.bandwidth }} MBPS speed relentless speed of unlimited
+              {{ pkg.bandwidth }} MBPS speed relentless speed of unlimited
               traffic with 24/7 service.
             </div>
           </v-card-text>
@@ -204,7 +204,7 @@
             <v-col></v-col>
             <v-col>
               <v-btn
-                :disabled="!allPkgs[i].data.ongoing || !allPkgs[i].status"
+                :disabled="!allPkgs[i].ongoing || !allPkgs[i].status"
                 color="deep-purple lighten-2"
                 @click="selectPressed(i)"
                 text
@@ -223,7 +223,7 @@
       <v-dialog v-model="dialog2" max-width="70%">
         <v-card>
           <v-card-title class="text-h5">
-            {{ allPkgs[currPkgIdx].data.name }}
+            {{ allPkgs[currPkgIdx].name }}
           </v-card-title>
 
           <v-card-text>
@@ -238,20 +238,20 @@
                 <tbody>
                   <tr>
                     <td>Package Name</td>
-                    <td>{{ allPkgs[currPkgIdx].data.name }}</td>
+                    <td>{{ allPkgs[currPkgIdx].name }}</td>
                   </tr>
                   <tr>
                     <td>Base Price</td>
-                    <td>Tk. {{ allPkgs[currPkgIdx].data.price }}</td>
+                    <td>Tk. {{ allPkgs[currPkgIdx].price }}</td>
                   </tr>
-                  <tr v-if="!!allPkgs[currPkgIdx].data.offerId">
+                  <tr v-if="!!allPkgs[currPkgIdx].offerId">
                     <td>Reduced Price</td>
                     <td>
                       Tk.
                       {{
                         calculateReducedPrice(
-                          allPkgs[currPkgIdx].data.price,
-                          allPkgs[currPkgIdx].data.offerId
+                          allPkgs[currPkgIdx].price,
+                          allPkgs[currPkgIdx].offerId
                         )
                       }}
                       /ISP
@@ -259,15 +259,15 @@
                   </tr>
                   <tr>
                     <td>Bandwidth</td>
-                    <td>{{ allPkgs[currPkgIdx].data.bandwidth }} MBPS</td>
+                    <td>{{ allPkgs[currPkgIdx].bandwidth }} MBPS</td>
                   </tr>
                   <tr>
                     <td>Upload Speed</td>
-                    <td>{{ allPkgs[currPkgIdx].data.up_speed }} MBPS</td>
+                    <td>{{ allPkgs[currPkgIdx].up_speed }} MBPS</td>
                   </tr>
                   <tr>
                     <td>Download Speed</td>
-                    <td>{{ allPkgs[currPkgIdx].data.down_speed }} MBPS</td>
+                    <td>{{ allPkgs[currPkgIdx].down_speed }} MBPS</td>
                   </tr>
                   <tr>
                     <td>Data Limit</td>
@@ -275,13 +275,11 @@
                   </tr>
                   <tr>
                     <td>Estimated Down Time</td>
-                    <td>{{ allPkgs[currPkgIdx].data.downTime }} hrs</td>
+                    <td>{{ allPkgs[currPkgIdx].downTime }} hrs</td>
                   </tr>
                   <tr>
                     <td>Estimated Response Time</td>
-                    <td>
-                      {{ allPkgs[currPkgIdx].data.responseTime }} milliseconds
-                    </td>
+                    <td>{{ allPkgs[currPkgIdx].responseTime }} milliseconds</td>
                   </tr>
                 </tbody>
               </template>
@@ -306,8 +304,7 @@
             <v-col>
               <v-btn
                 :disabled="
-                  !allPkgs[currPkgIdx].data.ongoing ||
-                    !allPkgs[currPkgIdx].status
+                  !allPkgs[currPkgIdx].ongoing || !allPkgs[currPkgIdx].status
                 "
                 color="deep-purple lighten-2"
                 @click="selectPressed(currPkgIdx)"
@@ -369,20 +366,19 @@ export default {
 
   mounted() {
     this.fetchAllOffers();
-    this.fetchAllPackages();
+    this.fetchUnionAllPackages();
     this.showPayment = false;
   },
 
   methods: {
     ...mapMutations(["setSelectedPkg"]),
 
-    fetchAllPackages() {
+    fetchUnionAllPackages() {
       this.isLoading = true;
 
       axios
-        .post("/api/package/fetchByQueryWithStatus", {
-          type: 3,
-          id: this.getUserData._id,
+        .post("/api/package/fetchUnionUserPackage", {
+          union: this.getUserData.union,
         })
         .then((res) => {
           // console.log(res);

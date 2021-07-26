@@ -147,7 +147,7 @@
               <v-icon left>
                 mdi-package
               </v-icon>
-              All ISP Packages
+              All Packages
             </v-tab>
 
             <v-tab-item>
@@ -157,7 +157,7 @@
               <pkgOwn></pkgOwn>
             </v-tab-item>
             <v-tab-item>
-              <pkgUSER></pkgUSER>
+              <pkgUnion></pkgUnion>
             </v-tab-item>
           </v-tabs>
         </v-card>
@@ -175,11 +175,11 @@ import axios from "axios";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
 import pkgISP from "./packages_ISP.vue";
-import pkgUSER from "./packages_USER.vue";
+import pkgUnion from "./packages_union.vue";
 import pkgOwn from "./packages_own.vue";
 
 export default {
-  components: { topbar, bottombar, pkgISP, pkgUSER, pkgOwn },
+  components: { topbar, bottombar, pkgISP, pkgUnion, pkgOwn },
 
   data() {
     return {

@@ -155,6 +155,13 @@ const routes = [
 		},
     component: () => import("../components/USER/packages"),
   },
+  // {
+  //   path: "/USER/tickets",
+  //   meta: {
+	// 		requireLoggedIn: true
+	// 	},
+  //   component: () => import("../components/USER/tickets"),
+  // },
   {
     path: "/USER/dashboard",
     meta: {

@@ -4,7 +4,17 @@
 
     <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
-      <template>
+      <!-- loading -->
+      <v-progress-linear
+        v-if="isLoading"
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+
+      <template v-if="!isLoading">
         <v-row justify="center">
           <v-expansion-panels v-model="panel" inset>
             <v-expansion-panel
@@ -51,6 +61,7 @@ export default {
   components: { topbar, bottombar },
   data() {
     return {
+      isLoading: true,
       panel: "",
       allNotifications: [],
     };
@@ -61,6 +72,7 @@ export default {
   },
 
   mounted() {
+    this.isLoading = true;
     if (!this.getUserData) {
       this.fetchOwnData();
     }
@@ -94,6 +106,7 @@ export default {
     },
 
     fetchNotifications() {
+      // this.isLoading = true;
       axios
         .post("/api/notification/fetchByQuery", {
           receiverID: this.getUserData.name,
@@ -108,6 +121,9 @@ export default {
               this.allNotifications[i].notificationArrivalTime = new Date(
                 this.allNotifications[i].notificationArrivalTime
               );
+            }
+            if (this.isLoading) {
+              this.isLoading = false;
             }
           } else {
             this.error = true;

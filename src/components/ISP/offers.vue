@@ -4,6 +4,8 @@
 
     <div class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
+
+      <!-- create new offer -->
       <v-row class="ma-12 mb-12" justify="center">
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
@@ -168,7 +170,18 @@
         </v-dialog>
       </v-row>
 
-      <v-row>
+      <!-- loading -->
+      <v-progress-linear
+        v-if="isLoading"
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+
+      <!-- showing offers -->
+      <v-row v-if="!isLoading">
         <div class="col-lg-4" v-for="(offer, i) in allOffers" :key="i">
           <v-badge :content="0" :value="0" color="red" overlap icon="mdi-home">
             <v-card class="mx-auto" max-width="344">
@@ -182,18 +195,6 @@
               <v-card-subtitle>
                 <h2 style="color:red">{{ offer.reduction }}% off</h2>
               </v-card-subtitle>
-
-              <!-- <v-card-actions>
-                    <v-btn color="orange lighten-2" text> Details </v-btn>
-
-                    <v-spacer></v-spacer>
-
-                    <v-btn icon @click="show = !show">
-                      <v-icon>{{
-                        show ? "mdi-chevron-up" : "mdi-chevron-down"
-                      }}</v-icon>
-                    </v-btn>
-                  </v-card-actions> -->
 
               <v-expand-transition>
                 <div>
@@ -232,6 +233,7 @@
 </template>
 
 <script>
+import { mapMutations, mapGetters } from "vuex";
 import axios from "axios";
 import topbar from "./topbar.vue";
 import bottombar from "./bottombar.vue";
@@ -244,6 +246,7 @@ export default {
 
   data() {
     return {
+      isLoading: true,
       valid: false,
       show: false,
 
@@ -292,9 +295,9 @@ export default {
     };
   },
 
-  mounted() {},
-
   computed: {
+    ...mapGetters(["getUserData"]),
+
     getToday() {
       let today = new Date();
       today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -322,38 +325,19 @@ export default {
     },
   },
 
+  mounted() {
+    this.fetchOffers();
+    this.isLoading = true;
+  },
+
   methods: {
-    sendNotification() {
-      axios
-        .get("/api/isp/fetch")
-        .then((res) => {
-          // console.log(res);
-          if (res.status === 200) {
-            // console.log(res.data.data);
-            this.ispList = res.data.data;
-            this.ispNameList = [];
-            for (let i in this.ispList) {
-              this.ispNameList.push(this.ispList[i].name);
-            }
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    ...mapMutations(["setUserData", "decNtfCount"]),
 
-      this.pageInfo = "notify";
-    },
-
-    showTickets() {
-      this.pageInfo = "tickets";
-    },
-
-    showOffers() {
+    fetchOffers() {
+      this.isLoading = true;
       axios
         .post("/api/offer/fetchByQuery", {
-          creator: "Nttn",
+          creator: this.getUserData.name,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -362,6 +346,7 @@ export default {
             for (let i in this.allOffers) {
               this.offerNameList.push(this.allOffers[i].name);
             }
+            this.isLoading = false;
           } else {
             this.error = true;
           }
@@ -378,41 +363,6 @@ export default {
       this.dates = [];
     },
 
-    sendPressed() {
-      // console.log("send pressed");
-
-      let newNotification = {
-        senderId: "Nttn",
-        receiverID: this.ispName,
-        senderType: 1,
-        receiverType: 2,
-        subject: this.subject,
-        details: this.details,
-        category: "",
-      };
-
-      // console.log(newNotification);
-
-      axios
-        .post("/api/notification/insert", newNotification)
-        .then((res) => {
-          // console.log(res);
-          if (res.status === 201) {
-            this.$refs.form.reset();
-            this.showSnackbar = true;
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-      setTimeout(() => {
-        this.showSnackbar = false;
-      }, 2000);
-    },
-
     submitPressed() {
       // console.log("submit pressed");
 
@@ -422,7 +372,7 @@ export default {
         reduction: this.reduction,
         startTime: this.dates[0],
         expirationTime: this.dates[1],
-        creator: "Nttn",
+        creator: this.getUserData.name,
         // minPrice: this.minPrice,
       };
 

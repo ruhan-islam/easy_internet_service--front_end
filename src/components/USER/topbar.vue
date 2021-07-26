@@ -1,10 +1,6 @@
 <template>
-  <div>
-    <v-bottom-navigation horizontal color="teal" grow dark>
-      <!-- <v-btn router-link to="/USER" exact>
-        <span>Home</span>
-        <v-icon>mdi-home</v-icon>
-      </v-btn> -->
+  <div style="margin-bottom:8%">
+    <v-app-bar :fixed="true" dark>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn v-bind="attrs" v-on="on" router-link to="/USER/home" exact>
@@ -15,10 +11,6 @@
         <span> Home </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/USER/packages" exact>
-        <span>Packages</span>
-        <v-icon>mdi-package-variant</v-icon>
-      </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn v-bind="attrs" v-on="on" router-link to="/USER/packages" exact>
@@ -29,10 +21,6 @@
         <span> Packages </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/USER/payments" exact>
-        <span>Payments</span>
-        <v-icon>mdi-credit-card</v-icon>
-      </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn v-bind="attrs" v-on="on" router-link to="/USER/payments" exact>
@@ -43,10 +31,6 @@
         <span> Payments </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/USER/notifications" exact>
-        <span>Notifications</span>
-        <v-icon>mdi-bell</v-icon>
-      </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -58,16 +42,35 @@
           >
             <span> Notifications </span>
             <v-icon> mdi-bell </v-icon>
-            <v-badge v-if="getNtfCount !== 0" :content="getNtfCount"> </v-badge>
+            <v-badge
+              offset-x="10"
+              offset-y="0"
+              v-if="getNtfCount !== 0"
+              :content="getNtfCount"
+            >
+            </v-badge>
           </v-btn>
         </template>
         <span> Notifications </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link to="/USER/profile" exact>
-        <span>Profile</span>
-        <v-icon>mdi-account</v-icon>
-      </v-btn> -->
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrsTickets }">
+          <v-btn
+            v-bind="attrsTickets"
+            v-on="on"
+            router-link
+            to="/USER/tickets"
+            exact
+            elevation="0"
+          >
+            <span> Tickets </span>
+            <v-icon> mdi-widgets </v-icon>
+          </v-btn>
+        </template>
+        <span> Tickets </span>
+      </v-tooltip>
+
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -84,10 +87,6 @@
         <span> Dashboard </span>
       </v-tooltip>
 
-      <!-- <v-btn router-link @click="logOut" exact>
-        <span>Signout</span>
-        <v-icon>mdi-logout</v-icon>
-      </v-btn> -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn v-bind="attrs" v-on="on" @click="logOut()">
@@ -97,7 +96,7 @@
         </template>
         <span> Signout </span>
       </v-tooltip>
-    </v-bottom-navigation>
+    </v-app-bar>
   </div>
 </template>
 
@@ -200,3 +199,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.v-btn {
+  margin: 0px 2%;
+}
+</style>

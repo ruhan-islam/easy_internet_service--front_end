@@ -244,6 +244,6 @@ export default {
 
 <style scoped>
 .v-btn {
-  margin: 0px 8px;
+  margin: 0px 0.6%;
 }
 </style>
