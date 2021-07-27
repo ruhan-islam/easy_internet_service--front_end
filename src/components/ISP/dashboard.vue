@@ -2,7 +2,18 @@
   <div>
     <topbar></topbar>
 
-    <div class="ma-12 mb-12 container-flow">
+    <!-- init Load -->
+    <div class="container" v-if="initLoading">
+      <v-progress-linear
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+    </div>
+
+    <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
       <v-row>
         <v-col cols="4">
           <v-card width="400">
@@ -166,6 +177,7 @@ export default {
 
   data() {
     return {
+      initLoading: true,
       labels: [],
       value: [],
       labels2: [],
@@ -183,10 +195,25 @@ export default {
   },
 
   mounted() {
-    this.fetchMyPackageList();
-    this.fetchUserPackageList();
-    this.fetchMyPaymentList();
-    this.fetchUserPaymentList();
+    axios
+      .post("/api/isp/fetchOwnData", {
+        id: this.getUserID,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          this.setUserData(res.data);
+          this.fetchMyPackageList();
+          this.fetchUserPackageList();
+          this.fetchMyPaymentList();
+          this.fetchUserPaymentList();
+          this.initLoading = false;
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
   computed: {

@@ -2,9 +2,19 @@
   <div>
     <topbar></topbar>
 
-    <div class="ma-12 mb-12 container-flow">
-      <!-- loading -->
-      <v-container>
+    <!-- init Load -->
+    <div class="container" v-if="initLoading">
+      <v-progress-linear
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+    </div>
+
+    <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
+      <v-container v-if="false">
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
             <v-row>
@@ -28,7 +38,7 @@
 
           <v-card style="padding: 30px">
             <h2>New to the system? Just start here...</h2>
-            <v-form ref="form" v-model="valid" lazy-validation>
+            <v-form ref="form" v-model="valid2" lazy-validation>
               <v-expansion-panels>
                 <v-expansion-panel>
                   <v-expansion-panel-header>
@@ -43,7 +53,7 @@
                               Give us an estimation to the number of your end
                               subscriber
                             </span>
-                            <span v-if="key === 1 && noCon > 0">
+                            <span key="1" v-if="noCon > 0">
                               {{ noCon }} end connections estimated
                             </span>
                           </v-fade-transition>
@@ -72,7 +82,7 @@
                             <span v-if="open" key="0">
                               Enter your desired duration for the package
                             </span>
-                            <span v-else key="1">
+                            <span key="1" v-if="duration > 0">
                               {{ duration }}
                             </span>
                           </v-fade-transition>
@@ -84,9 +94,9 @@
                   <v-expansion-panel-content>
                     <v-slider
                       v-model="duration"
-                      :min="minDur"
-                      :step="stepDur"
-                      :max="maxDur"
+                      :min="3"
+                      :step="1"
+                      :max="24"
                       label="Duration (month)"
                       class="align-center"
                       thumb-label="always"
@@ -130,7 +140,7 @@
           <v-toolbar flat dark>
             <v-toolbar-title> Manage Packages </v-toolbar-title>
           </v-toolbar>
-          <v-tabs vertical>
+          <v-tabs v-model="activeTab" vertical>
             <v-tab>
               <v-icon left>
                 mdi-package-variant-closed
@@ -186,10 +196,10 @@ export default {
 
   data() {
     return {
-      valid: false,
-      minDur: "",
-      maxDur: "",
-      stepDur: "",
+      initLoading: true,
+      activeTab: 0,
+      key: "",
+      valid2: false,
       selectedOpt: "nttn",
       dialog: false,
       noCon: 0,
@@ -197,41 +207,46 @@ export default {
 
       noConRules: [
         (v) => !!v || "Please enter your estimated number",
-        (v) => /^\d*$/.test(v) || "Number should be valid",
+        (v) => /^\d*$/.test(v) || "Number should be valid2",
       ],
     };
   },
 
-  mounted() {},
+  mounted() {
+    // console.log(this.getUserData);
+    axios
+      .post("/api/isp/fetchOwnData", {
+        id: this.getUserID,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          // console.log(res.data);
+          this.setUserData(res.data);
+          // console.log(this.userData);
+          if (this.getUserData.packages.length) {
+            this.activeTab = 1;
+          } else {
+            this.activeTab = 0;
+          }
+          this.initLoading = false;
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },
 
   computed: {
     ...mapGetters(["getUserID", "getUserData"]),
 
     isSubmitDisabled() {
-      // return !(
-      //   this.valid &&
-      //   this.packageName &&
-      //   this.bandwidth &&
-      //   this.downSpeed &&
-      //   this.upSpeed &&
-      //   this.responseTime &&
-      //   this.downTime &&
-      //   this.price
-      // );
-      return true;
+      return !(this.valid2 && this.noCon && this.duration);
     },
 
     isResetDisabled() {
-      // return !(
-      //   this.packageName ||
-      //   this.price ||
-      //   this.bandwidth > this.minBW ||
-      //   this.upSpeed > this.bandwidth ||
-      //   this.downSpeed > this.bandwidth ||
-      //   this.downTime > 0 ||
-      //   this.responseTime > this.minRT
-      // );
-      return true;
+      return !(this.noCon || this.duration);
     },
   },
 
@@ -259,7 +274,10 @@ export default {
 
     confirmPressed() {},
 
-    resetPressed() {},
+    resetPressed() {
+      this.noCon = 0;
+      this.duration = 0;
+    },
   },
 };
 </script>

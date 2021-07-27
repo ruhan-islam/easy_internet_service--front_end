@@ -2,7 +2,18 @@
   <div>
     <topbar></topbar>
 
-    <div class="ma-12 mb-12 container-flow">
+    <!-- init Load -->
+    <div class="container" v-if="initLoading">
+      <v-progress-linear
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+    </div>
+
+    <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
       <div class="container" justify-center>
         <v-form ref="form" v-model="valid" lazy-validation>
@@ -65,6 +76,7 @@ export default {
 
   data() {
     return {
+      initLoading: true,
       valid: false,
 
       userList: [],
@@ -87,7 +99,24 @@ export default {
   },
 
   mounted() {
-    this.fetchUserNameList();
+    axios
+      .post("/api/isp/fetchOwnData", {
+        id: this.getUserID,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          this.setUserData(res.data);
+          // data fetch begins
+          this.fetchUserNameList();
+          // data fetch terminates
+          this.initLoading = false;
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
   computed: {
@@ -107,6 +136,7 @@ export default {
   methods: {
     ...mapMutations([
       // "setNtfCount",
+      "setUserData",
     ]),
 
     fetchUserNameList() {

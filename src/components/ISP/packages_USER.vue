@@ -320,9 +320,9 @@
                   <v-range-slider
                     v-model="filterPrice"
                     label="Price (Taka)"
-                    min="0"
-                    max="1000000"
-                    step="1000"
+                    :min="minFilterPrice"
+                    :max="maxFilterPrice"
+                    :step="stepFilterPrice"
                   >
                   </v-range-slider>
                   <label style="color: rgb(97, 91, 91)"
@@ -632,7 +632,7 @@
 
 <script>
 import axios from "axios";
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 // import topbar from "./topbar.vue";
 // import bottombar from "./bottombar.vue";
 
@@ -699,7 +699,10 @@ export default {
       pkgNameList: [],
       allOffers: [],
       validOffers: [],
-      filterPrice: [1, 1000000],
+      filterPrice: [500, 20000],
+      minFilterPrice: 500,
+      maxFilterPrice: 20000,
+      stepFilterPrice: 500,
       filterBW: [1, 200],
       markVal: 0,
       selectallTitle: "Select All",
@@ -707,7 +710,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserName", "getUserData"]),
+    ...mapGetters(["getUserID", "getUserName", "getUserData"]),
 
     isSubmitDisabled() {
       return !(
@@ -741,6 +744,8 @@ export default {
   },
 
   methods: {
+    ...mapMutations(["setUserData"]),
+
     fetchAllPackages() {
       this.isLoading = true;
       axios
@@ -981,60 +986,80 @@ export default {
     },
 
     orderByNameAscending(a, b) {
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
         return -1;
       }
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceAscending(a, b) {
-      if (a.price < b.price) {
+      if (a.data.price < b.data.price) {
         return -1;
       }
-      if (a.price > b.price) {
+      if (a.data.price > b.data.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthAscending(a, b) {
-      if (a.bandwidth < b.bandwidth) {
+      if (a.data.bandwidth < b.data.bandwidth) {
         return -1;
       }
-      if (a.bandwidth > b.bandwidth) {
+      if (a.data.bandwidth > b.data.bandwidth) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByDurationAscending(a, b) {
+      if (a.data.duration < b.data.duration) {
+        return -1;
+      }
+      if (a.data.duration > b.data.duration) {
         return 1;
       }
       return 0;
     },
 
     orderByNameDescending(a, b) {
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
         return -1;
       }
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceDescending(a, b) {
-      if (a.price > b.price) {
+      if (a.data.price > b.data.price) {
         return -1;
       }
-      if (a.price < b.price) {
+      if (a.data.price < b.data.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthDescending(a, b) {
-      if (a.bandwidth > b.bandwidth) {
+      if (a.data.bandwidth > b.data.bandwidth) {
         return -1;
       }
-      if (a.bandwidth < b.bandwidth) {
+      if (a.data.bandwidth < b.data.bandwidth) {
+        return 1;
+      }
+      return 0;
+    },
+
+    orderByDurationDescending(a, b) {
+      if (a.data.duration > b.data.duration) {
+        return -1;
+      }
+      if (a.data.duration < b.data.duration) {
         return 1;
       }
       return 0;
@@ -1057,15 +1082,14 @@ export default {
         this.filterBW[0] > this.filterBW[1]
           ? this.filterBW[0]
           : this.filterBW[1];
-
       this.pkgs = [];
-      // console.log(minPrice, maxPrice);
+      console.log(minPrice, maxPrice);
       for (let pkg in this.allPkgs) {
         if (
-          this.allPkgs[pkg].price >= minPrice &&
-          this.allPkgs[pkg].price <= maxPrice &&
-          this.allPkgs[pkg].bandwidth >= minBandwidth &&
-          this.allPkgs[pkg].bandwidth <= maxBandwidth
+          this.allPkgs[pkg].data.price >= minPrice &&
+          this.allPkgs[pkg].data.price <= maxPrice &&
+          this.allPkgs[pkg].data.bandwidth >= minBandwidth &&
+          this.allPkgs[pkg].data.bandwidth <= maxBandwidth
         ) {
           this.pkgs.push(this.allPkgs[pkg]);
         }

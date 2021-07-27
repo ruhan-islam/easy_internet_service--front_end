@@ -12,6 +12,126 @@
       height="6"
     ></v-progress-linear>
 
+    <v-container v-if="!isLoading" class="mb-12">
+      <v-dialog v-model="dialog" persistent max-width="80%">
+        <template v-slot:activator="{ on, attrs }">
+          <v-row>
+            <v-col cols="1">
+              <v-btn
+                color="deep-purple lighten-2"
+                dark
+                v-bind="attrs"
+                v-on="on"
+                max-width="100%"
+                fab
+              >
+                <v-icon>mdi-robot</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col>
+              <h5 style="margin-top:15px">Start Tour</h5>
+            </v-col>
+          </v-row>
+        </template>
+
+        <v-card style="padding: 30px">
+          <h2>New to the system? Just start here...</h2>
+          <v-form ref="form" v-model="valid2" lazy-validation>
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template v-slot:default="{ open }">
+                    <v-row no-gutters>
+                      <v-col cols="4">
+                        Estimated Number of End Connections
+                      </v-col>
+                      <v-col cols="8" class="text--secondary">
+                        <v-fade-transition leave-absolute>
+                          <span v-if="open" key="0">
+                            Give us an estimation to the number of your end
+                            subscriber
+                          </span>
+                          <span key="1" v-if="noCon > 0">
+                            {{ noCon }} end connections estimated
+                          </span>
+                        </v-fade-transition>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-text-field
+                    v-model="noCon"
+                    :rules="noConRules"
+                    label="End Connections (Number)"
+                    required
+                    placeholder="e.g. 10000"
+                  ></v-text-field>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template v-slot:default="{ open }">
+                    <v-row no-gutters>
+                      <v-col cols="4"> Your desired duration(month) </v-col>
+                      <v-col cols="8" class="text--secondary">
+                        <v-fade-transition leave-absolute>
+                          <span v-if="open" key="0">
+                            Enter your desired duration for the package
+                          </span>
+                          <span key="1" v-if="duration > 0">
+                            {{ duration }}
+                          </span>
+                        </v-fade-transition>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+
+                <v-expansion-panel-content>
+                  <v-slider
+                    v-model="duration"
+                    :min="3"
+                    :step="1"
+                    :max="24"
+                    label="Duration (month)"
+                    class="align-center"
+                    thumb-label="always"
+                    placeholder="e.g. 6"
+                  >
+                  </v-slider>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
+              <v-card-actions>
+                <v-btn
+                  :disabled="isResetDisabled"
+                  color="error"
+                  class="mr-4"
+                  @click="resetPressed"
+                >
+                  Reset
+                </v-btn>
+
+                <v-btn
+                  :disabled="isSubmitDisabled"
+                  color="success"
+                  class="mr-4"
+                  @click="confirmPressed"
+                >
+                  Confirm
+                </v-btn>
+                <v-btn color="green darken-1" text @click="dialog = false">
+                  Cancel
+                </v-btn>
+              </v-card-actions>
+            </v-expansion-panels>
+          </v-form>
+        </v-card>
+      </v-dialog>
+    </v-container>
+
     <!-- package filters  -->
     <v-row v-if="!isLoading" justify="center">
       <v-card style="padding:0px 20px">
@@ -191,7 +311,7 @@
 
     <!-- show ISP packages -->
     <v-row v-if="!isLoading" justify="center">
-      <div class="col-lg-5" v-for="(pkg, i) in allPkgs" :key="i">
+      <div class="col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
@@ -585,8 +705,19 @@ export default {
 
   data() {
     return {
-      maxCompareCount: 3,
+      key: "",
+      valid2: false,
+      selectedOpt: "nttn",
+      dialog: false,
+      noCon: 0,
+      duration: 0,
 
+      noConRules: [
+        (v) => !!v || "Please enter your estimated number",
+        (v) => /^\d*$/.test(v) || "Number should be valid2",
+      ],
+
+      maxCompareCount: 3,
       dialogCompare: false,
       dialogZero: false,
       idxList: [],
@@ -634,7 +765,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["setSelectedPkg"]),
+    ...mapMutations(["setUserData", "setSelectedPkg"]),
 
     fetchAllPackages() {
       this.isLoading = true;
@@ -801,6 +932,21 @@ export default {
       return today.toISOString().slice(0, 10);
     },
 
+    confirmPressed() {},
+
+    resetPressed() {
+      this.noCon = 0;
+      this.duration = 0;
+    },
+
+    isSubmitDisabled() {
+      return !(this.valid2 && this.noCon && this.duration);
+    },
+
+    isResetDisabled() {
+      return !(this.noCon || this.duration);
+    },
+
     doSort(item) {
       if (item == "Price 🔺") {
         this.pkgs.sort(this.orderByPriceAscending);
@@ -822,80 +968,80 @@ export default {
     },
 
     orderByNameAscending(a, b) {
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
         return -1;
       }
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceAscending(a, b) {
-      if (a.price < b.price) {
+      if (a.data.price < b.data.price) {
         return -1;
       }
-      if (a.price > b.price) {
+      if (a.data.price > b.data.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthAscending(a, b) {
-      if (a.bandwidth < b.bandwidth) {
+      if (a.data.bandwidth < b.data.bandwidth) {
         return -1;
       }
-      if (a.bandwidth > b.bandwidth) {
+      if (a.data.bandwidth > b.data.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationAscending(a, b) {
-      if (a.duration < b.duration) {
+      if (a.data.duration < b.data.duration) {
         return -1;
       }
-      if (a.duration > b.duration) {
+      if (a.data.duration > b.data.duration) {
         return 1;
       }
       return 0;
     },
 
     orderByNameDescending(a, b) {
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
         return -1;
       }
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceDescending(a, b) {
-      if (a.price > b.price) {
+      if (a.data.price > b.data.price) {
         return -1;
       }
-      if (a.price < b.price) {
+      if (a.data.price < b.data.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthDescending(a, b) {
-      if (a.bandwidth > b.bandwidth) {
+      if (a.data.bandwidth > b.data.bandwidth) {
         return -1;
       }
-      if (a.bandwidth < b.bandwidth) {
+      if (a.data.bandwidth < b.data.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationDescending(a, b) {
-      if (a.duration > b.duration) {
+      if (a.data.duration > b.data.duration) {
         return -1;
       }
-      if (a.duration < b.duration) {
+      if (a.data.duration < b.data.duration) {
         return 1;
       }
       return 0;
@@ -930,12 +1076,12 @@ export default {
       // console.log(minPrice, maxPrice);
       for (let pkg in this.allPkgs) {
         if (
-          this.allPkgs[pkg].price >= minPrice &&
-          this.allPkgs[pkg].price <= maxPrice &&
-          this.allPkgs[pkg].bandwidth >= minBandwidth &&
-          this.allPkgs[pkg].bandwidth <= maxBandwidth &&
-          this.allPkgs[pkg].duration >= minDuration &&
-          this.allPkgs[pkg].duration <= maxDuration
+          this.allPkgs[pkg].data.price >= minPrice &&
+          this.allPkgs[pkg].data.price <= maxPrice &&
+          this.allPkgs[pkg].data.bandwidth >= minBandwidth &&
+          this.allPkgs[pkg].data.bandwidth <= maxBandwidth &&
+          this.allPkgs[pkg].data.duration >= minDuration &&
+          this.allPkgs[pkg].data.duration <= maxDuration
         ) {
           this.pkgs.push(this.allPkgs[pkg]);
         }

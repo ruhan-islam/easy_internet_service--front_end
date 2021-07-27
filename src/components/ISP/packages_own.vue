@@ -221,7 +221,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["setSelectedPkg"]),
+    ...mapMutations(["setUserData", "setSelectedPkg"]),
 
     fetchOwnPackages() {
       this.isLoading = true;

@@ -1138,80 +1138,80 @@ export default {
     },
 
     orderByNameAscending(a, b) {
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
         return -1;
       }
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceAscending(a, b) {
-      if (a.price < b.price) {
+      if (a.data.price < b.data.price) {
         return -1;
       }
-      if (a.price > b.price) {
+      if (a.data.price > b.data.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthAscending(a, b) {
-      if (a.bandwidth < b.bandwidth) {
+      if (a.data.bandwidth < b.data.bandwidth) {
         return -1;
       }
-      if (a.bandwidth > b.bandwidth) {
+      if (a.data.bandwidth > b.data.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationAscending(a, b) {
-      if (a.duration < b.duration) {
+      if (a.data.duration < b.data.duration) {
         return -1;
       }
-      if (a.duration > b.duration) {
+      if (a.data.duration > b.data.duration) {
         return 1;
       }
       return 0;
     },
 
     orderByNameDescending(a, b) {
-      if (a.name.toUpperCase() > b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
         return -1;
       }
-      if (a.name.toUpperCase() < b.name.toUpperCase()) {
+      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceDescending(a, b) {
-      if (a.price > b.price) {
+      if (a.data.price > b.data.price) {
         return -1;
       }
-      if (a.price < b.price) {
+      if (a.data.price < b.data.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthDescending(a, b) {
-      if (a.bandwidth > b.bandwidth) {
+      if (a.data.bandwidth > b.data.bandwidth) {
         return -1;
       }
-      if (a.bandwidth < b.bandwidth) {
+      if (a.data.bandwidth < b.data.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationDescending(a, b) {
-      if (a.duration > b.duration) {
+      if (a.data.duration > b.data.duration) {
         return -1;
       }
-      if (a.duration < b.duration) {
+      if (a.data.duration < b.data.duration) {
         return 1;
       }
       return 0;
@@ -1246,12 +1246,12 @@ export default {
       // console.log(minPrice, maxPrice);
       for (let pkg in this.allPkgs) {
         if (
-          this.allPkgs[pkg].price >= minPrice &&
-          this.allPkgs[pkg].price <= maxPrice &&
-          this.allPkgs[pkg].bandwidth >= minBandwidth &&
-          this.allPkgs[pkg].bandwidth <= maxBandwidth &&
-          this.allPkgs[pkg].duration >= minDuration &&
-          this.allPkgs[pkg].duration <= maxDuration
+          this.allPkgs[pkg].data.price >= minPrice &&
+          this.allPkgs[pkg].data.price <= maxPrice &&
+          this.allPkgs[pkg].data.bandwidth >= minBandwidth &&
+          this.allPkgs[pkg].data.bandwidth <= maxBandwidth &&
+          this.allPkgs[pkg].data.duration >= minDuration &&
+          this.allPkgs[pkg].data.duration <= maxDuration
         ) {
           this.pkgs.push(this.allPkgs[pkg]);
         }

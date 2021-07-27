@@ -2,7 +2,18 @@
   <div>
     <topbar></topbar>
 
-    <div class="ma-12 mb-12 container-flow">
+    <!-- init Load -->
+    <div class="container" v-if="initLoading">
+      <v-progress-linear
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+    </div>
+
+    <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
 
       <!-- create new offer -->
@@ -246,6 +257,7 @@ export default {
 
   data() {
     return {
+      initLoading: true,
       isLoading: true,
       valid: false,
       show: false,
@@ -296,7 +308,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserName", "getUserData"]),
+    ...mapGetters(["getUserID", "getUserName", "getUserData"]),
 
     getToday() {
       let today = new Date();
@@ -326,7 +338,24 @@ export default {
   },
 
   mounted() {
-    this.fetchOffers();
+    axios
+      .post("/api/isp/fetchOwnData", {
+        id: this.getUserID,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          this.setUserData(res.data);
+          // data fetch begins
+          this.fetchOffers();
+          // data fetch terminates
+          this.initLoading = false;
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
   methods: {
