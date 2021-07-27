@@ -95,6 +95,7 @@ export default {
       // "getAuthToken",
       // "getNtfCount",
       "getUserID",
+      "getUserName",
       "getUserData",
     ]),
 
@@ -136,7 +137,7 @@ export default {
       // console.log("send pressed");
 
       let newNotification = {
-        senderId: this.getUserData.name,
+        senderId: this.getUserName,
         receiverID: this.userName,
         senderType: 2,
         receiverType: 3,

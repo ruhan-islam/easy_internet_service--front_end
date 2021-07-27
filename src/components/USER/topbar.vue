@@ -148,6 +148,7 @@ export default {
       "getAuthToken",
       "getNtfCount",
       "getUserID",
+      "getUserName",
       "getUserData",
       "getUserType",
     ]),
@@ -183,7 +184,7 @@ export default {
 
       axios
         .post("/api/notification/unseenNotificationCount", {
-          receiverID: this.getUserData.name,
+          receiverID: this.getUserName,
           receiverType: 3, // for USER
         })
         .then((res) => {

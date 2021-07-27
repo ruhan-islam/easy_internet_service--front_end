@@ -249,6 +249,7 @@ export default {
       // "getAuthToken",
       // "getNtfCount",
       "getUserID",
+      "getUserName",
       "getUserData",
     ]),
 
@@ -265,7 +266,7 @@ export default {
       axios
         .post("/api/ticket/fetchBySender", {
           senderType: 2,
-          senderId: this.getUserData.name,
+          senderId: this.getUserName,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -295,7 +296,7 @@ export default {
       axios
         .post("/api/ticket/fetchByQuery", {
           receiverType: 2,
-          receiverId: this.getUserData.name,
+          receiverId: this.getUserName,
         })
         .then((res) => {
           // console.log(res);
@@ -327,7 +328,7 @@ export default {
       // console.log("send pressed");
 
       let newTicket = {
-        senderId: this.getUserData.name,
+        senderId: this.getUserName,
         receiverId: "Nttn",
         senderType: 2,
         receiverType: 1,

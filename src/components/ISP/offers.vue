@@ -296,7 +296,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserData"]),
+    ...mapGetters(["getUserName", "getUserData"]),
 
     getToday() {
       let today = new Date();
@@ -336,7 +336,7 @@ export default {
       this.isLoading = true;
       axios
         .post("/api/offer/fetchByQuery", {
-          creator: this.getUserData.name,
+          creator: this.getUserName,
         })
         .then((res) => {
           if (res.status === 200) {
@@ -371,7 +371,7 @@ export default {
         reduction: this.reduction,
         startTime: this.dates[0],
         expirationTime: this.dates[1],
-        creator: this.getUserData.name,
+        creator: this.getUserName,
         // minPrice: this.minPrice,
       };
 

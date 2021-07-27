@@ -74,7 +74,7 @@
                             <tr>
                               <td>ISP Name:</td>
                               <td>
-                                <strong> {{ getUserData.name }} </strong>
+                                <strong> {{ getUserName }} </strong>
                               </td>
                             </tr>
                             <tr>
@@ -1425,6 +1425,7 @@ export default {
   computed: {
     ...mapGetters([
       "getUserID",
+      "getUserName",
       "getUserData",
       "getSelectedPkg",
       // "getAuthToken",

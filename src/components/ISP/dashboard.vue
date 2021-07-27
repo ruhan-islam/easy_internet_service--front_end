@@ -11,7 +11,7 @@
               src="https://previews.123rf.com/images/kentoh/kentoh0901/kentoh090100278/4167332-blue-technology-internet-connected-background-abstract-wallpaper.jpg"
             >
               <v-avatar color="blue" style="margin:40px">
-                <span class="white--text text-h5">{{ getUserData.name }}</span>
+                <span class="white--text text-h5">{{ getUserName }}</span>
               </v-avatar>
             </v-img>
             <v-card-text style="padding:40px">
@@ -190,7 +190,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserID", "getUserData"]),
+    ...mapGetters(["getUserID", "getUserName", "getUserData"]),
   },
 
   methods: {
@@ -218,7 +218,7 @@ export default {
       this.isLoadingUserPackageList = true;
       axios
         .post("/api/package/fetchByQuery", {
-          packageCreator: this.getUserData.name,
+          packageCreator: this.getUserName,
         })
         .then((res) => {
           if (res.status === 200) {

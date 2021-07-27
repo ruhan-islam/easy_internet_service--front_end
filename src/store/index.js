@@ -12,6 +12,7 @@ export default new Vuex.Store({
         loginState: false,
         authToken: '',
         userID: '',
+        userName: '',
         userData: '',
         userType: '',
         userEmail: '',
@@ -36,6 +37,9 @@ export default new Vuex.Store({
         },
         getUserID: state => {
             return state.userID;
+        },
+        getUserName: state => {
+            return state.userName;
         },
         getUserData: state => {
             return state.userData;
@@ -76,6 +80,9 @@ export default new Vuex.Store({
         },
         setAuthToken: (state, authToken) => {
             state.authToken = authToken;
+        },
+        setUserName: (state, userName) => {
+            state.userName = userName;
         },
         setUserID: (state, userID) => {
             state.userID = userID;

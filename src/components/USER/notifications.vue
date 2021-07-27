@@ -68,7 +68,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserID", "getUserData"]),
+    ...mapGetters(["getUserID", "getUserName", "getUserData"]),
   },
 
   mounted() {
@@ -108,7 +108,7 @@ export default {
     fetchNotifications() {
       axios
         .post("/api/notification/fetchByQuery", {
-          receiverID: this.getUserData.name,
+          receiverID: this.getUserName,
           receiverType: 3, // for ISP
         })
         .then((res) => {

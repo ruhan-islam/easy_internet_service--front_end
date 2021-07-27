@@ -194,6 +194,7 @@ export default {
       "getTktCount",
       "getUserType",
       "getUserID",
+      "getUserName",
       "getUserData",
     ]),
   },
@@ -234,7 +235,7 @@ export default {
     fetchUnseenCount() {
       axios
         .post("/api/ticket/unseenCount", {
-          receiverId: this.getUserData.name,
+          receiverId: this.getUserName,
           receiverType: 2, // for ISP
         })
         .then((res) => {

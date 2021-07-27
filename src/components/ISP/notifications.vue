@@ -132,7 +132,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUserID", "getUserData"]),
+    ...mapGetters(["getUserID", "getUserName", "getUserData"]),
     dateRangeText() {
       return this.dates.join(" ~ ");
     },
@@ -173,7 +173,7 @@ export default {
       // this.isLoading = true;
       axios
         .post("/api/notification/fetchByQuery", {
-          receiverID: this.getUserData.name,
+          receiverID: this.getUserName,
           receiverType: 2, // for ISP
         })
         .then((res) => {
