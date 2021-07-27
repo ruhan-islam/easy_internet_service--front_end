@@ -669,8 +669,8 @@ export default {
           (v && v.length <= this.nameLen) ||
           `Name must be less than ${this.nameLen} characters`,
       ],
-      price: "",
 
+      price: "",
       priceRules: [
         (v) => !!v || "price is required",
         (v) => /^\d*$/.test(v) || "price must be valid",

@@ -16,7 +16,7 @@
     <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
       <div class="container" justify-center>
-        <v-form ref="form" v-model="valid" lazy-validation>
+        <v-form ref="form" v-model="formValid" lazy-validation>
           <div style="width:80%">
             <v-text-field
               v-model="userName"
@@ -50,7 +50,7 @@
               </v-btn>
             </v-card-actions>
 
-            <v-snackbar :value="showSnackbar">
+            <v-snackbar :value="showSnackbarNotify">
               Notification Sent
             </v-snackbar>
           </div>
@@ -77,7 +77,7 @@ export default {
   data() {
     return {
       initLoading: true,
-      valid: false,
+      formValid: false,
 
       userList: [],
       userNameList: [],
@@ -94,7 +94,7 @@ export default {
       details: "",
       detailsRules: [(v) => !!v || "Details is required"],
 
-      showSnackbar: false,
+      showSnackbarNotify: false,
     };
   },
 
@@ -129,7 +129,7 @@ export default {
     ]),
 
     isSendDisabled() {
-      return !(this.userName && this.subject && this.details && this.valid);
+      return !(this.userName && this.subject && this.details && this.formValid);
     },
   },
 
@@ -185,9 +185,9 @@ export default {
           // console.log(res);
           if (res.status === 201) {
             this.$refs.form.reset();
-            this.showSnackbar = true;
+            this.showSnackbarNotify = true;
             setTimeout(() => {
-              this.showSnackbar = false;
+              this.showSnackbarNotify = false;
             }, 2000);
           } else {
             this.error = true;

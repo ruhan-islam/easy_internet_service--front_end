@@ -142,7 +142,9 @@
                                     calculateReducedPrice(
                                       getSelectedPkg.price,
                                       getSelectedPkg.offerId
-                                    ) + ''
+                                    ) -
+                                      getUserData.balance +
+                                      ''
                                   "
                                   required
                                 ></v-text-field>

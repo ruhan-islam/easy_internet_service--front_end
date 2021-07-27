@@ -20,26 +20,53 @@
           <v-toolbar-title> Manage Tickets </v-toolbar-title>
         </v-toolbar>
         <v-tabs vertical>
+          <!-- create ticket -->
           <v-tab>
-            <v-icon left>
-              mdi-ticket-outline
-            </v-icon>
-            Create Ticket
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-ticket-outline
+                </v-icon>
+                Create Ticket
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
           <v-tab @click="fetchUserTickets">
-            <v-icon left>
-              mdi-ticket-account
-            </v-icon>
-            User Tickets
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-ticket-account
+                </v-icon>
+                User Tickets
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
-          <!-- <v-tab :disabled="true"> -->
           <v-tab @click="fetchOwnTickets">
-            <v-icon left>
-              mdi-ticket-confirmation
-            </v-icon>
-            Ticket History
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-ticket-confirmation
+                </v-icon>
+                Ticket History
+              </v-col>
+              <v-col></v-col>
+            </v-row>
+          </v-tab>
+
+          <v-tab>
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-cash-refund
+                </v-icon>
+                Refund
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
           <!-- send Tickets -->
@@ -213,6 +240,59 @@
               </v-data-table>
             </v-card>
           </v-tab-item>
+
+          <v-tab-item>
+            <div class="container" justify-center>
+              <v-form ref="form" v-model="refundValid" lazy-validation>
+                <div style="width:80%">
+                  <v-select
+                    v-model="refundCategory"
+                    :items="categories"
+                    label="Category"
+                    solo
+                  ></v-select>
+
+                  <v-text-field
+                    v-model="username"
+                    :rules="usernameRules"
+                    label="User name"
+                    required
+                  ></v-text-field>
+
+                  <v-text-field
+                    v-model="amount"
+                    :rules="amountRules"
+                    label="Amount (BDT)"
+                    required
+                  ></v-text-field>
+
+                  <v-textarea
+                    color="teal"
+                    v-model="refundDetails"
+                    :rules="refundDetailsRules"
+                    label="Details"
+                    required
+                  >
+                  </v-textarea>
+
+                  <v-card-actions class="justify-center">
+                    <v-btn
+                      :disabled="isRefundDisabled"
+                      color="success"
+                      class="mr-4"
+                      @click="refundPressed"
+                    >
+                      Refund
+                    </v-btn>
+                  </v-card-actions>
+
+                  <v-snackbar :value="showSnackbarRefund">
+                    Refund Done
+                  </v-snackbar>
+                </div>
+              </v-form>
+            </div>
+          </v-tab-item>
         </v-tabs>
       </v-card>
     </div>
@@ -238,8 +318,25 @@ export default {
       ticketType: "",
       checkbox: "",
 
+      refundValid: false,
+      refundCategory: "",
       details: "",
       detailsRules: [(v) => !!v || "Details is required"],
+      username: "",
+      usernameRules: [
+        (v) => !!v || "User name is required",
+        (v) =>
+          !(v && !this.userNameList.includes(v.trim())) || "user not found",
+      ],
+      amount: "",
+      amountRules: [
+        (v) => !!v || "Amount is required",
+        (v) => /^\d*$/.test(v) || "Amount must be valid",
+        (v) => v > 0 || "Amount must be valid",
+      ],
+      refundDetails: "",
+      refundDetailsRules: [(v) => !!v || "Details is required"],
+      showSnackbarRefund: false,
 
       showSnackbar: false,
       userTickets: [],
@@ -290,6 +387,7 @@ export default {
           // data fetch begins
           this.fetchOwnTickets();
           this.fetchUserTickets();
+          this.fetchUserNameList();
           // data fetch terminates
           this.initLoading = false;
         } else {
@@ -314,6 +412,16 @@ export default {
       "getUserData",
     ]),
 
+    isRefundDisabled() {
+      return !(
+        this.username &&
+        this.amount &&
+        this.refundCategory &&
+        this.refundDetails &&
+        this.refundValid
+      );
+    },
+
     isSendDisabled() {
       return !(this.category && this.details && this.valid);
     },
@@ -321,6 +429,57 @@ export default {
 
   methods: {
     ...mapMutations(["setUserData", "decTktCount"]),
+
+    fetchUserNameList() {
+      axios
+        .post("/api/user/fetchUserOfIspByQuery", {
+          id: this.getUserID,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            // console.log(res.data);
+            this.userList = res.data;
+            this.userNameList = [];
+            for (let i in this.userList) {
+              this.userNameList.push(this.userList[i].name);
+            }
+            // console.log(this.userNameList);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    refundPressed() {
+      axios
+        .post("/api/ticket/refund", {
+          type: 3, // for USER
+          name: this.username,
+          resolver: this.getUserName,
+          amount: this.amount,
+          message: this.refundDetails,
+          category: this.refundCategory,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            this.$refs.form.reset();
+            this.showSnackbarRefund = true;
+            setTimeout(() => {
+              this.showSnackbarRefund = false;
+            }, 2000);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
 
     fetchOwnTickets() {
       this.isLoadingOwn = true;

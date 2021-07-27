@@ -10,10 +10,27 @@
         </v-toolbar>
         <v-tabs vertical>
           <v-tab @click="fetchIspTickets">
-            <v-icon left>
-              mdi-ticket-account
-            </v-icon>
-            ISP Tickets
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-ticket-account
+                </v-icon>
+                ISP Tickets
+              </v-col>
+              <v-col></v-col>
+            </v-row>
+          </v-tab>
+
+          <v-tab>
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-cash-refund
+                </v-icon>
+                Refund
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
           <v-tab-item>
@@ -118,6 +135,59 @@
               </div>
             </template>
           </v-tab-item>
+
+          <v-tab-item>
+            <div class="container" justify-center>
+              <v-form ref="form" v-model="refundValid" lazy-validation>
+                <div style="width:80%">
+                  <v-select
+                    v-model="refundCategory"
+                    :items="categories"
+                    label="Category"
+                    solo
+                  ></v-select>
+
+                  <v-text-field
+                    v-model="username"
+                    :rules="usernameRules"
+                    label="ISP name"
+                    required
+                  ></v-text-field>
+
+                  <v-text-field
+                    v-model="amount"
+                    :rules="amountRules"
+                    label="Amount (BDT)"
+                    required
+                  ></v-text-field>
+
+                  <v-textarea
+                    color="teal"
+                    v-model="refundDetails"
+                    :rules="refundDetailsRules"
+                    label="Details"
+                    required
+                  >
+                  </v-textarea>
+
+                  <v-card-actions class="justify-center">
+                    <v-btn
+                      :disabled="isRefundDisabled"
+                      color="success"
+                      class="mr-4"
+                      @click="refundPressed"
+                    >
+                      Refund
+                    </v-btn>
+                  </v-card-actions>
+
+                  <v-snackbar :value="showSnackbarRefund">
+                    Refund Done
+                  </v-snackbar>
+                </div>
+              </v-form>
+            </div>
+          </v-tab-item>
         </v-tabs>
       </v-card>
     </div>
@@ -137,16 +207,36 @@ export default {
 
   data() {
     return {
+      initLoading: true,
       valid: false,
       panel: "",
       ticketType: "",
       checkbox: "",
+      ispList: [],
+      ispNameList: [],
 
+      refundValid: false,
+      refundCategory: "",
       details: "",
       detailsRules: [(v) => !!v || "Details is required"],
+      username: "",
+      usernameRules: [
+        (v) => !!v || "ISP name is required",
+        (v) => !(v && !this.ispNameList.includes(v.trim())) || "ISP not found",
+      ],
+      amount: "",
+      amountRules: [
+        (v) => !!v || "Amount is required",
+        (v) => /^\d*$/.test(v) || "Amount must be valid",
+        (v) => v > 0 || "Amount must be valid",
+      ],
+      refundDetails: "",
+      refundDetailsRules: [(v) => !!v || "Details is required"],
+      showSnackbarRefund: false,
 
       showSnackbar: false,
       userTickets: [],
+      myTickets: [],
 
       category: "",
       categories: [
@@ -184,6 +274,7 @@ export default {
 
   mounted() {
     this.fetchIspTickets();
+    this.fetchIspNameList();
   },
 
   // updated() {
@@ -199,13 +290,69 @@ export default {
       "getUserData",
     ]),
 
-    isSendDisabled() {
-      return !(this.category && this.details && this.valid);
+    isRefundDisabled() {
+      return !(
+        this.username &&
+        this.amount &&
+        this.refundCategory &&
+        this.refundDetails &&
+        this.refundValid
+      );
     },
   },
 
   methods: {
     ...mapMutations(["decTktCount"]),
+
+    fetchIspNameList() {
+      axios
+        .post("/api/isp/fetchIspOfNttnByQuery")
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            // console.log(res.data);
+            this.ispList = res.data;
+            this.ispNameList = [];
+            for (let i in this.ispList) {
+              this.ispNameList.push(this.ispList[i].name);
+            }
+            // console.log(this.ispNameList);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    refundPressed() {
+      console.log(this.ispNameList);
+      axios
+        .post("/api/ticket/refund", {
+          type: 2, // for ISP
+          name: this.username,
+          resolver: this.getUserName,
+          amount: this.amount,
+          message: this.refundDetails,
+          category: this.refundCategory,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            this.$refs.form.reset();
+            this.showSnackbarRefund = true;
+            setTimeout(() => {
+              this.showSnackbarRefund = false;
+            }, 2000);
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
 
     fetchIspTickets() {
       this.isLoadingIsps = true;
