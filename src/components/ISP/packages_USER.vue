@@ -866,7 +866,7 @@ export default {
         duration: 1,
         price: this.price,
         ongoing: true,
-        isRealIp: true,
+        isRealIp: false,
         downTime: this.downTime,
         responseTime: this.responseTime,
         areas: [],

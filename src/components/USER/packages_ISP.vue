@@ -42,6 +42,35 @@
               <v-expansion-panel>
                 <v-expansion-panel-header v-slot="{ open }">
                   <v-row no-gutters>
+                    <v-col cols="4"> User Type </v-col>
+                    <v-col cols="8" class="text--secondary">
+                      <v-fade-transition leave-absolute>
+                        <span v-if="open" key="0">
+                          Select user type
+                        </span>
+                        <span v-else key="1">
+                          {{ userType }}
+                        </span>
+                      </v-fade-transition>
+                    </v-col>
+                  </v-row>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-row no-gutters>
+                    <v-spacer></v-spacer>
+                    <v-autocomplete
+                      v-model="userType"
+                      :items="userTypeList"
+                      label="User type"
+                      :required="true"
+                    ></v-autocomplete>
+                  </v-row>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
+              <v-expansion-panel>
+                <v-expansion-panel-header v-slot="{ open }">
+                  <v-row no-gutters>
                     <v-col cols="4"> Category </v-col>
                     <v-col cols="8" class="text--secondary">
                       <v-fade-transition leave-absolute>
@@ -68,7 +97,7 @@
                 </v-expansion-panel-content>
               </v-expansion-panel>
 
-              <v-expansion-panel>
+              <!-- <v-expansion-panel>
                 <v-expansion-panel-header>
                   <template v-slot:default="{ open }">
                     <v-row no-gutters>
@@ -98,7 +127,7 @@
                   >
                   </v-slider>
                 </v-expansion-panel-content>
-              </v-expansion-panel>
+              </v-expansion-panel> -->
 
               <v-expansion-panel>
                 <v-expansion-panel-header>
@@ -141,8 +170,8 @@
                     !(
                       this.valid2 &&
                       this.downTime &&
-                      this.noCon &&
-                      this.duration
+                      this.category &&
+                      this.userType
                     )
                   "
                   color="success"
@@ -1011,21 +1040,15 @@ export default {
         "Social Networking",
         "others",
       ],
+      userType: "",
+      userTypeList: ["Individual", "Group", "Company"],
       pageSeq: 1,
       downTime: 0,
       key: "",
       valid2: false,
-      selectedOpt: "nttn",
       dialog: false,
-      noCon: 0,
-      duration: 0,
       suggestedPkgs: [],
       suggestIdxList: [],
-      noConRules: [
-        (v) => !!v || "Please enter your estimated number",
-        (v) => /^\d*$/.test(v) || "Number should be valid2",
-        (v) => v < 80000 || "Too much end users!!",
-      ],
       maxCompareCount: 3,
       dialogCompare: false,
       dialogZero: false,
@@ -1129,11 +1152,10 @@ export default {
     suggestPressed() {
       this.suggestedPkgs = [];
       this.suggestIdxList = [];
+
       for (let i in this.allPkgs) {
         if (
-          this.allPkgs[i].data.bandwidth >= this.noCon / 1000 &&
-          this.allPkgs[i].data.duration >= this.duration - 3 &&
-          this.allPkgs[i].data.duration <= this.duration + 3 &&
+          this.allPkgs[i].data.bandwidth >= 10 &&
           this.allPkgs[i].data.downTime <= this.downTime
         ) {
           this.suggestIdxList.push(i);
