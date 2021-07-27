@@ -21,25 +21,40 @@
         </v-toolbar>
         <v-tabs vertical>
           <v-tab>
-            <v-icon left>
-              mdi-package-variant-closed
-            </v-icon>
-            Pay Now
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-package-variant-closed
+                </v-icon>
+                Pay Now
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
           <v-tab>
-            <v-icon left>
-              mdi-package-variant
-            </v-icon>
-            My Payment History
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-package-variant
+                </v-icon>
+                My Payment History
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
           <!-- <v-tab :disabled="true"> -->
           <v-tab>
-            <v-icon left>
-              mdi-package
-            </v-icon>
-            User Payment History
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-package
+                </v-icon>
+                User Payment History
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
           <!-- pay now -->

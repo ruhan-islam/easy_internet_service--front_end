@@ -2,7 +2,17 @@
   <div>
     <topbar></topbar>
 
-    <div class="ma-12 mb-12 container-flow">
+    <div class="container" v-if="initLoading">
+      <v-progress-linear
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+    </div>
+
+    <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
       <v-card style="margin:0% 0% 20% 0%">
         <v-toolbar flat dark>
@@ -1306,6 +1316,7 @@ export default {
 
   data() {
     return {
+      initLoading: true,
       isLoadingPayNow: true,
 
       isLoadingOwn: true,
@@ -1472,19 +1483,30 @@ export default {
   },
 
   mounted() {
-    this.fetchAllOffers();
-    this.fetchOwnPayments();
-    this.fetchOwnPackages();
-
-    console.log(this.getSelectedPkg);
-    if (this.getSelectedPkg) {
-      this.pageInfo = "paymentHighlights";
-      this.dialog = true;
-    }
-
-    // console.log(this.getUserData);
-    // console.log(this.getSelectedPkg);
-    // console.log(this.getUserData.package_id);
+    axios
+      .post("/api/user/fetchOwnData", {
+        id: this.getUserID,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          this.setUserData(res.data);
+          // data fetch begins
+          this.fetchAllOffers();
+          this.fetchOwnPayments();
+          this.fetchOwnPackages();
+          // data fetch terminates
+          if (this.getSelectedPkg) {
+            this.pageInfo = "paymentHighlights";
+            this.dialog = true;
+          }
+          this.initLoading = false;
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
   methods: {

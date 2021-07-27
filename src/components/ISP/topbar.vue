@@ -11,8 +11,8 @@
             exact
             elevation="0"
           >
-            <span> Home </span>
             <v-icon> mdi-home </v-icon>
+            <span> Home </span>
           </v-btn>
         </template>
         <span> Home </span>

@@ -142,25 +142,39 @@
           </v-toolbar>
           <v-tabs v-model="activeTab" vertical>
             <v-tab>
-              <v-icon left>
-                mdi-package-variant-closed
-              </v-icon>
-              NTTN Packages
+              <v-row>
+                <v-col>
+                  <v-icon left>
+                    mdi-package-variant-closed
+                  </v-icon>
+                  NTTN Packages
+                </v-col>
+                <v-col></v-col>
+              </v-row>
             </v-tab>
 
             <v-tab>
-              <v-icon left>
-                mdi-package-variant
-              </v-icon>
-              My Packages
+              <v-row>
+                <v-col>
+                  <v-icon left>
+                    mdi-package-variant
+                  </v-icon>
+                  My Packages
+                </v-col>
+                <v-col></v-col>
+              </v-row>
             </v-tab>
 
-            <!-- <v-tab :disabled="true"> -->
             <v-tab>
-              <v-icon left>
-                mdi-package
-              </v-icon>
-              User Packages
+              <v-row>
+                <v-col>
+                  <v-icon left>
+                    mdi-package
+                  </v-icon>
+                  User Packages
+                </v-col>
+                <v-col></v-col>
+              </v-row>
             </v-tab>
 
             <v-tab-item>

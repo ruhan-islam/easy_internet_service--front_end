@@ -2,7 +2,17 @@
   <div>
     <topbar></topbar>
 
-    <div class="ma-12 mb-12 container-flow">
+    <div class="container" v-if="initLoading">
+      <v-progress-linear
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+    </div>
+
+    <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
       <v-container>
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
@@ -184,6 +194,7 @@ export default {
 
   data() {
     return {
+      initLoading: true,
       valid: false,
       minDur: "",
       maxDur: "",
@@ -201,9 +212,23 @@ export default {
   },
 
   mounted() {
-    if (!this.getUserData) {
-      this.fetchOwnData();
-    }
+    axios
+      .post("/api/user/fetchOwnData", {
+        id: this.getUserID,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          this.setUserData(res.data);
+          // data fetch begins
+          // data fetch terminates
+          this.initLoading = false;
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
   computed: {
@@ -239,25 +264,6 @@ export default {
 
   methods: {
     ...mapMutations(["setUserData"]),
-
-    fetchOwnData() {
-      axios
-        .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            // console.log(res.data);
-            this.setUserData(res.data);
-            // console.log(this.userData);
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
 
     confirmPressed() {},
 
