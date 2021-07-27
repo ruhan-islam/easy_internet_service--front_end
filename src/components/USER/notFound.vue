@@ -3,7 +3,7 @@
     <div>
       <topbar></topbar>
 
-      <div class="container mt-5">
+      <div style="margin-bottom:15%" class="container mt-5">
         <!-- contents here  -->
         <v-row>
           <v-col justify="center">

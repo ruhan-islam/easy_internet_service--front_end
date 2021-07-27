@@ -21,9 +21,9 @@
               height="150px"
               src="https://previews.123rf.com/images/kentoh/kentoh0901/kentoh090100278/4167332-blue-technology-internet-connected-background-abstract-wallpaper.jpg"
             >
-              <v-avatar color="blue" style="margin:40px">
+              <v-chip color="blue" style="margin:40px">
                 <span class="white--text text-h5">{{ getUserName }}</span>
-              </v-avatar>
+              </v-chip>
             </v-img>
             <v-card-text style="padding:40px">
               <v-row>

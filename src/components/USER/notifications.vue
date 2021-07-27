@@ -2,7 +2,7 @@
   <div>
     <topbar></topbar>
 
-    <div class="container" v-if="initLoading">
+    <div style="margin-bottom:15%" class="container" v-if="initLoading">
       <v-progress-linear
         style="margin:10% 0"
         color="deep-purple accent-4"
@@ -15,14 +15,16 @@
     <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
       <!-- contents here  -->
       <!-- loading -->
-      <v-progress-linear
-        v-if="isLoading"
-        style="margin:10% 0"
-        color="deep-purple accent-4"
-        indeterminate
-        rounded
-        height="6"
-      ></v-progress-linear>
+      <div style="margin-bottom:15%" class="container" v-if="isLoading">
+        <v-progress-linear
+          v-if="isLoading"
+          style="margin:10% 0"
+          color="deep-purple accent-4"
+          indeterminate
+          rounded
+          height="6"
+        ></v-progress-linear>
+      </div>
 
       <template v-if="!isLoading">
         <v-row>

@@ -2,7 +2,7 @@
   <div>
     <topbar></topbar>
 
-    <div class="container" v-if="initLoading">
+    <div style="margin-bottom:15%" class="container" v-if="initLoading">
       <v-progress-linear
         style="margin:10% 0"
         color="deep-purple accent-4"
@@ -202,6 +202,7 @@ export default {
   methods: {
     ...mapMutations([
       // "setNtfCount",
+      "setUserData",
     ]),
 
     fetchOwnTickets() {

@@ -3,14 +3,15 @@
     <topbar></topbar>
 
     <!-- <div class="ma-12 mb-12 container-flow"> -->
-    <v-progress-linear
-      v-if="isLoading"
-      style="margin:20% 0"
-      color="deep-purple accent-4"
-      indeterminate
-      rounded
-      height="6"
-    ></v-progress-linear>
+    <div v-if="isLoading" class="container">
+      <v-progress-linear
+        style="margin:20% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+    </div>
 
     <div v-if="!isLoading" style="padding:0px 200px 50px 200px">
       <H1 style="padding-bottom:50px">Welcome to Amader Internet</H1>

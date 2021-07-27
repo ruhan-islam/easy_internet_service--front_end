@@ -2,7 +2,7 @@
   <div>
     <topbar></topbar>
 
-    <div class="container" v-if="initLoading">
+    <div style="margin-bottom:15%" class="container" v-if="initLoading">
       <v-progress-linear
         style="margin:10% 0"
         color="deep-purple accent-4"
@@ -140,25 +140,40 @@
           </v-toolbar>
           <v-tabs vertical>
             <v-tab>
-              <v-icon left>
-                mdi-package-variant-closed
-              </v-icon>
-              My ISP Packages
+              <v-row>
+                <v-col>
+                  <v-icon left>
+                    mdi-package-variant-closed
+                  </v-icon>
+                  My ISP Packages
+                </v-col>
+                <v-col></v-col>
+              </v-row>
             </v-tab>
 
             <v-tab>
-              <v-icon left>
-                mdi-package-variant
-              </v-icon>
-              My Package
+              <v-row>
+                <v-col>
+                  <v-icon left>
+                    mdi-package-variant
+                  </v-icon>
+                  My Package
+                </v-col>
+                <v-col></v-col>
+              </v-row>
             </v-tab>
 
             <!-- <v-tab :disabled="true"> -->
             <v-tab>
-              <v-icon left>
-                mdi-package
-              </v-icon>
-              All Packages
+              <v-row>
+                <v-col>
+                  <v-icon left>
+                    mdi-package
+                  </v-icon>
+                  All Packages
+                </v-col>
+                <v-col></v-col>
+              </v-row>
             </v-tab>
 
             <v-tab-item>
