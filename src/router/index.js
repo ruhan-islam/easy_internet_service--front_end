@@ -162,13 +162,13 @@ const routes = [
 		},
     component: () => import("../components/USER/payments"),
   },
-  // {
-  //   path: "/USER/tickets",
-  //   meta: {
-	// 		requireLoggedIn: true
-	// 	},
-  //   component: () => import("../components/USER/tickets"),
-  // },
+  {
+    path: "/USER/tickets",
+    meta: {
+			requireLoggedIn: true
+		},
+    component: () => import("../components/USER/tickets"),
+  },
   {
     path: "/USER/dashboard",
     meta: {

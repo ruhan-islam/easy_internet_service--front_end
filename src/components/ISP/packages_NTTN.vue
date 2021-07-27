@@ -631,7 +631,6 @@ export default {
   mounted() {
     this.fetchAllOffers();
     this.fetchAllPackages();
-    this.showPayment = false;
   },
 
   methods: {

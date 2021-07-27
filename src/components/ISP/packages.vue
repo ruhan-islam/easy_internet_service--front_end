@@ -202,11 +202,7 @@ export default {
     };
   },
 
-  mounted() {
-    if (!this.getUserData) {
-      this.fetchOwnData();
-    }
-  },
+  mounted() {},
 
   computed: {
     ...mapGetters(["getUserID", "getUserData"]),

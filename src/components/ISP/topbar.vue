@@ -122,6 +122,13 @@
           >
             <span> Tickets </span>
             <v-icon> mdi-ticket </v-icon>
+            <v-badge
+              offset-x="10"
+              offset-y="0"
+              v-if="getTktCount !== 0"
+              :content="getTktCount"
+            >
+            </v-badge>
           </v-btn>
         </template>
         <span> Tickets </span>
@@ -165,6 +172,7 @@ export default {
   data() {
     return {
       intervalID: "",
+      isOwnDataLoading: true,
     };
   },
 
@@ -172,6 +180,8 @@ export default {
     if (this.getUserType !== "ISP") {
       this.$router.go(-1);
     }
+    this.fetchOwnData();
+    while (this.isOwnDataLoading);
     this.updateInfo();
     this.intervalID = setInterval(this.updateInfo, 2000);
   },
@@ -181,6 +191,7 @@ export default {
       "getLoginState",
       "getAuthToken",
       "getNtfCount",
+      "getTktCount",
       "getUserType",
       "getUserID",
       "getUserData",
@@ -193,10 +204,11 @@ export default {
       "setLoginState",
       "setAuthToken",
       "setNtfCount",
+      "setTktCount",
       "setUserData",
     ]),
 
-    updateInfo() {
+    fetchOwnData() {
       axios
         .post("/api/isp/fetchOwnData", {
           id: this.getUserID,
@@ -207,6 +219,9 @@ export default {
             // console.log(res.data);
             this.setUserData(res.data);
             // console.log(this.userData);
+            if (this.isOwnDataLoading) {
+              this.isOwnDataLoading = false;
+            }
           } else {
             this.error = true;
           }
@@ -214,17 +229,20 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+    },
 
+    fetchUnseenCount() {
       axios
-        .post("/api/notification/unseenNotificationCount", {
-          receiverID: this.getUserData.name,
+        .post("/api/ticket/unseenCount", {
+          receiverId: this.getUserData.name,
           receiverType: 2, // for ISP
         })
         .then((res) => {
-          // console.log(res);
           if (res.status === 200) {
+            // console.log(res);
             // console.log(res.data.unseenCount);
-            this.setNtfCount(res.data.unseenCount);
+            this.setNtfCount(res.data.unseenNotification);
+            this.setTktCount(res.data.unseenTicket);
           } else {
             this.error = true;
           }
@@ -232,6 +250,11 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+    },
+
+    updateInfo() {
+      this.fetchOwnData();
+      this.fetchUnseenCount();
     },
 
     logOut() {
@@ -245,7 +268,9 @@ export default {
             clearInterval(this.intervalID);
             this.setLoginState(false);
             this.setNtfCount(0);
+            this.setTktCount(0);
             this.setUserType("");
+            this.setUserData("");
             this.setAuthToken("");
             this.$router.push("/");
           }

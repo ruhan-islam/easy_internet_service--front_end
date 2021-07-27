@@ -738,7 +738,6 @@ export default {
   mounted() {
     this.fetchAllOffers();
     this.fetchAllPackages();
-    this.isLoading = true;
   },
 
   methods: {

@@ -16,7 +16,7 @@
             Create Ticket
           </v-tab>
 
-          <v-tab>
+          <v-tab @click="fetchUserTickets">
             <v-icon left>
               mdi-ticket-account
             </v-icon>
@@ -24,7 +24,7 @@
           </v-tab>
 
           <!-- <v-tab :disabled="true"> -->
-          <v-tab>
+          <v-tab @click="fetchOwnTickets">
             <v-icon left>
               mdi-ticket-confirmation
             </v-icon>
@@ -86,36 +86,60 @@
               <div style="text-align:center" v-if="!selectedUserTickets.length">
                 <h2>No Ticket Found</h2>
               </div>
-              <v-row justify="center">
-                <v-expansion-panels v-model="panel" inset>
-                  <v-expansion-panel
-                    v-for="(ticket, i) in selectedUserTickets"
-                    :key="i"
-                  >
-                    <v-expansion-panel-header
-                      @click="expandClicked(i)"
-                      disable-icon-rotate
+              <div style="margin:4% 5%">
+                <v-row justify="center">
+                  <v-radio-group v-model="ticketType" row>
+                    <v-radio label="All" value="all"></v-radio>
+                    <v-radio label="Seen" value="onlySeens"></v-radio>
+                    <v-radio label="Unseen" value="onlyUnseens"></v-radio>
+                  </v-radio-group>
+                </v-row>
+
+                <v-row justify="center">
+                  <v-expansion-panels v-model="panel" inset>
+                    <v-expansion-panel
+                      v-for="(ticket, i) in selectedUserTickets"
+                      :key="i"
                     >
-                      <strong>
-                        {{ ticket.category }} from {{ ticket.senderId }}
-                      </strong>
-                      &nbsp;
-                      <small class="text-right">
-                        @
-                        {{ ticket.arrivalTime.toString().slice(0, 24) }}
-                      </small>
-                      <template v-if="ticket.seenStatus" v-slot:actions>
-                        <v-icon color="teal">
-                          mdi-check
-                        </v-icon>
-                      </template>
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content>
-                      {{ ticket.details }}
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-              </v-row>
+                      <v-expansion-panel-header
+                        @click="expandClicked(i)"
+                        disable-icon-rotate
+                      >
+                        <strong>
+                          {{ ticket.category }} from {{ ticket.senderId }}
+                        </strong>
+                        &nbsp;
+                        <small class="text-right">
+                          @
+                          {{ ticket.arrivalTime.toString().slice(0, 24) }}
+                        </small>
+                        <template v-if="ticket.seenStatus" v-slot:actions>
+                          <v-icon v-if="ticket.resolveStatus" color="teal">
+                            mdi-check-all
+                          </v-icon>
+                          <v-icon v-else color="teal">
+                            mdi-check
+                          </v-icon>
+                        </template>
+                      </v-expansion-panel-header>
+
+                      <v-expansion-panel-content>
+                        <v-col cols="10">
+                          {{ ticket.details }}
+                        </v-col>
+                        <v-col>
+                          <v-btn
+                            :disabled="ticket.resolveStatus"
+                            @click="resolvePressed(i)"
+                          >
+                            Resolve
+                          </v-btn>
+                        </v-col>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
+                </v-row>
+              </div>
             </template>
           </v-tab-item>
 
@@ -137,7 +161,14 @@
                 :headers="headersOwn"
                 :items="itemsOwn"
                 :search="searchOwn"
-              ></v-data-table>
+              >
+                <template v-slot:[`item.resolveStatus`]="{ item }">
+                  <v-simple-checkbox
+                    v-model="item.resolveStatus"
+                    disabled
+                  ></v-simple-checkbox>
+                </template>
+              </v-data-table>
             </v-card>
           </v-tab-item>
         </v-tabs>
@@ -160,6 +191,8 @@ export default {
   data() {
     return {
       valid: false,
+      panel: "",
+      ticketType: "",
 
       details: "",
       detailsRules: [(v) => !!v || "Details is required"],
@@ -182,6 +215,7 @@ export default {
         { text: "Category", value: "category" },
         { text: "Details", value: "details" },
         { text: "Resolved", value: "resolveStatus" },
+        // { text: "Resolved", value: "resolveStatus ? 'Yes' : 'No'" },
         { text: "Sending Time", value: "arrivalTime" },
       ],
       itemsOwn: [
@@ -204,9 +238,11 @@ export default {
   mounted() {
     this.fetchOwnTickets();
     this.fetchUserTickets();
-    this.isLoadingOwn = true;
-    this.isLoadingUsers = true;
   },
+
+  // updated() {
+  //   this.fetchUserTickets();
+  // },
 
   computed: {
     ...mapGetters([
@@ -222,9 +258,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations([
-      // "setNtfCount",
-    ]),
+    ...mapMutations(["decTktCount"]),
 
     fetchOwnTickets() {
       this.isLoadingOwn = true;
@@ -239,9 +273,6 @@ export default {
             this.itemsOwn = res.data.data;
             // console.log(this.itemsOwn);
             for (let i in this.itemsOwn) {
-              this.itemsOwn[i].resolveStatus = this.itemsOwn[i].resolveStatus
-                ? "Yes"
-                : "No";
               this.itemsOwn[i].arrivalTime = new Date(
                 this.itemsOwn[i].arrivalTime
               );
@@ -272,10 +303,6 @@ export default {
             // console.log(res.data.data);
             this.allUserTickets = res.data.data;
             for (let i in this.allUserTickets) {
-              this.allUserTickets[i].resolveStatus = this.allUserTickets[i]
-                .resolveStatus
-                ? "Yes"
-                : "No";
               this.allUserTickets[i].arrivalTime = new Date(
                 this.allUserTickets[i].arrivalTime
               );
@@ -330,17 +357,35 @@ export default {
         });
     },
 
+    resolvePressed(i) {
+      axios
+        .post("/api/ticket/updateResolveStatus", {
+          id: this.selectedUserTickets[i]._id,
+        })
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            this.selectedUserTickets[i].resolveStatus = true;
+          } else {
+            this.error = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     expandClicked(i) {
       if (!this.selectedUserTickets[i].seenStatus) {
         axios
-          .post("/api/tiket/updateSeenStatus", {
+          .post("/api/ticket/updateSeenStatus", {
             id: this.selectedUserTickets[i]._id,
           })
           .then((res) => {
             // console.log(res);
             if (res.status === 200) {
               this.selectedUserTickets[i].seenStatus = true;
-              // this.decNtfCount(true);
+              this.decTktCount(true);
             } else {
               this.error = true;
             }

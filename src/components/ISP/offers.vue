@@ -327,7 +327,6 @@ export default {
 
   mounted() {
     this.fetchOffers();
-    this.isLoading = true;
   },
 
   methods: {

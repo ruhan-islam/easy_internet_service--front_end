@@ -23,13 +23,7 @@ export default {
     return {};
   },
 
-  mounted() {
-    if (!this.getUserData) {
-      this.fetchOwnData();
-    }
-    // console.log("home mounted");
-    // console.log(this.getUserData);
-  },
+  mounted() {},
 
   computed: {
     ...mapGetters(["getUserID", "getUserData"]),

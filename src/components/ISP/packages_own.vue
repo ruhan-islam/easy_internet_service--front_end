@@ -218,8 +218,6 @@ export default {
     this.fetchAllOffers();
     this.fetchAllPackages();
     this.fetchOwnPackages();
-    this.currPkgIdx = -1;
-    this.showPayment = false;
   },
 
   methods: {

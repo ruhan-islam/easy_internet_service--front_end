@@ -17,6 +17,7 @@ export default new Vuex.Store({
         userEmail: '',
         // 
         notificationCount: 0,
+        ticketCount: 0,
         selectedPackage: '',
         currentPage: 'home',
         isPaid: false,
@@ -48,6 +49,9 @@ export default new Vuex.Store({
         //
         getNtfCount: state => {
             return state.notificationCount;
+        },
+        getTktCount: state => {
+            return state.ticketCount;
         },
         getSelectedPkg: state => {
             return state.selectedPackage;
@@ -92,6 +96,13 @@ export default new Vuex.Store({
         decNtfCount: (state, needToDecrease) => {
             if (needToDecrease && state.notificationCount > 0)
                 state.notificationCount--;
+        },
+        setTktCount: (state, ticketCount) => {
+            state.ticketCount = ticketCount;
+        },
+        decTktCount: (state, needToDecrease) => {
+            if (needToDecrease && state.ticketCount > 0)
+                state.ticketCount--;
         },
         setSelectedPkg: (state, selectedPackage) => {
             state.selectedPackage = selectedPackage;
