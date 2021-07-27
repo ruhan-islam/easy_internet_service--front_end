@@ -1,6 +1,6 @@
 <template>
   <div style="margin-bottom:8%">
-    <v-app-bar :fixed="true" grow dark>
+    <v-app-bar @click="`clearInterval(intervalID)`" :fixed="true" grow dark>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrsHome }">
           <v-btn
@@ -123,6 +123,7 @@
             <span> Tickets </span>
             <v-icon> mdi-ticket </v-icon>
             <v-badge
+              color="error"
               offset-x="10"
               offset-y="0"
               v-if="getTktCount !== 0"
@@ -172,7 +173,6 @@ export default {
   data() {
     return {
       intervalID: "",
-      isOwnDataLoading: true,
     };
   },
 
@@ -180,10 +180,8 @@ export default {
     if (this.getUserType !== "ISP") {
       this.$router.go(-1);
     }
-    this.fetchOwnData();
-    while (this.isOwnDataLoading);
     this.updateInfo();
-    this.intervalID = setInterval(this.updateInfo, 2000);
+    this.intervalID = setInterval(this.fetchUnseenCount, 2000);
   },
 
   computed: {
@@ -206,6 +204,8 @@ export default {
       "setAuthToken",
       "setNtfCount",
       "setTktCount",
+      "setUserID",
+      "setUserName",
       "setUserData",
     ]),
 
@@ -220,9 +220,6 @@ export default {
             // console.log(res.data);
             this.setUserData(res.data);
             // console.log(this.userData);
-            if (this.isOwnDataLoading) {
-              this.isOwnDataLoading = false;
-            }
           } else {
             this.error = true;
           }
@@ -271,6 +268,8 @@ export default {
             this.setNtfCount(0);
             this.setTktCount(0);
             this.setUserType("");
+            this.setUserID("");
+            this.setUserName("");
             this.setUserData("");
             this.setAuthToken("");
             this.$router.push("/");

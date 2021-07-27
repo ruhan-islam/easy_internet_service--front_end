@@ -11,8 +11,8 @@
             exact
             elevation="0"
           >
-            <v-icon> mdi-home </v-icon>
             <span> Home </span>
+            <v-icon> mdi-home </v-icon>
           </v-btn>
         </template>
         <span> Home </span>
@@ -121,7 +121,15 @@
             elevation="0"
           >
             <span> Tickets </span>
-            <v-icon> mdi-widgets </v-icon>
+            <v-icon> mdi-ticket </v-icon>
+            <v-badge
+              color="error"
+              offset-x="10"
+              offset-y="0"
+              v-if="getTktCount !== 0"
+              :content="getTktCount"
+            >
+            </v-badge>
           </v-btn>
         </template>
         <span> Tickets </span>
@@ -175,8 +183,8 @@ export default {
     this.setUserData({
       name: "Nttn",
     });
-    this.updateInfo();
-    this.intervalID = setInterval(this.updateInfo, 2000);
+    this.fetchUnseenCount();
+    this.intervalID = setInterval(this.fetchUnseenCount, 2000);
   },
 
   computed: {
@@ -184,6 +192,7 @@ export default {
       "getLoginState",
       "getAuthToken",
       "getNtfCount",
+      "getTktCount",
       "getUserType",
       "getUserData",
     ]),
@@ -196,19 +205,20 @@ export default {
       "setLoginState",
       "setAuthToken",
       "setNtfCount",
+      "setTktCount",
     ]),
 
-    updateInfo() {
+    fetchUnseenCount() {
       axios
-        .post("/api/notification/unseenNotificationCount", {
-          receiverID: "Nttn",
+        .post("/api/ticket/unseenCount", {
+          receiverId: "Nttn",
           receiverType: 1, // for NTTN
         })
         .then((res) => {
-          // console.log(res);
           if (res.status === 200) {
-            // console.log(res.data.unseenCount);
-            this.setNtfCount(res.data.unseenCount);
+            this.setNtfCount(res.data.unseenNotification);
+            this.setTktCount(res.data.unseenTicket);
+            // console.log(res.data.unseenTicket);
           } else {
             this.error = true;
           }

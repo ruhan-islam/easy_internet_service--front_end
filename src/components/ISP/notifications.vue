@@ -18,6 +18,9 @@
         <v-row>
           <v-col>
             <v-radio-group v-model="notificationType" row>
+              <v-col></v-col>
+              <v-col></v-col>
+              <v-col></v-col>
               <v-col>
                 <v-radio @click="filterAll" label="All" value="all"></v-radio>
               </v-col>
@@ -35,9 +38,12 @@
                   value="onlyUnseens"
                 ></v-radio>
               </v-col>
+              <v-col></v-col>
+              <v-col></v-col>
+              <v-col></v-col>
             </v-radio-group>
           </v-col>
-          <v-col>
+          <!-- <v-col>
             <v-row>
               <v-menu
                 v-model="menu"
@@ -71,7 +77,7 @@
                 Filter
               </v-btn>
             </v-row>
-          </v-col>
+          </v-col> -->
         </v-row>
 
         <v-row justify="center">
@@ -118,6 +124,7 @@ import bottombar from "./bottombar.vue";
 
 export default {
   components: { topbar, bottombar },
+
   data() {
     return {
       menu: "",
@@ -127,15 +134,15 @@ export default {
       panel: "",
       allNotifications: [],
       selectedNotifications: [],
-      dateFilteredNotifications: [],
     };
   },
 
   computed: {
     ...mapGetters(["getUserID", "getUserName", "getUserData"]),
-    dateRangeText() {
-      return this.dates.join(" ~ ");
-    },
+
+    // dateRangeText() {
+    //   return this.dates.join(" ~ ");
+    // },
   },
 
   mounted() {
@@ -149,27 +156,7 @@ export default {
   methods: {
     ...mapMutations(["setUserData", "decNtfCount"]),
 
-    fetchOwnData() {
-      axios
-        .post("/api/isp/fetchOwnData", {
-          id: this.getUserID,
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            // console.log(res.data);
-            this.setUserData(res.data);
-            // console.log(this.userData);
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
     fetchNotifications() {
-      // console.log("in");
       // this.isLoading = true;
       axios
         .post("/api/notification/fetchByQuery", {
@@ -186,9 +173,8 @@ export default {
                 this.allNotifications[i].notificationArrivalTime
               );
             }
-            if (!this.notificationType && !this.dates.length) {
+            if (!this.notificationType) {
               this.selectedNotifications = this.allNotifications;
-              this.dateFilteredNotifications = this.allNotifications;
             }
             if (this.isLoading) {
               this.isLoading = false;
@@ -202,55 +188,54 @@ export default {
         });
     },
 
-    filterByDates() {
-      let minDate = this.dates[0];
-      let maxDate = this.dates[1];
-      if (maxDate < minDate) {
-        minDate = maxDate;
-        maxDate = this.dates[0];
-      }
+    // filterByDates() {
+    //   let minDate = this.dates[0];
+    //   let maxDate = this.dates[1];
+    //   if (maxDate < minDate) {
+    //     minDate = maxDate;
+    //     maxDate = this.dates[0];
+    //   }
 
-      this.dateFilteredNotifications = [];
+    //   this.dateFilteredNotifications = [];
+    //   for (let i in this.allNotifications) {
+    //     if (
+    //       this.allNotifications[0].notificationArrivalTime.toISOString() >=
+    //         minDate &&
+    //       this.allNotifications[0].notificationArrivalTime.toISOString() <=
+    //         maxDate
+    //     ) {
+    //       this.dateFilteredNotifications.push(this.allNotifications[i]);
+    //     }
+    //   }
 
-      for (let i in this.allNotifications) {
-        if (
-          this.allNotifications[0].notificationArrivalTime.toISOString() >=
-            minDate &&
-          this.allNotifications[0].notificationArrivalTime.toISOString() <=
-            maxDate
-        ) {
-          this.dateFilteredNotifications.push(this.allNotifications[i]);
-        }
-      }
-
-      console.log(this.notificationType);
-      if (this.notificationType === "onlySeens") {
-        this.filterSeen();
-      } else if (this.notificationType === "onlyUnseens") {
-        this.filterUnseen();
-      } else {
-        this.selectedNotifications = this.dateFilteredNotifications;
-      }
-    },
+    //   console.log(this.notificationType);
+    //   if (this.notificationType === "onlySeens") {
+    //     this.filterSeen();
+    //   } else if (this.notificationType === "onlyUnseens") {
+    //     this.filterUnseen();
+    //   } else {
+    //     this.selectedNotifications = this.dateFilteredNotifications;
+    //   }
+    // },
 
     filterAll() {
-      this.selectedNotifications = this.dateFilteredNotifications;
+      this.selectedNotifications = this.allNotifications;
     },
 
     filterSeen() {
       this.selectedNotifications = [];
-      for (let i in this.dateFilteredNotifications) {
-        if (this.dateFilteredNotifications[i].seenStatus) {
-          this.selectedNotifications.push(this.dateFilteredNotifications[i]);
+      for (let i in this.allNotifications) {
+        if (this.allNotifications[i].seenStatus) {
+          this.selectedNotifications.push(this.allNotifications[i]);
         }
       }
     },
 
     filterUnseen() {
       this.selectedNotifications = [];
-      for (let i in this.dateFilteredNotifications) {
-        if (!this.dateFilteredNotifications[i].seenStatus) {
-          this.selectedNotifications.push(this.dateFilteredNotifications[i]);
+      for (let i in this.allNotifications) {
+        if (!this.allNotifications[i].seenStatus) {
+          this.selectedNotifications.push(this.allNotifications[i]);
         }
       }
     },

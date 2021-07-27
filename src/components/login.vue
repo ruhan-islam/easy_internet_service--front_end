@@ -116,7 +116,7 @@ export default {
             this.setLoginState(true);
             this.setAuthToken(res.data.token);
             this.setUserType(this.type.toUpperCase());
-            this.setUserData(this.username);
+            this.setUserName(this.username);
             this.setUserData(res.data.user);
             this.$router.push(dest);
             this.$router.go();

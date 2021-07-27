@@ -9,72 +9,17 @@
           <v-toolbar-title> Manage Tickets </v-toolbar-title>
         </v-toolbar>
         <v-tabs vertical>
-          <v-tab>
-            <v-icon left>
-              mdi-ticket-outline
-            </v-icon>
-            Create Ticket
-          </v-tab>
-
-          <v-tab @click="fetchUserTickets">
+          <v-tab @click="fetchIspTickets">
             <v-icon left>
               mdi-ticket-account
             </v-icon>
-            User Tickets
+            ISP Tickets
           </v-tab>
-
-          <!-- <v-tab :disabled="true"> -->
-          <v-tab @click="fetchOwnTickets">
-            <v-icon left>
-              mdi-ticket-confirmation
-            </v-icon>
-            Ticket History
-          </v-tab>
-
-          <!-- send Tickets -->
-          <v-tab-item>
-            <div class="container" justify-center>
-              <v-form ref="form" v-model="valid" lazy-validation>
-                <div style="width:80%">
-                  <v-select
-                    v-model="category"
-                    :items="categories"
-                    label="Category"
-                    solo
-                  ></v-select>
-
-                  <v-textarea
-                    color="teal"
-                    v-model="details"
-                    :rules="detailsRules"
-                    label="Details"
-                    required
-                  >
-                  </v-textarea>
-
-                  <v-card-actions class="justify-center">
-                    <v-btn
-                      :disabled="isSendDisabled"
-                      color="success"
-                      class="mr-4"
-                      @click="sendPressed"
-                    >
-                      Send
-                    </v-btn>
-                  </v-card-actions>
-
-                  <v-snackbar :value="showSnackbar">
-                    Ticket Sent
-                  </v-snackbar>
-                </div>
-              </v-form>
-            </div>
-          </v-tab-item>
 
           <v-tab-item>
             <!-- loading -->
             <v-progress-linear
-              v-if="isLoadingUsers"
+              v-if="isLoadingIsps"
               style="margin:10% 0"
               color="deep-purple accent-4"
               indeterminate
@@ -82,8 +27,8 @@
               height="6"
             ></v-progress-linear>
 
-            <template v-if="!isLoadingUsers">
-              <div style="text-align:center" v-if="!selectedUserTickets.length">
+            <template v-if="!isLoadingIsps">
+              <div style="text-align:center" v-if="!selectedIspTickets.length">
                 <h2>No Ticket Found</h2>
               </div>
               <div style="margin:4% 5%">
@@ -133,7 +78,7 @@
                 <v-row justify="center">
                   <v-expansion-panels v-model="panel" inset>
                     <v-expansion-panel
-                      v-for="(ticket, i) in selectedUserTickets"
+                      v-for="(ticket, i) in selectedIspTickets"
                       :key="i"
                     >
                       <v-expansion-panel-header
@@ -173,35 +118,6 @@
               </div>
             </template>
           </v-tab-item>
-
-          <v-tab-item>
-            <!-- loading own payments -->
-            <v-card>
-              <v-card-title>
-                <v-text-field
-                  v-model="searchOwn"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-card-title>
-              <v-data-table
-                :loading="isLoadingOwn"
-                loading-text="Loading... Please wait"
-                :headers="headersOwn"
-                :items="itemsOwn"
-                :search="searchOwn"
-              >
-                <template v-slot:[`item.resolveStatus`]="{ item }">
-                  <v-simple-checkbox
-                    v-model="item.resolveStatus"
-                    disabled
-                  ></v-simple-checkbox>
-                </template>
-              </v-data-table>
-            </v-card>
-          </v-tab-item>
         </v-tabs>
       </v-card>
     </div>
@@ -231,7 +147,6 @@ export default {
 
       showSnackbar: false,
       userTickets: [],
-      myTickets: [],
 
       category: "",
       categories: [
@@ -261,19 +176,18 @@ export default {
         // },
       ],
 
-      isLoadingUsers: true,
-      allUserTickets: [],
-      selectedUserTickets: [],
+      isLoadingIsps: true,
+      allIspTickets: [],
+      selectedIspTickets: [],
     };
   },
 
   mounted() {
-    this.fetchOwnTickets();
-    this.fetchUserTickets();
+    this.fetchIspTickets();
   },
 
   // updated() {
-  //   this.fetchUserTickets();
+  //   this.fetchIspTickets();
   // },
 
   computed: {
@@ -293,60 +207,30 @@ export default {
   methods: {
     ...mapMutations(["decTktCount"]),
 
-    fetchOwnTickets() {
-      this.isLoadingOwn = true;
-      axios
-        .post("/api/ticket/fetchBySender", {
-          senderType: 2,
-          senderId: this.getUserName,
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            // console.log(res.data.data);
-            this.itemsOwn = res.data.data.reverse();
-            // console.log(this.itemsOwn);
-            for (let i in this.itemsOwn) {
-              this.itemsOwn[i].arrivalTime = new Date(
-                this.itemsOwn[i].arrivalTime
-              );
-              this.itemsOwn[i].arrivalTime = this.itemsOwn[i].arrivalTime
-                .toString()
-                .slice(0, 24);
-            }
-            this.isLoadingOwn = false;
-          } else {
-            this.error = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    fetchUserTickets() {
-      this.isLoadingUsers = true;
+    fetchIspTickets() {
+      this.isLoadingIsps = true;
       axios
         .post("/api/ticket/fetchByQuery", {
-          receiverType: 2,
-          receiverId: this.getUserName,
+          receiverType: 1,
+          receiverId: "Nttn",
         })
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
             // console.log(res.data.data);
-            this.allUserTickets = res.data.data.reverse();
-            for (let i in this.allUserTickets) {
-              this.allUserTickets[i].arrivalTime = new Date(
-                this.allUserTickets[i].arrivalTime
+            this.allIspTickets = res.data.data.reverse();
+            for (let i in this.allIspTickets) {
+              this.allIspTickets[i].arrivalTime = new Date(
+                this.allIspTickets[i].arrivalTime
               );
-              this.allUserTickets[i].arrivalTime = this.allUserTickets[
+              this.allIspTickets[i].arrivalTime = this.allIspTickets[
                 i
               ].arrivalTime
                 .toString()
                 .slice(0, 24);
             }
-            this.selectedUserTickets = this.allUserTickets;
-            this.isLoadingUsers = false;
+            this.selectedIspTickets = this.allIspTickets;
+            this.isLoadingIsps = false;
           } else {
             this.error = true;
           }
@@ -357,41 +241,41 @@ export default {
     },
 
     filterAll() {
-      this.selectedUserTickets = this.allUserTickets;
+      this.selectedIspTickets = this.allIspTickets;
     },
 
     filterSeen() {
-      this.selectedUserTickets = [];
-      for (let i in this.allUserTickets) {
-        if (this.allUserTickets[i].seenStatus) {
-          this.selectedUserTickets.push(this.allUserTickets[i]);
+      this.selectedIspTickets = [];
+      for (let i in this.allIspTickets) {
+        if (this.allIspTickets[i].seenStatus) {
+          this.selectedIspTickets.push(this.allIspTickets[i]);
         }
       }
     },
 
     filterUnseen() {
-      this.selectedUserTickets = [];
-      for (let i in this.allUserTickets) {
-        if (!this.allUserTickets[i].seenStatus) {
-          this.selectedUserTickets.push(this.allUserTickets[i]);
+      this.selectedIspTickets = [];
+      for (let i in this.allIspTickets) {
+        if (!this.allIspTickets[i].seenStatus) {
+          this.selectedIspTickets.push(this.allIspTickets[i]);
         }
       }
     },
 
     filterResolved() {
-      this.selectedUserTickets = [];
-      for (let i in this.allUserTickets) {
-        if (this.allUserTickets[i].resolveStatus) {
-          this.selectedUserTickets.push(this.allUserTickets[i]);
+      this.selectedIspTickets = [];
+      for (let i in this.allIspTickets) {
+        if (this.allIspTickets[i].resolveStatus) {
+          this.selectedIspTickets.push(this.allIspTickets[i]);
         }
       }
     },
 
     filterUnresolved() {
-      this.selectedUserTickets = [];
-      for (let i in this.allUserTickets) {
-        if (!this.allUserTickets[i].resolveStatus) {
-          this.selectedUserTickets.push(this.allUserTickets[i]);
+      this.selectedIspTickets = [];
+      for (let i in this.allIspTickets) {
+        if (!this.allIspTickets[i].resolveStatus) {
+          this.selectedIspTickets.push(this.allIspTickets[i]);
         }
       }
     },
@@ -433,12 +317,12 @@ export default {
     resolvePressed(i) {
       axios
         .post("/api/ticket/updateResolveStatus", {
-          id: this.selectedUserTickets[i]._id,
+          id: this.selectedIspTickets[i]._id,
         })
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
-            this.selectedUserTickets[i].resolveStatus = true;
+            this.selectedIspTickets[i].resolveStatus = true;
           } else {
             this.error = true;
           }
@@ -449,15 +333,15 @@ export default {
     },
 
     expandClicked(i) {
-      if (!this.selectedUserTickets[i].seenStatus) {
+      if (!this.selectedIspTickets[i].seenStatus) {
         axios
           .post("/api/ticket/updateSeenStatus", {
-            id: this.selectedUserTickets[i]._id,
+            id: this.selectedIspTickets[i]._id,
           })
           .then((res) => {
             // console.log(res);
             if (res.status === 200) {
-              this.selectedUserTickets[i].seenStatus = true;
+              this.selectedIspTickets[i].seenStatus = true;
               this.decTktCount(true);
             } else {
               this.error = true;

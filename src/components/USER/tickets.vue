@@ -188,7 +188,7 @@ export default {
         .then((res) => {
           if (res.status === 200) {
             // console.log(res.data.data);
-            this.itemsOwn = res.data.data;
+            this.itemsOwn = res.data.data.reverse();
             // console.log(this.itemsOwn);
             for (let i in this.itemsOwn) {
               this.itemsOwn[i].arrivalTime = new Date(
