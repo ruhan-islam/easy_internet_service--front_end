@@ -401,6 +401,7 @@ export default {
         startTime: this.dates[0],
         expirationTime: this.dates[1],
         creator: this.getUserName,
+        union: this.getUserData.union,
         // minPrice: this.minPrice,
       };
 

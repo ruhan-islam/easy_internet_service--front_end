@@ -178,12 +178,16 @@
               </template>
             </div>
 
+            <div>
+              ISP: <strong>{{ pkg.packageCreator }}</strong>
+            </div>
+
             <v-chip-group
               active-class="deep-purple accent-4 white--text"
               column
             >
-              <v-chip>ISP: {{ pkg.packageCreator }} </v-chip>
               <v-chip>{{ pkg.bandwidth }} MBPS</v-chip>
+              <v-chip v-if="pkg.isRealIp"> Real IP </v-chip>
             </v-chip-group>
 
             <div>
@@ -256,6 +260,12 @@
                           allPkgs[currPkgIdx].offerId
                         )
                       }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Real IP</td>
+                    <td>
+                      {{ myPackageList[currPkgIdx].isRealIp ? "Yes" : "No" }}
                     </td>
                   </tr>
                   <tr>
@@ -366,7 +376,7 @@ export default {
   },
 
   mounted() {
-    this.fetchAllOffers();
+    this.fetchUnionAllOffers();
     this.fetchUnionAllPackages();
     this.showPayment = false;
   },
@@ -397,14 +407,15 @@ export default {
         });
     },
 
-    fetchAllOffers() {
+    fetchUnionAllOffers() {
       axios
-        .post("/api/offer/fetchByQuery", {
-          creator: this.getUserData.ispId,
+        .post("/api/offer/fetchUnionOffer", {
+          union: this.getUserData.union,
         })
         .then((res) => {
+          // console.log(res.data);
           if (res.status === 200) {
-            this.allOffers = res.data.data;
+            this.allOffers = res.data;
             // console.log(this.allOffers);
             this.validOffers = [];
             for (let i in this.allOffers) {
@@ -466,6 +477,7 @@ export default {
     },
 
     calculateReducedPrice(price, offerId) {
+      // console.log(offerId);
       let percentage = 0;
       if (!offerId) {
         return price;
@@ -473,6 +485,8 @@ export default {
       for (let i in this.allOffers) {
         if (this.allOffers[i]._id === offerId) {
           percentage = this.allOffers[i].reduction;
+          // console.log(price);
+          // console.log(this.allOffers[i].name);
           break;
         }
       }

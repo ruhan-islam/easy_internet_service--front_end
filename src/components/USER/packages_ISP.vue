@@ -228,20 +228,12 @@
                     active-class="deep-purple accent-4 white--text"
                     column
                   >
-                    <v-chip v-for="(area, i) in pkg.data.areas" :key="i"
-                      >{{ area }}
-                    </v-chip>
-                  </v-chip-group>
-                  <v-chip-group
-                    active-class="deep-purple accent-4 white--text"
-                    column
-                  >
-                    <v-chip>{{ pkg.data.bandwidth }} GBPS</v-chip>
-                    <v-chip>{{ pkg.data.duration }} months</v-chip>
+                    <v-chip>{{ pkg.data.bandwidth }} MBPS</v-chip>
+                    <v-chip v-if="pkg.data.isRealIp"> Real IP </v-chip>
                   </v-chip-group>
 
                   <div>
-                    {{ pkg.bandwidth }} GBPS speed relentless speed of unlimited
+                    {{ pkg.bandwidth }} MBPS speed relentless speed of unlimited
                     traffic with 24/7 service.
                   </div>
                 </v-card-text>
@@ -385,10 +377,19 @@
                             >{{ p.data.price }}</v-col
                           >
                         </v-row>
+                        <v-row style="margin-right: 40px">
+                          <v-col>Real IP</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.isRealIp ? "Yes" : "No" }}</v-col
+                          >
+                        </v-row>
                         <v-row
                           style="background-color: #595260; margin-right: 40px"
                         >
-                          <v-col>Bandwidth(GBPS)</v-col>
+                          <v-col>Bandwidth(MBPS)</v-col>
                           <v-col
                             v-for="(p, j) in compareList"
                             :key="j"
@@ -396,19 +397,10 @@
                             >{{ p.data.bandwidth }}</v-col
                           >
                         </v-row>
-                        <v-row style="margin-right: 40px">
-                          <v-col>Duration(months)</v-col>
-                          <v-col
-                            v-for="(p, j) in compareList"
-                            :key="j"
-                            style="margin-left:100px"
-                            >{{ p.data.duration }}</v-col
-                          >
-                        </v-row>
                         <v-row
                           style="background-color: #595260; margin-right: 40px"
                         >
-                          <v-col>Upload Speed(GBPS)</v-col>
+                          <v-col>Upload Speed(MBPS)</v-col>
                           <v-col
                             v-for="(p, j) in compareList"
                             :key="j"
@@ -417,23 +409,12 @@
                           >
                         </v-row>
                         <v-row style="margin-right: 40px">
-                          <v-col>Download Speed(GBPS)</v-col>
+                          <v-col>Download Speed(MBPS)</v-col>
                           <v-col
                             v-for="(p, j) in compareList"
                             :key="j"
                             style="margin-left:100px"
                             >{{ p.data.down_speed }}</v-col
-                          >
-                        </v-row>
-                        <v-row
-                          style="background-color: #595260; margin-right: 40px"
-                        >
-                          <v-col>Upload Speed(GBPS)</v-col>
-                          <v-col
-                            v-for="(p, j) in compareList"
-                            :key="j"
-                            style="margin-left:100px"
-                            >{{ p.data.up_speed }}</v-col
                           >
                         </v-row>
                         <v-row style="margin-right: 40px">
@@ -684,6 +665,7 @@
               column
             >
               <v-chip>{{ pkg.data.bandwidth }} MBPS</v-chip>
+              <v-chip v-if="pkg.data.isRealIp"> Real IP </v-chip>
             </v-chip-group>
 
             <div>
@@ -719,7 +701,7 @@
             </v-col>
             <v-col>
               <v-btn
-                :disabled="!allPkgs[i].data.ongoing || !allPkgs[i].status"
+                :disabled="!pkgs[i].data.ongoing || !pkgs[i].status"
                 color="deep-purple lighten-2"
                 @click="selectPressed(i)"
                 text
@@ -821,7 +803,7 @@
                   >
                 </v-row>
                 <v-row style="background-color: #595260; margin-right: 40px">
-                  <v-col>Bandwidth(GBPS)</v-col>
+                  <v-col>Bandwidth(MBPS)</v-col>
                   <v-col
                     v-for="(p, j) in compareList"
                     :key="j"
@@ -839,7 +821,7 @@
                   >
                 </v-row>
                 <v-row style="background-color: #595260; margin-right: 40px">
-                  <v-col>Upload Speed(GBPS)</v-col>
+                  <v-col>Upload Speed(MBPS)</v-col>
                   <v-col
                     v-for="(p, j) in compareList"
                     :key="j"
@@ -848,7 +830,7 @@
                   >
                 </v-row>
                 <v-row style="margin-right: 40px">
-                  <v-col>Download Speed(GBPS)</v-col>
+                  <v-col>Download Speed(MBPS)</v-col>
                   <v-col
                     v-for="(p, j) in compareList"
                     :key="j"
@@ -857,7 +839,7 @@
                   >
                 </v-row>
                 <v-row style="background-color: #595260; margin-right: 40px">
-                  <v-col>Upload Speed(GBPS)</v-col>
+                  <v-col>Upload Speed(MBPS)</v-col>
                   <v-col
                     v-for="(p, j) in compareList"
                     :key="j"
@@ -950,6 +932,12 @@
                           allPkgs[currPkgIdx].data.offerId
                         )
                       }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Real IP</td>
+                    <td>
+                      {{ myPackageList[currPkgIdx].isRealIp ? "Yes" : "No" }}
                     </td>
                   </tr>
                   <tr>
@@ -1153,10 +1141,46 @@ export default {
       this.suggestedPkgs = [];
       this.suggestIdxList = [];
 
+      // "Individual", "Group", "Company"
+      let minBW = 0;
+      if (this.userType === "Group") {
+        minBW = 10;
+      } else if (this.userType === "Company") {
+        minBW = 25;
+      }
+
+      // "Studying",
+      // "Business",
+      // "Gaming",
+      // "Browsing",
+      // "Streaming",
+      // "Movies",
+      // "Social Networking",
+      // "others",
+      let maxRT = 5000; // responseTime
+      if (this.category === "Studying") {
+        maxRT = 2500;
+      } else if (this.category === "Business") {
+        maxRT = 500;
+      } else if (this.category === "Gaming") {
+        maxRT = 500;
+      } else if (this.category === "Browsing") {
+        maxRT = 3000;
+      } else if (this.category === "Streaming") {
+        maxRT = 1000;
+      } else if (this.category === "Movies") {
+        maxRT = 1500;
+      } else if (this.category === "Social Networking") {
+        maxRT = 2000;
+      } else if (this.category === "others") {
+        maxRT = 3000;
+      }
+
       for (let i in this.allPkgs) {
         if (
-          this.allPkgs[i].data.bandwidth >= 10 &&
-          this.allPkgs[i].data.downTime <= this.downTime
+          this.allPkgs[i].data.bandwidth >= minBW &&
+          this.allPkgs[i].data.downTime <= this.downTime &&
+          this.allPkgs[i].data.responseTime <= maxRT
         ) {
           this.suggestIdxList.push(i);
           this.suggestedPkgs.push(this.allPkgs[i]);

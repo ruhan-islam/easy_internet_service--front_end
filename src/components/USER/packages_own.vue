@@ -28,12 +28,35 @@
             </v-card-title>
 
             <v-card-text>
+              <div class="my-4 text-subtitle-1">
+                Taka
+                <span v-if="!myPackage.data.offerId">
+                  {{ myPackage.data.price }}
+                </span>
+                <template v-if="!!myPackage.data.offerId">
+                  <s>{{ myPackage.data.price }}</s>
+                  <span>
+                    &nbsp;
+                    {{
+                      calculateReducedPrice(
+                        myPackage.data.price,
+                        myPackage.data.offerId
+                      )
+                    }}
+                  </span>
+                  <v-chip color="deep-purple">
+                    <span style="color:white">
+                      {{ getOfferName(myPackage.data.offerId) }}
+                    </span>
+                  </v-chip>
+                </template>
+              </div>
               <v-chip-group
                 active-class="deep-purple accent-4 white--text"
                 column
               >
                 <v-chip>{{ myPackage.data.bandwidth }} MBPS</v-chip>
-                <v-chip>{{ myPackage.data.duration }} months</v-chip>
+                <v-chip v-if="myPackage.data.isRealIp"> Real IP </v-chip>
               </v-chip-group>
 
               <div>
@@ -95,7 +118,25 @@
                   </tr>
                   <tr>
                     <td>Price</td>
-                    <td>Tk. {{ myPackageList[currPkgIdx].data.price }} /ISP</td>
+                    <td>Tk. {{ myPackageList[currPkgIdx].data.price }}</td>
+                  </tr>
+                  <tr v-if="!!allPkgs[currPkgIdx].offerId">
+                    <td>Reduced Price</td>
+                    <td>
+                      Tk.
+                      {{
+                        calculateReducedPrice(
+                          allPkgs[currPkgIdx].price,
+                          allPkgs[currPkgIdx].offerId
+                        )
+                      }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Real IP</td>
+                    <td>
+                      {{ myPackageList[currPkgIdx].isRealIp ? "Yes" : "No" }}
+                    </td>
                   </tr>
                   <tr>
                     <td>Bandwidth</td>
@@ -309,7 +350,7 @@ export default {
     selectPressed(i) {
       // console.log(i);
       this.setSelectedPkg(this.allPkgs[i].data);
-      console.log(this.getSelectedPkg);
+      // console.log(this.getSelectedPkg);
       this.$router.push("/ISP/payments");
       // this.showPayment = true;
     },

@@ -88,6 +88,38 @@
                   <v-expansion-panel-header>
                     <template v-slot:default="{ open }">
                       <v-row no-gutters>
+                        <v-col cols="4"> Real IP </v-col>
+                        <v-col cols="8" class="text--secondary">
+                          <v-fade-transition leave-absolute>
+                            <span v-if="open" key="0">
+                              Enter whether IP is real
+                            </span>
+                            <span v-else key="1">
+                              {{ isRealIp ? "Yes" : "No" }}
+                            </span>
+                          </v-fade-transition>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-row>
+                      <v-col></v-col>
+                      <v-col
+                        ><v-checkbox
+                          v-model="isRealIp"
+                          label="Real IP"
+                        ></v-checkbox
+                      ></v-col>
+                      <v-col></v-col>
+                    </v-row>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    <template v-slot:default="{ open }">
+                      <v-row no-gutters>
                         <v-col cols="4"> Bandwidth(MBPS) </v-col>
                         <v-col cols="8" class="text--secondary">
                           <v-fade-transition leave-absolute>
@@ -469,6 +501,7 @@
                   column
                 >
                   <v-chip>{{ pkg.bandwidth }} MBPS</v-chip>
+                  <v-chip v-if="pkg.isRealIp"> Real IP </v-chip>
                 </v-chip-group>
                 <div>
                   {{ pkg.bandwidth }} MBPS speed relentless speed of unlimited
@@ -538,7 +571,25 @@
                     </tr>
                     <tr>
                       <td>Price (Taka)</td>
-                      <td>Tk. {{ allPkgs[currPkgIdx].price }} /ISP</td>
+                      <td>Tk. {{ allPkgs[currPkgIdx].price }}</td>
+                    </tr>
+                    <tr v-if="!!allPkgs[currPkgIdx].offerId">
+                      <td>Reduced Price</td>
+                      <td>
+                        Tk.
+                        {{
+                          calculateReducedPrice(
+                            allPkgs[currPkgIdx].price,
+                            allPkgs[currPkgIdx].offerId
+                          )
+                        }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Real IP</td>
+                      <td>
+                        {{ myPackageList[currPkgIdx].isRealIp ? "Yes" : "No" }}
+                      </td>
                     </tr>
                     <tr>
                       <td>Bandwidth (MBPS)</td>
@@ -641,6 +692,7 @@ export default {
 
   data() {
     return {
+      isRealIp: false,
       isLoading: true,
       sortedItems: [
         "Name 🔺",
@@ -866,7 +918,7 @@ export default {
         duration: 1,
         price: this.price,
         ongoing: true,
-        isRealIp: false,
+        isRealIp: this.isRealIp,
         downTime: this.downTime,
         responseTime: this.responseTime,
         areas: [],
