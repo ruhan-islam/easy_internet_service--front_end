@@ -13,7 +13,12 @@
       ></v-progress-linear>
     </div>
 
-    <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
+    <div
+      v-if="
+        !initLoading && !isLoadingMyPaymentList && !isLoadingUserPaymentList
+      "
+      class="ma-12 mb-12 container-flow"
+    >
       <v-row>
         <v-col cols="4">
           <v-card width="400">
@@ -115,7 +120,7 @@
 
             <v-card-text>
               <div class="text-h4 font-weight-thin">
-                Total Cost {{ value[value.length - 1] }} BDT
+                Total Cost {{ value.length ? value[value.length - 1] : 0 }} BDT
               </div>
             </v-card-text>
           </v-card>
@@ -140,17 +145,18 @@
 
             <v-card-text>
               <div class="text-h4 font-weight-thin">
-                Total Earned {{ value2[value2.length - 1] }} BDT
+                Total Earned
+                {{ value2.length ? value2[value2.length - 1] : 0 }} BDT
               </div>
             </v-card-text>
 
             <v-divider></v-divider>
 
-            <v-card-actions class="justify-center">
+            <!-- <v-card-actions class="justify-center">
               <v-btn block router-link to="/ISP/payments">
                 See Full Report
               </v-btn>
-            </v-card-actions>
+            </v-card-actions> -->
           </v-card>
         </v-col>
       </v-row>

@@ -327,7 +327,7 @@ export default {
     },
 
     refundPressed() {
-      console.log(this.ispNameList);
+      // console.log(this.ispNameList);
       axios
         .post("/api/ticket/refund", {
           type: 2, // for ISP

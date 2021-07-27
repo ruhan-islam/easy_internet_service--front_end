@@ -284,7 +284,7 @@ export default {
     },
 
     offerMore() {
-      this.$router.push("/NTTN/dashboard");
+      this.$router.push("/NTTN/offers");
     },
   },
 };

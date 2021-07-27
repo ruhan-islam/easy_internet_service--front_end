@@ -406,7 +406,7 @@
 
           <v-card-actions>
             <v-row align="center" justify="end">
-              <v-col cols="6"></v-col>
+              <v-col cols="4"></v-col>
               <v-col>
                 <v-btn
                   color="deep-purple lighten-2"
@@ -464,7 +464,7 @@
 
       <!-- showing user packages -->
       <v-row>
-        <div class="col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
+        <div class="container col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
           <v-badge
             :content="0"
             :value="markVal"
@@ -588,7 +588,7 @@
                     <tr>
                       <td>Real IP</td>
                       <td>
-                        {{ myPackageList[currPkgIdx].isRealIp ? "Yes" : "No" }}
+                        {{ allPkgs[currPkgIdx].isRealIp ? "Yes" : "No" }}
                       </td>
                     </tr>
                     <tr>
@@ -640,7 +640,7 @@
           <v-card>
             <v-card-title class="text-h5"> Offer List </v-card-title>
 
-            <v-card-text>
+            <!-- <v-card-text>
               <v-radio-group mandatory v-model="selectedOffer">
                 <v-radio
                   v-for="(offer, i) in validOffers"
@@ -653,6 +653,18 @@
                       10
                     )} To ${offer.expirationTime.slice(0, 10)} )`
                   "
+                  :value="offer._id"
+                >
+                </v-radio>
+              </v-radio-group>
+            </v-card-text> -->
+
+            <v-card-text>
+              <v-radio-group mandatory v-model="selectedOffer">
+                <v-radio
+                  v-for="(offer, i) in validOffers"
+                  :key="i"
+                  :label="`${offer.name} -- Reduction: ${offer.reduction}%`"
                   :value="offer._id"
                 >
                 </v-radio>
@@ -751,11 +763,11 @@ export default {
       pkgNameList: [],
       allOffers: [],
       validOffers: [],
-      filterPrice: [500, 20000],
-      minFilterPrice: 500,
+      filterPrice: [0, 20000],
+      minFilterPrice: 0,
       maxFilterPrice: 20000,
       stepFilterPrice: 500,
-      filterBW: [1, 200],
+      filterBW: [0, 100],
       markVal: 0,
       selectallTitle: "Select All",
     };
@@ -935,8 +947,8 @@ export default {
             this.allPkgs.push(newPkg);
             this.pkgs = this.allPkgs;
             this.pkgNameList.push(newPkg.name);
-            this.filterPrice = [0, 1000000];
-            this.filterBW = [0, 200];
+            this.filterPrice = [0, 20000];
+            this.filterBW = [0, 100];
             this.showSuccessOverlay = true;
           } else {
             this.error = true;
@@ -998,6 +1010,7 @@ export default {
     detailsPressed(i) {
       this.currPkgIdx = i;
       this.dialog2 = true;
+      // console.log(this.allPkgs);
       // console.log(this.currPkgIdx);
     },
 
@@ -1038,80 +1051,80 @@ export default {
     },
 
     orderByNameAscending(a, b) {
-      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
         return -1;
       }
-      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceAscending(a, b) {
-      if (a.data.price < b.data.price) {
+      if (a.price < b.price) {
         return -1;
       }
-      if (a.data.price > b.data.price) {
+      if (a.price > b.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthAscending(a, b) {
-      if (a.data.bandwidth < b.data.bandwidth) {
+      if (a.bandwidth < b.bandwidth) {
         return -1;
       }
-      if (a.data.bandwidth > b.data.bandwidth) {
+      if (a.bandwidth > b.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationAscending(a, b) {
-      if (a.data.duration < b.data.duration) {
+      if (a.duration < b.duration) {
         return -1;
       }
-      if (a.data.duration > b.data.duration) {
+      if (a.duration > b.duration) {
         return 1;
       }
       return 0;
     },
 
     orderByNameDescending(a, b) {
-      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
         return -1;
       }
-      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceDescending(a, b) {
-      if (a.data.price > b.data.price) {
+      if (a.price > b.price) {
         return -1;
       }
-      if (a.data.price < b.data.price) {
+      if (a.price < b.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthDescending(a, b) {
-      if (a.data.bandwidth > b.data.bandwidth) {
+      if (a.bandwidth > b.bandwidth) {
         return -1;
       }
-      if (a.data.bandwidth < b.data.bandwidth) {
+      if (a.bandwidth < b.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationDescending(a, b) {
-      if (a.data.duration > b.data.duration) {
+      if (a.duration > b.duration) {
         return -1;
       }
-      if (a.data.duration < b.data.duration) {
+      if (a.duration < b.duration) {
         return 1;
       }
       return 0;
@@ -1138,10 +1151,10 @@ export default {
       console.log(minPrice, maxPrice);
       for (let pkg in this.allPkgs) {
         if (
-          this.allPkgs[pkg].data.price >= minPrice &&
-          this.allPkgs[pkg].data.price <= maxPrice &&
-          this.allPkgs[pkg].data.bandwidth >= minBandwidth &&
-          this.allPkgs[pkg].data.bandwidth <= maxBandwidth
+          this.allPkgs[pkg].price >= minPrice &&
+          this.allPkgs[pkg].price <= maxPrice &&
+          this.allPkgs[pkg].bandwidth >= minBandwidth &&
+          this.allPkgs[pkg].bandwidth <= maxBandwidth
         ) {
           this.pkgs.push(this.allPkgs[pkg]);
         }
@@ -1150,8 +1163,8 @@ export default {
     },
 
     clearFilter() {
-      this.filterPrice = [0, 1000000];
-      this.filterBW = [1, 200];
+      this.filterPrice = [0, 20000];
+      this.filterBW = [0, 100];
       this.pkgs = this.allPkgs;
     },
   },

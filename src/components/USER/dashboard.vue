@@ -2,7 +2,21 @@
   <div>
     <topbar></topbar>
 
-    <div class="ma-12 mb-12 container-flow">
+    <div
+      style="margin-bottom:15%"
+      class="container"
+      v-if="isLoadingMyPackageList"
+    >
+      <v-progress-linear
+        style="margin:10% 0"
+        color="deep-purple accent-4"
+        indeterminate
+        rounded
+        height="6"
+      ></v-progress-linear>
+    </div>
+
+    <div v-if="!isLoadingMyPackageList" class="ma-12 mb-12 container-flow">
       <v-row>
         <v-col cols="4">
           <v-card width="400">
@@ -144,6 +158,7 @@ export default {
       value: [],
       pageInfo: "",
       myPackageList: [],
+      isLoadingMyPackageList: true,
 
       totalUsage: 0,
     };

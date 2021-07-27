@@ -13,7 +13,10 @@
     ></v-progress-linear>
 
     <!-- suggestions -->
-    <v-container v-if="!isLoading" class="mb-12">
+    <v-container
+      v-if="!isLoading && !getUserData.packages.length"
+      class="mb-12"
+    >
       <v-dialog v-model="dialog" persistent max-width="80%">
         <template v-slot:activator="{ on, attrs }">
           <v-row>
@@ -528,7 +531,7 @@
                   v-model="filterPrice"
                   label="Price (Taka)"
                   min="0"
-                  max="1000000"
+                  max="20000"
                   step="1000"
                 >
                 </v-range-slider>
@@ -1058,16 +1061,14 @@ export default {
       validOffers: [],
       allPkgs: [],
       pkgs: [],
-      filterPrice: [0, 1000000],
-      filterBW: [1, 200],
-      filterDuration: [1, 24],
+      filterPrice: [0, 20000],
+      filterBW: [0, 100],
+      filterDuration: [0, 24],
       sortedItems: [
         "Name 🔺",
         "Name 🔻",
         "Price 🔺",
         "Price 🔻",
-        "Duration 🔺",
-        "Duration 🔻",
         "Bandwidth 🔺",
         "Bandwidth 🔻",
       ],
@@ -1143,10 +1144,13 @@ export default {
 
       // "Individual", "Group", "Company"
       let minBW = 0;
+      let realIP = true;
       if (this.userType === "Group") {
         minBW = 10;
       } else if (this.userType === "Company") {
         minBW = 25;
+      } else {
+        realIP = false;
       }
 
       // "Studying",
@@ -1180,7 +1184,8 @@ export default {
         if (
           this.allPkgs[i].data.bandwidth >= minBW &&
           this.allPkgs[i].data.downTime <= this.downTime &&
-          this.allPkgs[i].data.responseTime <= maxRT
+          this.allPkgs[i].data.responseTime <= maxRT &&
+          this.allPkgs[i].data.isRealIp === realIP
         ) {
           this.suggestIdxList.push(i);
           this.suggestedPkgs.push(this.allPkgs[i]);
@@ -1315,16 +1320,12 @@ export default {
     doSort(item) {
       if (item == "Price 🔺") {
         this.pkgs.sort(this.orderByPriceAscending);
-      } else if (item == "Duration 🔺") {
-        this.pkgs.sort(this.orderByDurationAscending);
       } else if (item == "Bandwidth 🔺") {
         this.pkgs.sort(this.orderByBandwidthAscending);
       } else if (item == "Name 🔺") {
         this.pkgs.sort(this.orderByNameAscending);
       } else if (item == "Price 🔻") {
         this.pkgs.sort(this.orderByPriceDescending);
-      } else if (item == "Duration 🔻") {
-        this.pkgs.sort(this.orderByDurationDescending);
       } else if (item == "Bandwidth 🔻") {
         this.pkgs.sort(this.orderByBandwidthDescending);
       } else if (item == "Name 🔻") {
@@ -1455,9 +1456,9 @@ export default {
     },
 
     clearFilter() {
-      this.filterPrice = [0, 1000000];
-      this.filterBW = [1, 200];
-      this.filterDuration = [1, 24];
+      this.filterPrice = [0, 20000];
+      this.filterBW = [0, 100];
+      this.filterDuration = [0, 24];
       this.pkgs = this.allPkgs;
     },
   },

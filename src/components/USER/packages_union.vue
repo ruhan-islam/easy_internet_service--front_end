@@ -45,7 +45,7 @@
                   v-model="filterPrice"
                   label="Price (Taka)"
                   min="0"
-                  max="1000000"
+                  max="20000"
                   step="1000"
                 >
                 </v-range-slider>
@@ -151,7 +151,7 @@
 
     <!-- show User packages -->
     <v-row v-if="!isLoading" justify="center">
-      <div class="col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
+      <div class="container col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
@@ -355,16 +355,14 @@ export default {
       validOffers: [],
       allPkgs: [],
       pkgs: [],
-      filterPrice: [0, 1000000],
-      filterBW: [1, 200],
+      filterPrice: [0, 20000],
+      filterBW: [1, 100],
       filterDuration: [1, 24],
       sortedItems: [
         "Name 🔺",
         "Name 🔻",
         "Price 🔺",
         "Price 🔻",
-        "Duration 🔺",
-        "Duration 🔻",
         "Bandwidth 🔺",
         "Bandwidth 🔻",
       ],
@@ -437,7 +435,7 @@ export default {
     findIdx(myPkg) {
       this.currPkgIdx = -1;
       for (let i in this.allPkgs) {
-        if (this.allPkgs[i].data._id === myPkg._id) {
+        if (this.allPkgs[i]._id === myPkg._id) {
           this.currPkgIdx = i;
           break;
         }
@@ -502,16 +500,12 @@ export default {
     doSort(item) {
       if (item == "Price 🔺") {
         this.pkgs.sort(this.orderByPriceAscending);
-      } else if (item == "Duration 🔺") {
-        this.pkgs.sort(this.orderByDurationAscending);
       } else if (item == "Bandwidth 🔺") {
         this.pkgs.sort(this.orderByBandwidthAscending);
       } else if (item == "Name 🔺") {
         this.pkgs.sort(this.orderByNameAscending);
       } else if (item == "Price 🔻") {
         this.pkgs.sort(this.orderByPriceDescending);
-      } else if (item == "Duration 🔻") {
-        this.pkgs.sort(this.orderByDurationDescending);
       } else if (item == "Bandwidth 🔻") {
         this.pkgs.sort(this.orderByBandwidthDescending);
       } else if (item == "Name 🔻") {
@@ -520,80 +514,80 @@ export default {
     },
 
     orderByNameAscending(a, b) {
-      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
         return -1;
       }
-      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceAscending(a, b) {
-      if (a.data.price < b.data.price) {
+      if (a.price < b.price) {
         return -1;
       }
-      if (a.data.price > b.data.price) {
+      if (a.price > b.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthAscending(a, b) {
-      if (a.data.bandwidth < b.data.bandwidth) {
+      if (a.bandwidth < b.bandwidth) {
         return -1;
       }
-      if (a.data.bandwidth > b.data.bandwidth) {
+      if (a.bandwidth > b.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationAscending(a, b) {
-      if (a.data.duration < b.data.duration) {
+      if (a.duration < b.duration) {
         return -1;
       }
-      if (a.data.duration > b.data.duration) {
+      if (a.duration > b.duration) {
         return 1;
       }
       return 0;
     },
 
     orderByNameDescending(a, b) {
-      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
         return -1;
       }
-      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceDescending(a, b) {
-      if (a.data.price > b.data.price) {
+      if (a.price > b.price) {
         return -1;
       }
-      if (a.data.price < b.data.price) {
+      if (a.price < b.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthDescending(a, b) {
-      if (a.data.bandwidth > b.data.bandwidth) {
+      if (a.bandwidth > b.bandwidth) {
         return -1;
       }
-      if (a.data.bandwidth < b.data.bandwidth) {
+      if (a.bandwidth < b.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationDescending(a, b) {
-      if (a.data.duration > b.data.duration) {
+      if (a.duration > b.duration) {
         return -1;
       }
-      if (a.data.duration < b.data.duration) {
+      if (a.duration < b.duration) {
         return 1;
       }
       return 0;
@@ -628,12 +622,12 @@ export default {
       // console.log(minPrice, maxPrice);
       for (let pkg in this.allPkgs) {
         if (
-          this.allPkgs[pkg].data.price >= minPrice &&
-          this.allPkgs[pkg].data.price <= maxPrice &&
-          this.allPkgs[pkg].data.bandwidth >= minBandwidth &&
-          this.allPkgs[pkg].data.bandwidth <= maxBandwidth &&
-          this.allPkgs[pkg].data.duration >= minDuration &&
-          this.allPkgs[pkg].data.duration <= maxDuration
+          this.allPkgs[pkg].price >= minPrice &&
+          this.allPkgs[pkg].price <= maxPrice &&
+          this.allPkgs[pkg].bandwidth >= minBandwidth &&
+          this.allPkgs[pkg].bandwidth <= maxBandwidth &&
+          this.allPkgs[pkg].duration >= minDuration &&
+          this.allPkgs[pkg].duration <= maxDuration
         ) {
           this.pkgs.push(this.allPkgs[pkg]);
         }
@@ -642,8 +636,8 @@ export default {
     },
 
     clearFilter() {
-      this.filterPrice = [0, 1000000];
-      this.filterBW = [1, 200];
+      this.filterPrice = [0, 20000];
+      this.filterBW = [1, 100];
       this.filterDuration = [1, 24];
       this.pkgs = this.allPkgs;
     },

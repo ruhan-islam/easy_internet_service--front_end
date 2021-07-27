@@ -247,8 +247,6 @@ export default {
         "Name 🔻",
         "Price 🔺",
         "Price 🔻",
-        "Duration 🔺",
-        "Duration 🔻",
         "Bandwidth 🔺",
         "Bandwidth 🔻",
       ],

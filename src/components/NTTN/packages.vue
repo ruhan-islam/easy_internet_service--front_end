@@ -381,9 +381,9 @@
                     <v-range-slider
                       v-model="filterPrice"
                       label="Price (Taka)"
-                      min="0"
-                      max="1000000"
-                      step="1000"
+                      :min="minPrice"
+                      :max="maxPrice"
+                      :step="stepPrice"
                     >
                     </v-range-slider>
                     <label style="color: rgb(97, 91, 91)"
@@ -422,8 +422,8 @@
                     <v-range-slider
                       v-model="filterBW"
                       label="Bandwidth (GBPS)"
-                      min="0"
-                      max="100"
+                      :min="minBW"
+                      :max="maxBW"
                       thumb-label="always"
                     >
                     </v-range-slider>
@@ -460,8 +460,8 @@
                     <v-range-slider
                       v-model="filterDuration"
                       label="Duration (Months)"
-                      min="0"
-                      max="24"
+                      :min="minDur"
+                      :max="maxDur"
                       thumb-label="always"
                     >
                     </v-range-slider>
@@ -640,14 +640,14 @@
                         <td>Base Price (Taka)</td>
                         <td>Tk. {{ allPkgs[currPkgIdx].price }} /ISP</td>
                       </tr>
-                      <tr v-if="!!allPkgs[currPkgIdx].data.offerId">
+                      <tr v-if="!!allPkgs[currPkgIdx].offerId">
                         <td>Reduced Price</td>
                         <td>
                           Tk.
                           {{
                             calculateReducedPrice(
-                              allPkgs[currPkgIdx].data.price,
-                              allPkgs[currPkgIdx].data.offerId
+                              allPkgs[currPkgIdx].price,
+                              allPkgs[currPkgIdx].offerId
                             )
                           }}
                           /ISP
@@ -715,7 +715,7 @@
               name: {{ allPkgs[currPkgIdx].name }} <br />
               bandwidth: {{ allPkgs[currPkgIdx].bandwidth }} GBPS <br />-->
                 <!-- :label="`Radio ${n}`" -->
-                <v-radio-group mandatory v-model="selectedOffer">
+                <!-- <v-radio-group mandatory v-model="selectedOffer">
                   <v-radio
                     v-for="(offer, i) in validOffers"
                     :key="i"
@@ -727,6 +727,15 @@
                         10
                       )} To ${offer.expirationTime.slice(0, 10)} )`
                     "
+                    :value="offer._id"
+                  >
+                  </v-radio>
+                </v-radio-group> -->
+                <v-radio-group mandatory v-model="selectedOffer">
+                  <v-radio
+                    v-for="(offer, i) in validOffers"
+                    :key="i"
+                    :label="`${offer.name} -- Reduction: ${offer.reduction}%`"
                     :value="offer._id"
                   >
                   </v-radio>
@@ -831,7 +840,7 @@ export default {
       upSpeed: "",
       downSpeed: "",
       minBW: 1,
-      maxBW: 200,
+      maxBW: 100,
       speedRules: [(v) => v <= this.bandwidth || "must be less than bandwidth"],
       duration: "",
       minDur: 3,
@@ -844,16 +853,19 @@ export default {
       responseTime: "",
       minRT: 1,
       stepRT: 1,
-      maxRT: 200,
+      maxRT: 2000,
       allPkgs: [],
       pkgs: [],
       dummyPkg: "",
       pkgNameList: [],
       allOffers: [],
       validOffers: [],
-      filterPrice: [1, 1000000],
-      filterBW: [1, 200],
-      filterDuration: [1, 24],
+      minPrice: 0,
+      maxPrice: 1000000,
+      stepPrice: 10000,
+      filterPrice: [0, 1000000],
+      filterBW: [0, 100],
+      filterDuration: [0, 24],
       markVal: 0,
       selectallTitle: "Select All",
     };
@@ -1005,7 +1017,7 @@ export default {
             this.pkgs = this.allPkgs;
             this.pkgNameList.push(newPkg.name);
             this.filterPrice = [0, 1000000];
-            this.filterBW = [0, 200];
+            this.filterBW = [0, 100];
             this.filterDuration = [0, 24];
             this.showSuccessOverlay = true;
           } else {
@@ -1138,80 +1150,80 @@ export default {
     },
 
     orderByNameAscending(a, b) {
-      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
         return -1;
       }
-      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceAscending(a, b) {
-      if (a.data.price < b.data.price) {
+      if (a.price < b.price) {
         return -1;
       }
-      if (a.data.price > b.data.price) {
+      if (a.price > b.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthAscending(a, b) {
-      if (a.data.bandwidth < b.data.bandwidth) {
+      if (a.bandwidth < b.bandwidth) {
         return -1;
       }
-      if (a.data.bandwidth > b.data.bandwidth) {
+      if (a.bandwidth > b.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationAscending(a, b) {
-      if (a.data.duration < b.data.duration) {
+      if (a.duration < b.duration) {
         return -1;
       }
-      if (a.data.duration > b.data.duration) {
+      if (a.duration > b.duration) {
         return 1;
       }
       return 0;
     },
 
     orderByNameDescending(a, b) {
-      if (a.data.name.toUpperCase() > b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() > b.name.toUpperCase()) {
         return -1;
       }
-      if (a.data.name.toUpperCase() < b.data.name.toUpperCase()) {
+      if (a.name.toUpperCase() < b.name.toUpperCase()) {
         return 1;
       }
       return 0;
     },
 
     orderByPriceDescending(a, b) {
-      if (a.data.price > b.data.price) {
+      if (a.price > b.price) {
         return -1;
       }
-      if (a.data.price < b.data.price) {
+      if (a.price < b.price) {
         return 1;
       }
       return 0;
     },
 
     orderByBandwidthDescending(a, b) {
-      if (a.data.bandwidth > b.data.bandwidth) {
+      if (a.bandwidth > b.bandwidth) {
         return -1;
       }
-      if (a.data.bandwidth < b.data.bandwidth) {
+      if (a.bandwidth < b.bandwidth) {
         return 1;
       }
       return 0;
     },
 
     orderByDurationDescending(a, b) {
-      if (a.data.duration > b.data.duration) {
+      if (a.duration > b.duration) {
         return -1;
       }
-      if (a.data.duration < b.data.duration) {
+      if (a.duration < b.duration) {
         return 1;
       }
       return 0;
@@ -1246,12 +1258,12 @@ export default {
       // console.log(minPrice, maxPrice);
       for (let pkg in this.allPkgs) {
         if (
-          this.allPkgs[pkg].data.price >= minPrice &&
-          this.allPkgs[pkg].data.price <= maxPrice &&
-          this.allPkgs[pkg].data.bandwidth >= minBandwidth &&
-          this.allPkgs[pkg].data.bandwidth <= maxBandwidth &&
-          this.allPkgs[pkg].data.duration >= minDuration &&
-          this.allPkgs[pkg].data.duration <= maxDuration
+          this.allPkgs[pkg].price >= minPrice &&
+          this.allPkgs[pkg].price <= maxPrice &&
+          this.allPkgs[pkg].bandwidth >= minBandwidth &&
+          this.allPkgs[pkg].bandwidth <= maxBandwidth &&
+          this.allPkgs[pkg].duration >= minDuration &&
+          this.allPkgs[pkg].duration <= maxDuration
         ) {
           this.pkgs.push(this.allPkgs[pkg]);
         }
@@ -1261,8 +1273,8 @@ export default {
 
     clearFilter() {
       this.filterPrice = [0, 1000000];
-      this.filterBW = [1, 200];
-      this.filterDuration = [1, 24];
+      this.filterBW = [0, 100];
+      this.filterDuration = [0, 24];
       this.pkgs = this.allPkgs;
     },
   },

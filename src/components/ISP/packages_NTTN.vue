@@ -13,7 +13,10 @@
     ></v-progress-linear>
 
     <!-- suggestions -->
-    <v-container v-if="!isLoading" class="mb-12">
+    <v-container
+      v-if="!isLoading && !getUserData.packages.length"
+      class="mb-12"
+    >
       <v-dialog v-model="dialog" persistent max-width="80%">
         <template v-slot:activator="{ on, attrs }">
           <v-row>
@@ -395,17 +398,6 @@
                             :key="j"
                             style="margin-left:100px"
                             >{{ p.data.down_speed }}</v-col
-                          >
-                        </v-row>
-                        <v-row
-                          style="background-color: #595260; margin-right: 40px"
-                        >
-                          <v-col>Upload Speed(GBPS)</v-col>
-                          <v-col
-                            v-for="(p, j) in compareList"
-                            :key="j"
-                            style="margin-left:100px"
-                            >{{ p.data.up_speed }}</v-col
                           >
                         </v-row>
                         <v-row style="margin-right: 40px">
@@ -880,15 +872,6 @@
                     >{{ p.data.down_speed }}</v-col
                   >
                 </v-row>
-                <v-row style="background-color: #595260; margin-right: 40px">
-                  <v-col>Upload Speed(GBPS)</v-col>
-                  <v-col
-                    v-for="(p, j) in compareList"
-                    :key="j"
-                    style="margin-left:100px"
-                    >{{ p.data.up_speed }}</v-col
-                  >
-                </v-row>
                 <v-row style="margin-right: 40px">
                   <v-col>Estimated Down Time(hrs)</v-col>
                   <v-col
@@ -1076,7 +1059,7 @@ export default {
       noConRules: [
         (v) => !!v || "Please enter your estimated number",
         (v) => /^\d*$/.test(v) || "Number should be valid2",
-        (v) => v < 80000 || "Too much end users!!",
+        (v) => v <= 80000 || "Too much end users!!",
       ],
 
       maxCompareCount: 3,
@@ -1102,7 +1085,7 @@ export default {
       pkgs: [],
       currPkgIdx: -1,
       filterPrice: [0, 1000000],
-      filterBW: [1, 200],
+      filterBW: [1, 100],
       filterDuration: [1, 24],
       sortedItems: [
         "Name 🔺",
@@ -1492,7 +1475,7 @@ export default {
 
     clearFilter() {
       this.filterPrice = [0, 1000000];
-      this.filterBW = [1, 200];
+      this.filterBW = [1, 100];
       this.filterDuration = [1, 24];
       this.pkgs = this.allPkgs;
     },
