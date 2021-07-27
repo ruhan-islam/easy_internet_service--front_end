@@ -13,7 +13,7 @@
     </div>
 
     <div v-if="!initLoading" class="ma-12 mb-12 container-flow">
-      <v-container>
+      <!-- <v-container>
         <v-dialog v-model="dialog" persistent max-width="80%">
           <template v-slot:activator="{ on, attrs }">
             <v-row>
@@ -131,7 +131,7 @@
             </v-form>
           </v-card>
         </v-dialog>
-      </v-container>
+      </v-container> -->
 
       <template>
         <v-card>

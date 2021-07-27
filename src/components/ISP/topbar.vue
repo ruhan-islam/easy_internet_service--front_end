@@ -64,6 +64,13 @@
           >
             <span> Payments </span>
             <v-icon> mdi-credit-card </v-icon>
+            <v-badge
+              color="purple"
+              offset-x="10"
+              offset-y="0"
+              v-if="getPayNotification"
+            >
+            </v-badge>
           </v-btn>
         </template>
         <span> Payments </span>
@@ -195,6 +202,17 @@ export default {
       "getUserName",
       "getUserData",
     ]),
+
+    getPayNotification() {
+      let date = new Date();
+      date.setDate(date.getDate() + 7);
+      for (let i in this.getUserData.packages) {
+        if (new Date(this.getUserData.packages[i].terminationTime) < date) {
+          return true;
+        }
+      }
+      return false;
+    },
   },
 
   methods: {

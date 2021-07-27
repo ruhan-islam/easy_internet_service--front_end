@@ -12,6 +12,479 @@
       height="6"
     ></v-progress-linear>
 
+    <!-- suggestions -->
+    <v-container v-if="!isLoading" class="mb-12">
+      <v-dialog v-model="dialog" persistent max-width="80%">
+        <template v-slot:activator="{ on, attrs }">
+          <v-row>
+            <v-col cols="1">
+              <v-btn
+                color="deep-purple lighten-2"
+                dark
+                v-bind="attrs"
+                v-on="on"
+                max-width="100%"
+                fab
+              >
+                <v-icon>mdi-robot</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col>
+              <h5 style="margin-top:15px">Start Tour</h5>
+            </v-col>
+          </v-row>
+        </template>
+
+        <v-card v-if="pageSeq === 1" style="padding: 30px">
+          <h2>New to the system? Just start here...</h2>
+          <v-form ref="form" v-model="valid2" lazy-validation>
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-header v-slot="{ open }">
+                  <v-row no-gutters>
+                    <v-col cols="4"> Category </v-col>
+                    <v-col cols="8" class="text--secondary">
+                      <v-fade-transition leave-absolute>
+                        <span v-if="open" key="0">
+                          Select category
+                        </span>
+                        <span v-else key="1">
+                          {{ category }}
+                        </span>
+                      </v-fade-transition>
+                    </v-col>
+                  </v-row>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <v-row no-gutters>
+                    <v-spacer></v-spacer>
+                    <v-autocomplete
+                      v-model="category"
+                      :items="categoryList"
+                      label="Category"
+                      :required="true"
+                    ></v-autocomplete>
+                  </v-row>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template v-slot:default="{ open }">
+                    <v-row no-gutters>
+                      <v-col cols="4"> Your desired duration(month) </v-col>
+                      <v-col cols="8" class="text--secondary">
+                        <span v-if="open" key="0">
+                          Enter your desired duration for the package
+                        </span>
+                        <span key="1" v-if="!open && duration > 0">
+                          {{ duration }}
+                        </span>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+
+                <v-expansion-panel-content>
+                  <v-slider
+                    v-model="duration"
+                    :min="3"
+                    :step="1"
+                    :max="24"
+                    label="Duration (month)"
+                    class="align-center"
+                    thumb-label="always"
+                    placeholder="e.g. 6"
+                  >
+                  </v-slider>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template v-slot:default="{ open2 }">
+                    <v-row no-gutters>
+                      <v-col cols="4"> Expected maximum downtime (hour) </v-col>
+                      <v-col cols="8" class="text--secondary">
+                        <span v-if="open2" key="0">
+                          Enter your maximum expected downtime in hour
+                        </span>
+                        <span key="1" v-if="downTime > 0">
+                          {{ downTime }}
+                        </span>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+
+                <v-expansion-panel-content>
+                  <v-slider
+                    v-model="downTime"
+                    :min="0.5"
+                    :step="0.5"
+                    :max="2.5"
+                    label="Maximum Downtime (hour)"
+                    class="align-center"
+                    thumb-label="always"
+                    placeholder="e.g. 6"
+                  >
+                  </v-slider>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+
+              <v-card-actions>
+                <v-btn color="green darken-1" text @click="dialog = false">
+                  Cancel
+                </v-btn>
+                <v-btn
+                  :disabled="
+                    !(
+                      this.valid2 &&
+                      this.downTime &&
+                      this.noCon &&
+                      this.duration
+                    )
+                  "
+                  color="success"
+                  class="mr-4"
+                  @click="suggestPressed"
+                >
+                  Suggest
+                </v-btn>
+              </v-card-actions>
+            </v-expansion-panels>
+          </v-form>
+        </v-card>
+
+        <v-card v-if="pageSeq === 2" style="padding: 30px">
+          <v-row v-if="!isLoading" justify="center">
+            <div
+              class="container col-lg-5"
+              v-for="(pkg, i) in suggestedPkgs"
+              :key="i"
+            >
+              <v-card>
+                <v-img height="250" src="./../../assets/images.jpg"></v-img>
+
+                <v-card-title>
+                  {{ pkg.data.name }} &nbsp;
+                  <v-chip v-if="!pkg.data.ongoing" color="red">
+                    Disabled
+                  </v-chip>
+                </v-card-title>
+
+                <v-card-text>
+                  <div class="my-4 text-subtitle-1">
+                    Taka
+                    <span v-if="!pkg.data.offerId"> {{ pkg.data.price }} </span>
+                    <template v-if="!!pkg.data.offerId">
+                      <s>{{ pkg.data.price }}</s>
+                      <span>
+                        &nbsp;
+                        {{
+                          calculateReducedPrice(
+                            pkg.data.price,
+                            pkg.data.offerId
+                          )
+                        }}
+                      </span>
+                      <v-chip color="deep-purple">
+                        <span style="color:white">
+                          {{ getOfferName(pkg.data.offerId) }}
+                        </span>
+                      </v-chip>
+                    </template>
+                  </div>
+                  <v-chip-group
+                    active-class="deep-purple accent-4 white--text"
+                    column
+                  >
+                    <v-chip v-for="(area, i) in pkg.data.areas" :key="i"
+                      >{{ area }}
+                    </v-chip>
+                  </v-chip-group>
+                  <v-chip-group
+                    active-class="deep-purple accent-4 white--text"
+                    column
+                  >
+                    <v-chip>{{ pkg.data.bandwidth }} GBPS</v-chip>
+                    <v-chip>{{ pkg.data.duration }} months</v-chip>
+                  </v-chip-group>
+
+                  <div>
+                    {{ pkg.bandwidth }} GBPS speed relentless speed of unlimited
+                    traffic with 24/7 service.
+                  </div>
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-col>
+                    <v-btn
+                      color="deep-purple lighten-2"
+                      @click="suggestDetailsPressed(i)"
+                      text
+                    >
+                      Details
+                    </v-btn>
+                  </v-col>
+
+                  <v-col>
+                    <v-btn
+                      :disabled="
+                        idxList.length >= maxCompareCount &&
+                          !idxList.includes(i)
+                      "
+                      color="deep-purple lighten-2"
+                      @click="suggestToggleComparePressed(i)"
+                      text
+                    >
+                      <span v-if="!idxList.includes(i)">
+                        Compare
+                      </span>
+                      <span v-if="idxList.includes(i)"> Remove </span>
+                    </v-btn>
+                  </v-col>
+
+                  <v-col>
+                    <v-btn
+                      :disabled="
+                        !suggestedPkgs[i].data.ongoing ||
+                          !suggestedPkgs[i].status
+                      "
+                      color="deep-purple lighten-2"
+                      @click="suggestSelectPressed(i)"
+                      text
+                    >
+                      Select
+                    </v-btn>
+                  </v-col>
+                  <v-col></v-col>
+                </v-card-actions>
+              </v-card>
+            </div>
+
+            <div>
+              <v-row>
+                <v-col cols="8"></v-col>
+                <v-col>
+                  <v-btn color="error" @click="clearCompare" dark>
+                    Clear
+                  </v-btn>
+                </v-col>
+
+                <v-col>
+                  <v-badge
+                    :content="messages"
+                    :value="messages"
+                    color="red"
+                    overlap
+                  >
+                    <v-btn
+                      color="deep-purple lighten-2"
+                      @click="comparePkg"
+                      dark
+                    >
+                      Compare
+                    </v-btn>
+                  </v-badge>
+
+                  <v-dialog
+                    v-model="dialogCompare"
+                    fullscreen
+                    hide-overlay
+                    transition="dialog-bottom-transition"
+                  >
+                    <v-card>
+                      <v-toolbar dark color="primary">
+                        <v-btn
+                          icon
+                          dark
+                          @click="
+                            dialogCompare = false;
+                            messages = 0;
+                            idxList = [];
+                            compareList = [];
+                          "
+                        >
+                          <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                        <v-toolbar-title>Package Comparison</v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-toolbar-items>
+                          <v-btn
+                            dark
+                            text
+                            @click="
+                              dialogCompare = false;
+                              messages = 0;
+                              idxList = [];
+                              compareList = [];
+                            "
+                          >
+                            Done
+                          </v-btn>
+                        </v-toolbar-items>
+                      </v-toolbar>
+
+                      <!-- <v-divider></v-divider> -->
+
+                      <v-card
+                        style="
+                    margin: 20px 20px;
+                    padding: 20px 0px 20px 50px;
+                    background-color: #171010;
+                    color: white;
+                  "
+                        elevation="20"
+                      >
+                        <h4 style="margin-bottom: 50px">Package Comparison</h4>
+
+                        <v-row
+                          style="background-color: #595260; margin-right: 40px"
+                        >
+                          <v-col><h5>Features</h5></v-col>
+                          <v-col v-for="(p, j) in compareList" :key="j">
+                            <h5 style="margin-left:25px">{{ p.data.name }}</h5>
+                          </v-col>
+                        </v-row>
+                        <v-row style="margin-right: 40px">
+                          <v-col>Price(BDT)</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.price }}</v-col
+                          >
+                        </v-row>
+                        <v-row
+                          style="background-color: #595260; margin-right: 40px"
+                        >
+                          <v-col>Bandwidth(GBPS)</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.bandwidth }}</v-col
+                          >
+                        </v-row>
+                        <v-row style="margin-right: 40px">
+                          <v-col>Duration(months)</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.duration }}</v-col
+                          >
+                        </v-row>
+                        <v-row
+                          style="background-color: #595260; margin-right: 40px"
+                        >
+                          <v-col>Upload Speed(GBPS)</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.up_speed }}</v-col
+                          >
+                        </v-row>
+                        <v-row style="margin-right: 40px">
+                          <v-col>Download Speed(GBPS)</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.down_speed }}</v-col
+                          >
+                        </v-row>
+                        <v-row
+                          style="background-color: #595260; margin-right: 40px"
+                        >
+                          <v-col>Upload Speed(GBPS)</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.up_speed }}</v-col
+                          >
+                        </v-row>
+                        <v-row style="margin-right: 40px">
+                          <v-col>Estimated Down Time(hrs)</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.downTime }}</v-col
+                          >
+                        </v-row>
+                        <v-row
+                          style="background-color: #595260; margin-right: 40px"
+                        >
+                          <v-col>Response Time(milliseconds)</v-col>
+                          <v-col
+                            v-for="(p, j) in compareList"
+                            :key="j"
+                            style="margin-left:100px"
+                            >{{ p.data.responseTime }}</v-col
+                          >
+                        </v-row>
+                      </v-card>
+                    </v-card>
+                  </v-dialog>
+
+                  <v-dialog
+                    v-model="dialogZero"
+                    persistent
+                    max-width="40%"
+                    transition="dialog-bottom-transition"
+                  >
+                    <v-card>
+                      <v-card-title class="text-h5">
+                        Not Sufficient Package
+                      </v-card-title>
+                      <v-card-text
+                        >Sufficient amount of package was not selected. Please
+                        select at least two packages to compare.</v-card-text
+                      >
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          color="green darken-1"
+                          text
+                          @click="dialogZero = false"
+                        >
+                          Close
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-col>
+              </v-row>
+            </div>
+          </v-row>
+          <v-form ref="form" v-model="valid2" lazy-validation>
+            <v-expansion-panels>
+              <v-card-actions>
+                <v-btn color="green darken-1" text @click="pageSeq = 1">
+                  Back
+                </v-btn>
+
+                <v-btn
+                  color="green darken-1"
+                  text
+                  @click="
+                    dialog = false;
+                    pageSeq = 1;
+                  "
+                >
+                  Cancel
+                </v-btn>
+              </v-card-actions>
+            </v-expansion-panels>
+          </v-form>
+        </v-card>
+      </v-dialog>
+    </v-container>
+
     <!-- package filters  -->
     <v-row v-if="!isLoading" justify="center">
       <v-card style="padding:0px 20px">
@@ -151,7 +624,7 @@
 
     <!-- show User packages -->
     <v-row v-if="!isLoading" justify="center">
-      <div class="col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
+      <div class="container col-lg-5" v-for="(pkg, i) in pkgs" :key="i">
         <v-card>
           <v-img height="250" src="./../../assets/images.jpg"></v-img>
 
@@ -191,7 +664,6 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-col></v-col>
             <v-col>
               <v-btn
                 color="deep-purple lighten-2"
@@ -201,7 +673,21 @@
                 Details
               </v-btn>
             </v-col>
-            <v-col></v-col>
+            <v-col>
+              <v-btn
+                :disabled="
+                  idxList.length >= maxCompareCount && !idxList.includes(i)
+                "
+                color="deep-purple lighten-2"
+                @click="toggleComparePressed(i)"
+                text
+              >
+                <span v-if="!idxList.includes(i)">
+                  Compare
+                </span>
+                <span v-if="idxList.includes(i)"> Remove </span>
+              </v-btn>
+            </v-col>
             <v-col>
               <v-btn
                 :disabled="!allPkgs[i].data.ongoing || !allPkgs[i].status"
@@ -212,9 +698,190 @@
                 Select
               </v-btn>
             </v-col>
-            <v-col></v-col>
           </v-card-actions>
         </v-card>
+      </div>
+
+      <div>
+        <v-row>
+          <v-col cols="8"></v-col>
+          <v-col>
+            <v-btn
+              :disabled="!compareList.length"
+              color="error"
+              @click="clearCompare"
+              dark
+            >
+              Clear Compare
+            </v-btn>
+          </v-col>
+          <v-col>
+            <v-badge :content="messages" :value="messages" color="red" overlap>
+              <v-btn color="deep-purple lighten-2" @click="comparePkg" dark>
+                Compare
+              </v-btn>
+            </v-badge>
+          </v-col>
+        </v-row>
+        <v-row>
+          <!-- <v-col> -->
+          <v-dialog
+            v-model="dialogCompare"
+            fullscreen
+            hide-overlay
+            transition="dialog-bottom-transition"
+          >
+            <v-card>
+              <v-toolbar dark color="primary">
+                <v-btn
+                  icon
+                  dark
+                  @click="
+                    dialogCompare = false;
+                    messages = 0;
+                    idxList = [];
+                    compareList = [];
+                  "
+                >
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-toolbar-title>Package Comparison</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-toolbar-items>
+                  <v-btn
+                    dark
+                    text
+                    @click="
+                      dialogCompare = false;
+                      messages = 0;
+                      idxList = [];
+                      compareList = [];
+                    "
+                  >
+                    Done
+                  </v-btn>
+                </v-toolbar-items>
+              </v-toolbar>
+
+              <!-- <v-divider></v-divider> -->
+
+              <v-card
+                style="
+                    margin: 20px 20px;
+                    padding: 20px 0px 20px 50px;
+                    background-color: #171010;
+                    color: white;
+                  "
+                elevation="20"
+              >
+                <h4 style="margin-bottom: 50px">Package Comparison</h4>
+
+                <v-row style="background-color: #595260; margin-right: 40px">
+                  <v-col><h5>Features</h5></v-col>
+                  <v-col v-for="(p, j) in compareList" :key="j">
+                    <h5 style="margin-left:25px">{{ p.data.name }}</h5>
+                  </v-col>
+                </v-row>
+                <v-row style="margin-right: 40px">
+                  <v-col>Price(BDT)</v-col>
+                  <v-col
+                    v-for="(p, j) in compareList"
+                    :key="j"
+                    style="margin-left:100px"
+                    >{{ p.data.price }}</v-col
+                  >
+                </v-row>
+                <v-row style="background-color: #595260; margin-right: 40px">
+                  <v-col>Bandwidth(GBPS)</v-col>
+                  <v-col
+                    v-for="(p, j) in compareList"
+                    :key="j"
+                    style="margin-left:100px"
+                    >{{ p.data.bandwidth }}</v-col
+                  >
+                </v-row>
+                <v-row style="margin-right: 40px">
+                  <v-col>Duration(months)</v-col>
+                  <v-col
+                    v-for="(p, j) in compareList"
+                    :key="j"
+                    style="margin-left:100px"
+                    >{{ p.data.duration }}</v-col
+                  >
+                </v-row>
+                <v-row style="background-color: #595260; margin-right: 40px">
+                  <v-col>Upload Speed(GBPS)</v-col>
+                  <v-col
+                    v-for="(p, j) in compareList"
+                    :key="j"
+                    style="margin-left:100px"
+                    >{{ p.data.up_speed }}</v-col
+                  >
+                </v-row>
+                <v-row style="margin-right: 40px">
+                  <v-col>Download Speed(GBPS)</v-col>
+                  <v-col
+                    v-for="(p, j) in compareList"
+                    :key="j"
+                    style="margin-left:100px"
+                    >{{ p.data.down_speed }}</v-col
+                  >
+                </v-row>
+                <v-row style="background-color: #595260; margin-right: 40px">
+                  <v-col>Upload Speed(GBPS)</v-col>
+                  <v-col
+                    v-for="(p, j) in compareList"
+                    :key="j"
+                    style="margin-left:100px"
+                    >{{ p.data.up_speed }}</v-col
+                  >
+                </v-row>
+                <v-row style="margin-right: 40px">
+                  <v-col>Estimated Down Time(hrs)</v-col>
+                  <v-col
+                    v-for="(p, j) in compareList"
+                    :key="j"
+                    style="margin-left:100px"
+                    >{{ p.data.downTime }}</v-col
+                  >
+                </v-row>
+                <v-row style="background-color: #595260; margin-right: 40px">
+                  <v-col>Response Time(milliseconds)</v-col>
+                  <v-col
+                    v-for="(p, j) in compareList"
+                    :key="j"
+                    style="margin-left:100px"
+                    >{{ p.data.responseTime }}</v-col
+                  >
+                </v-row>
+              </v-card>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog
+            v-model="dialogZero"
+            persistent
+            max-width="40%"
+            transition="dialog-bottom-transition"
+          >
+            <v-card>
+              <v-card-title class="text-h5">
+                Not Sufficient Package
+              </v-card-title>
+              <v-card-text
+                >Sufficient amount of package was not selected. Please select at
+                least two packages to compare.</v-card-text
+              >
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" text @click="dialogZero = false">
+                  Close
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <!-- </v-col> -->
+        </v-row>
       </div>
     </v-row>
 
@@ -254,7 +921,6 @@
                           allPkgs[currPkgIdx].data.offerId
                         )
                       }}
-                      /ISP
                     </td>
                   </tr>
                   <tr>
@@ -334,6 +1000,40 @@ export default {
 
   data() {
     return {
+      category: "",
+      categoryList: [
+        "Studying",
+        "Business",
+        "Gaming",
+        "Browsing",
+        "Streaming",
+        "Movies",
+        "Social Networking",
+        "others",
+      ],
+      pageSeq: 1,
+      downTime: 0,
+      key: "",
+      valid2: false,
+      selectedOpt: "nttn",
+      dialog: false,
+      noCon: 0,
+      duration: 0,
+      suggestedPkgs: [],
+      suggestIdxList: [],
+      noConRules: [
+        (v) => !!v || "Please enter your estimated number",
+        (v) => /^\d*$/.test(v) || "Number should be valid2",
+        (v) => v < 80000 || "Too much end users!!",
+      ],
+      maxCompareCount: 3,
+      dialogCompare: false,
+      dialogZero: false,
+      idxList: [],
+      compareList: [],
+      compareDisable: false,
+      messages: 0,
+
       isLoading: true,
       currPkgIdx: -1,
       valid: false,
@@ -426,6 +1126,54 @@ export default {
         });
     },
 
+    suggestPressed() {
+      this.suggestedPkgs = [];
+      this.suggestIdxList = [];
+      for (let i in this.allPkgs) {
+        if (
+          this.allPkgs[i].data.bandwidth >= this.noCon / 1000 &&
+          this.allPkgs[i].data.duration >= this.duration - 3 &&
+          this.allPkgs[i].data.duration <= this.duration + 3 &&
+          this.allPkgs[i].data.downTime <= this.downTime
+        ) {
+          this.suggestIdxList.push(i);
+          this.suggestedPkgs.push(this.allPkgs[i]);
+        }
+      }
+      this.suggestedPkgs.sort(this.orderByPriceAscending);
+      this.messages = 0;
+      this.idxList = [];
+      this.compareList = [];
+      this.pageSeq = 2;
+    },
+
+    suggestSelectPressed(i) {
+      // console.log(i);
+      this.setSelectedPkg(this.allPkgs[this.suggestIdxList[i]].data);
+      this.$router.push("/USER/payments");
+      // this.showPayment = true;
+    },
+
+    suggestDetailsPressed(i) {
+      this.currPkgIdx = this.suggestIdxList[i];
+      this.dialog2 = true;
+      // console.log(this.currPkgIdx);
+    },
+
+    suggestToggleComparePressed(i) {
+      let idx = this.idxList.indexOf(i);
+
+      if (idx > -1) {
+        this.compareList.splice(idx, 1);
+        this.idxList.splice(idx, 1);
+        this.messages--;
+      } else {
+        this.idxList.push(i);
+        this.compareList.push(this.allPkgs[this.suggestIdxList[i]]);
+        this.messages++;
+      }
+    },
+
     findIdx(myPkg) {
       this.currPkgIdx = -1;
       for (let i in this.allPkgs) {
@@ -451,6 +1199,36 @@ export default {
       this.currPkgIdx = i;
       this.dialog2 = true;
       // console.log(this.currPkgIdx);
+    },
+
+    toggleComparePressed(i) {
+      let idx = this.idxList.indexOf(i);
+
+      if (idx > -1) {
+        this.compareList.splice(idx, 1);
+        this.idxList.splice(idx, 1);
+        this.messages--;
+      } else {
+        this.idxList.push(i);
+        this.compareList.push(this.allPkgs[i]);
+        this.messages++;
+      }
+    },
+
+    comparePkg() {
+      if (this.compareList.length < 2) {
+        this.dialogZero = true;
+      } else {
+        this.dialogCompare = true;
+        this.compareDisable = false;
+      }
+    },
+
+    clearCompare() {
+      this.compareDisable = false;
+      this.idxList = [];
+      this.compareList = [];
+      this.messages = 0;
     },
 
     isProceedDisabled() {

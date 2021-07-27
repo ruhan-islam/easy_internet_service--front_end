@@ -256,7 +256,6 @@
                           allPkgs[currPkgIdx].offerId
                         )
                       }}
-                      /ISP
                     </td>
                   </tr>
                   <tr>
