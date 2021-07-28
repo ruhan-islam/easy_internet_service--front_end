@@ -210,10 +210,11 @@ export default {
 
             let sVal = parseInt(this.myPackageList[0].startTime.slice(8, 10));
             let fVal = parseInt(this.getToday());
-            let sMonth = parseInt(this.myPackageList[0].startTime.slice(6, 8));
-            let fMonth = parseInt(this.getMonth());
+            // let sMonth = parseInt(this.myPackageList[0].startTime.slice(6, 8));
+            // let fMonth = parseInt(this.getMonth());
 
-            if (sMonth < fMonth) sVal = 1;
+            // if (sMonth <= fMonth) sVal = 1;
+            sVal = 1;
 
             for (let i = sVal; i <= fVal; i++) {
               this.labels.push(i);

@@ -482,7 +482,12 @@ export default {
                 .toString()
                 .slice(0, 24);
 
-              this.labels.push(this.items[i].payment_time.slice(4, 15));
+              let year = this.items[i].payment_time.slice(13, 15);
+              let month = this.items[i].payment_time.slice(4, 7);
+              let date = month + "/" + year;
+              this.labels.push(date);
+
+              // this.labels.push(this.items[i].payment_time.slice(4, 15));
               if (i === 0) {
                 this.value.push(this.items[i].amount);
               } else {

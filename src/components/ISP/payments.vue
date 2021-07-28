@@ -1679,10 +1679,16 @@ export default {
               this.itemsUsers[i].payment_time = new Date(
                 this.itemsUsers[i].payment_time
               );
-              let year = this.itemsUsers[i].payment_time.toString().slice(11, 15);
-              let month = this.itemsUsers[i].payment_time.toString().slice(4, 7);
+              let year = this.itemsUsers[i].payment_time
+                .toString()
+                .slice(11, 15);
+              let month = this.itemsUsers[i].payment_time
+                .toString()
+                .slice(4, 7);
               let day = this.itemsUsers[i].payment_time.toString().slice(8, 10);
-              let time = this.itemsUsers[i].payment_time.toString().slice(16, 24);
+              let time = this.itemsUsers[i].payment_time
+                .toString()
+                .slice(16, 24);
               let date = year + "-" + month + "-" + day + " " + time;
               this.itemsUsers[i].payment_time = date;
             }
