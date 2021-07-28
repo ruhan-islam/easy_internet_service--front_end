@@ -1588,7 +1588,13 @@ export default {
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
-            this.myPackageList = res.data;
+            this.myPackageList = [];
+            // this.myPackageList = res.data;
+            for (let i in res.data) {
+              if (res.data[i].data.ongoing) {
+                this.myPackageList.push(res.data[i]);
+              }
+            }
             // console.log(this.myPackageList);
             this.isLoadingPayNow = false;
           } else {

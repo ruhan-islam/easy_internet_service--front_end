@@ -138,6 +138,7 @@ export default {
   data() {
     return {
       intervalID: "",
+      init: false,
     };
   },
 
@@ -145,7 +146,43 @@ export default {
     if (this.getUserType !== "USER") {
       this.$router.go(-1);
     }
-    this.updateInfo();
+    axios
+      .post("/api/user/fetchOwnData", {
+        id: this.getUserID,
+      })
+      .then((res) => {
+        // console.log(res);
+        if (res.status === 200) {
+          // console.log(res.data);
+          this.setUserData(res.data);
+          // console.log(this.userData);
+          this.init = true;
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .post("/api/notification/unseenNotificationCount", {
+        receiverID: this.getUserName,
+        receiverType: 3, // for USER
+      })
+      .then((res) => {
+        // console.log(res);
+        if (res.status === 200) {
+          // console.log(res.data.unseenCount);
+          this.setNtfCount(res.data.unseenCount);
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     this.intervalID = setInterval(this.updateInfo, 2000);
   },
 
@@ -161,8 +198,10 @@ export default {
     ]),
 
     getPayNotification() {
+      if (!this.init) return false;
       let date = new Date();
       date.setDate(date.getDate() + 7);
+      // console.log(this.getUserData);
       if (new Date(this.getUserData.packages[0].terminationTime) < date) {
         return true;
       }

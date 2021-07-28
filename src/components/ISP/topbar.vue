@@ -180,6 +180,7 @@ export default {
   data() {
     return {
       intervalID: "",
+      init: false,
     };
   },
 
@@ -187,7 +188,45 @@ export default {
     if (this.getUserType !== "ISP") {
       this.$router.go(-1);
     }
-    this.updateInfo();
+
+    axios
+      .post("/api/isp/fetchOwnData", {
+        id: this.getUserID,
+      })
+      .then((res) => {
+        // console.log(res);
+        if (res.status === 200) {
+          // console.log(res.data);
+          this.setUserData(res.data);
+          // console.log(this.userData);
+          this.init = true;
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .post("/api/ticket/unseenCount", {
+        receiverId: this.getUserName,
+        receiverType: 2, // for ISP
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          // console.log(res);
+          // console.log(res.data.unseenCount);
+          this.setNtfCount(res.data.unseenNotification);
+          this.setTktCount(res.data.unseenTicket);
+        } else {
+          this.error = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     this.intervalID = setInterval(this.fetchUnseenCount, 2000);
   },
 
@@ -204,6 +243,7 @@ export default {
     ]),
 
     getPayNotification() {
+      if (!this.init) return false;
       let date = new Date();
       date.setDate(date.getDate() + 7);
       for (let i in this.getUserData.packages) {
