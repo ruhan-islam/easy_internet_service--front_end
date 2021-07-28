@@ -847,11 +847,13 @@ export default {
             this.validOffers = [];
             for (let i in this.allOffers) {
               if (
+                this.allOffers[i].startTime.slice(0, 10) <= this.getToday() &&
                 this.allOffers[i].expirationTime.slice(0, 10) >= this.getToday()
               ) {
                 this.validOffers.push(this.allOffers[i]);
               }
             }
+            this.allOffers = this.validOffers;
           } else {
             this.error = true;
           }

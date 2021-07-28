@@ -78,9 +78,12 @@ export default {
             this.items = res.data.reverse();
             for (let i in this.items) {
               this.items[i].payment_time = new Date(this.items[i].payment_time);
-              this.items[i].payment_time = this.items[i].payment_time
-                .toString()
-                .slice(0, 24);
+              let year = this.items[i].payment_time.toString().slice(11, 15);
+              let month = this.items[i].payment_time.toString().slice(4, 7);
+              let day = this.items[i].payment_time.toString().slice(8, 10);
+              let time = this.items[i].payment_time.toString().slice(16, 24);
+              let date = year + "-" + month + "-" + day + " " + time;
+              this.items[i].payment_time = date;
             }
             this.isLoading = false;
           } else {

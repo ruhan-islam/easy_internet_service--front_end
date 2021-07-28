@@ -334,7 +334,7 @@ export default {
         })
         .then((res) => {
           if (res.status === 200) {
-            this.allOffers = res.data.data;
+            this.allOffers = res.data.data.reverse();
             this.offerNameList = [];
             for (let i in this.allOffers) {
               this.offerNameList.push(this.allOffers[i].name);

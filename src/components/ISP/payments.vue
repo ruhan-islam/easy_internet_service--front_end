@@ -1647,9 +1647,12 @@ export default {
               this.itemsOwn[i].payment_time = new Date(
                 this.itemsOwn[i].payment_time
               );
-              this.itemsOwn[i].payment_time = this.itemsOwn[i].payment_time
-                .toString()
-                .slice(0, 24);
+              let year = this.itemsOwn[i].payment_time.toString().slice(11, 15);
+              let month = this.itemsOwn[i].payment_time.toString().slice(4, 7);
+              let day = this.itemsOwn[i].payment_time.toString().slice(8, 10);
+              let time = this.itemsOwn[i].payment_time.toString().slice(16, 24);
+              let date = year + "-" + month + "-" + day + " " + time;
+              this.itemsOwn[i].payment_time = date;
             }
             this.isLoadingOwn = false;
           } else {
@@ -1676,9 +1679,12 @@ export default {
               this.itemsUsers[i].payment_time = new Date(
                 this.itemsUsers[i].payment_time
               );
-              this.itemsUsers[i].payment_time = this.itemsUsers[i].payment_time
-                .toString()
-                .slice(0, 24);
+              let year = this.itemsUsers[i].payment_time.toString().slice(11, 15);
+              let month = this.itemsUsers[i].payment_time.toString().slice(4, 7);
+              let day = this.itemsUsers[i].payment_time.toString().slice(8, 10);
+              let time = this.itemsUsers[i].payment_time.toString().slice(16, 24);
+              let date = year + "-" + month + "-" + day + " " + time;
+              this.itemsUsers[i].payment_time = date;
             }
             this.isLoadingUsers = false;
           } else {

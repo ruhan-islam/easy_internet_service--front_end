@@ -276,7 +276,7 @@ export default {
           // console.log(res);
           if (res.status === 200) {
             // console.log(res.data);
-            this.userPaymentList = res.data.reverse();
+            this.userPaymentList = res.data;
             for (let i in this.userPaymentList) {
               this.userPaymentList[i].payment_time = new Date(
                 this.userPaymentList[i].payment_time
@@ -287,9 +287,10 @@ export default {
                 .toString()
                 .slice(0, 24);
 
-              this.labels2.push(
-                this.userPaymentList[i].payment_time.slice(4, 15)
-              );
+              let year = this.myPaymentList[i].payment_time.slice(13, 15);
+              let month = this.myPaymentList[i].payment_time.slice(4, 7);
+              let date = month + "/" + year;
+              this.labels2.push(date);
               if (i === 0) {
                 this.value2.push(this.userPaymentList[i].amount);
               } else {
@@ -343,7 +344,7 @@ export default {
           // console.log(res);
           if (res.status === 200) {
             // console.log(res.data);
-            this.myPaymentList = res.data.reverse();
+            this.myPaymentList = res.data;
             for (let i in this.myPaymentList) {
               this.myPaymentList[i].payment_time = new Date(
                 this.myPaymentList[i].payment_time
@@ -354,7 +355,10 @@ export default {
                 .toString()
                 .slice(0, 24);
 
-              this.labels.push(this.myPaymentList[i].payment_time.slice(4, 15));
+              let year = this.myPaymentList[i].payment_time.slice(13, 15);
+              let month = this.myPaymentList[i].payment_time.slice(4, 7);
+              let date = month + "/" + year;
+              this.labels.push(date);
               if (i === 0) {
                 this.value.push(this.myPaymentList[i].amount);
               } else {
