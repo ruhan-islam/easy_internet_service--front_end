@@ -3,9 +3,12 @@
     <topbar></topbar>
 
     <!-- init Load -->
-    <div class="container" v-if="initLoading">
+    <div
+      class="container"
+      v-if="initLoading || isLoadingMyPaymentList || isLoadingUserPaymentList"
+    >
       <v-progress-linear
-        style="margin:10% 0"
+        style="margin:20% 0"
         color="deep-purple accent-4"
         indeterminate
         rounded
@@ -287,8 +290,8 @@ export default {
                 .toString()
                 .slice(0, 24);
 
-              let year = this.myPaymentList[i].payment_time.slice(13, 15);
-              let month = this.myPaymentList[i].payment_time.slice(4, 7);
+              let year = this.userPaymentList[i].payment_time.slice(13, 15);
+              let month = this.userPaymentList[i].payment_time.slice(4, 7);
               let date = month + "/" + year;
               this.labels2.push(date);
               if (i === 0) {

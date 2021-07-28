@@ -4,7 +4,7 @@
 
     <div style="margin-bottom:15%" class="container" v-if="initLoading">
       <v-progress-linear
-        style="margin:10% 0"
+        style="margin:20% 0"
         color="deep-purple accent-4"
         indeterminate
         rounded
@@ -138,7 +138,7 @@
           <v-toolbar flat dark>
             <v-toolbar-title> Manage Packages </v-toolbar-title>
           </v-toolbar>
-          <v-tabs vertical>
+          <v-tabs v-model="activeTab" vertical>
             <v-tab>
               <v-row>
                 <v-col>
@@ -210,6 +210,7 @@ export default {
   data() {
     return {
       initLoading: true,
+      activeTab: 0,
       valid: false,
       minDur: "",
       maxDur: "",
@@ -236,6 +237,11 @@ export default {
           this.setUserData(res.data);
           // data fetch begins
           // data fetch terminates
+          if (this.getUserData.packages.length) {
+            this.activeTab = 1;
+          } else {
+            this.activeTab = 0;
+          }
           this.initLoading = false;
         } else {
           this.error = true;

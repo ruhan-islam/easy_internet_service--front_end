@@ -5,7 +5,7 @@
     <!-- init Load -->
     <div class="container" v-if="initLoading">
       <v-progress-linear
-        style="margin:10% 0"
+        style="margin:20% 0"
         color="deep-purple accent-4"
         indeterminate
         rounded

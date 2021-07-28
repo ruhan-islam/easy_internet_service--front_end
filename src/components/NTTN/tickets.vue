@@ -37,7 +37,7 @@
             <!-- loading -->
             <v-progress-linear
               v-if="isLoadingIsps"
-              style="margin:10% 0"
+              style="margin:20% 0"
               color="deep-purple accent-4"
               indeterminate
               rounded

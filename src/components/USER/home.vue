@@ -5,7 +5,7 @@
     <!-- <div class="ma-12 mb-12 container-flow"> -->
     <div style="margin-bottom:15%" v-if="isLoading" class="container">
       <v-progress-linear
-        style="margin:10% 0"
+        style="margin:20% 0"
         color="deep-purple accent-4"
         indeterminate
         rounded

@@ -4,7 +4,7 @@
 
     <div style="margin-bottom:15%" class="container" v-if="initLoading">
       <v-progress-linear
-        style="margin:10% 0"
+        style="margin:20% 0"
         color="deep-purple accent-4"
         indeterminate
         rounded
@@ -38,7 +38,7 @@
           <v-tab-item>
             <v-progress-linear
               v-if="isLoadingPayNow"
-              style="margin:10% 0"
+              style="margin:20% 0"
               color="deep-purple accent-4"
               indeterminate
               rounded
