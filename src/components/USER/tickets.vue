@@ -20,18 +20,28 @@
         </v-toolbar>
         <v-tabs vertical>
           <v-tab>
-            <v-icon left>
-              mdi-ticket-outline
-            </v-icon>
-            Create Ticket
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-ticket-outline
+                </v-icon>
+                Create Ticket
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
           <!-- <v-tab :disabled="true"> -->
           <v-tab @click="fetchOwnTickets">
-            <v-icon left>
-              mdi-ticket-confirmation
-            </v-icon>
-            Ticket History
+            <v-row>
+              <v-col>
+                <v-icon left>
+                  mdi-ticket-confirmation
+                </v-icon>
+                Ticket History
+              </v-col>
+              <v-col></v-col>
+            </v-row>
           </v-tab>
 
           <!-- send tickets -->

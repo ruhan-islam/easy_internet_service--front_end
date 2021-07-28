@@ -1161,23 +1161,23 @@ export default {
       // "Movies",
       // "Social Networking",
       // "others",
-      let maxRT = 5000; // responseTime
+      let maxRT = 50; // responseTime
       if (this.category === "Studying") {
-        maxRT = 2500;
+        maxRT = 25;
       } else if (this.category === "Business") {
-        maxRT = 500;
+        maxRT = 15;
       } else if (this.category === "Gaming") {
-        maxRT = 500;
+        maxRT = 10;
       } else if (this.category === "Browsing") {
-        maxRT = 3000;
+        maxRT = 50;
       } else if (this.category === "Streaming") {
-        maxRT = 1000;
+        maxRT = 20;
       } else if (this.category === "Movies") {
-        maxRT = 1500;
+        maxRT = 20;
       } else if (this.category === "Social Networking") {
-        maxRT = 2000;
+        maxRT = 100;
       } else if (this.category === "others") {
-        maxRT = 3000;
+        maxRT = 500;
       }
 
       for (let i in this.allPkgs) {
